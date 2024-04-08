@@ -10,10 +10,12 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    paworker.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    paworker.h
 
 FORMS += \
     mainwindow.ui
@@ -22,3 +24,17 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+# ---PORTAUDIO---
+
+# Path to the PortAudio source code directory
+PORTAUDIO_DIR = $$PWD/libs/portaudio
+
+win32 {
+
+    # Include path for PortAudio headers
+    INCLUDEPATH += $$PORTAUDIO_DIR/include
+
+    # Link against the PortAudio library
+    LIBS += -L$$PORTAUDIO_DIR/lib/.libs -lportaudio
+}
