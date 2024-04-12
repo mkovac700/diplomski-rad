@@ -31,6 +31,8 @@ private slots:
 
     void on_pushButton_StartStop_clicked();
 
+    void on_comboBox_SampleRate_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
 
@@ -61,6 +63,8 @@ private:
         );
 
     static MainWindow *s_mainWindow;
+
+    int sample_rate = SAMPLE_RATE;
 
 protected:
     void closeEvent(QCloseEvent *event) override;

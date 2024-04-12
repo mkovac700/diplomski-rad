@@ -147,7 +147,7 @@ void MainWindow::on_pushButton_StartStop_clicked()
             &stream,
             &inputParameters,
             &outputParameters,
-            SAMPLE_RATE,
+            sample_rate,
             FRAMES_PER_BUFFER,
             paNoFlag,
             patestCallback,
@@ -192,5 +192,13 @@ void MainWindow::on_pushButton_StartStop_clicked()
     isStreaming = !isStreaming;
 
 
+}
+
+
+void MainWindow::on_comboBox_SampleRate_currentIndexChanged(int index)
+{
+    Q_UNUSED(index)
+
+    sample_rate = ui->comboBox_SampleRate->currentText().toInt();
 }
 

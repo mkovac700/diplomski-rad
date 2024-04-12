@@ -75,8 +75,32 @@ https://www.portaudio.com/docs/v19-doxydocs/tutorial_start.html
     ```bash
     diplomski-rad/Software/audio-visualizer/libs/portaudio    
     ```
+    
+4. Instalirati audio drivere:
+
+    * ALSA:
+
+        Riječ je o driveru za Linux audio uređaje. Rješava problem s nemogućnosti pronalaska audio uređaja. Više o tome: https://www.portaudio.com/docs/v19-doxydocs/compile_linux.html#:~:text=Installing%20ALSA%20Development%20Kit
         
-4. Izvršiti sljedeće naredbe:
+        Dodatne informacije o ALSA-i: https://www.alsa-project.org/wiki/Main_Page
+        
+        Za instalaciju izvršiti naredbu:
+        
+        ```bash
+        sudo apt-get install libasound-dev
+        ```
+    
+    * JACK:
+    
+        Više informacija: https://jackaudio.org/
+    
+        ```bash
+        sudo apt-get install libjack-dev
+        ```
+        
+5. Izvršiti sljedeće naredbe:
+
+    ⚠️VAŽNO: Prije izvšavanja mora biti instalirana ALSA, kako bi ju skripta configure mogla pronaći
 
     ```bash
     ./configure && make   
@@ -84,17 +108,7 @@ https://www.portaudio.com/docs/v19-doxydocs/tutorial_start.html
     sudo make install
     ```
     
-5. Instalirati ALSA
 
-    Riječ je o driverima za Linux audio uređaje. Rješavaju problem s nemogućnosti pronalaska audio uređaja. Više o tome: https://www.portaudio.com/docs/v19-doxydocs/compile_linux.html#:~:text=Installing%20ALSA%20Development%20Kit
-    
-    Dodatne informacije o ALSA-i: https://www.alsa-project.org/wiki/Main_Page
-    
-    Za instalaciju izvršiti naredbu:
-    
-    ```bash
-    sudo apt-get install libasound-dev
-    ```
 
 6. Pokušati izvršiti build.
 

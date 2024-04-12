@@ -39,5 +39,5 @@ win32 {
 
 linux-g++* {
     INCLUDEPATH += $$PORTAUDIO_DIR/include
-    LIBS += -L$$PORTAUDIO_DIR/lib -lportaudio -lrt -lm -pthread -lasound #-ljack
+    LIBS += -L$$PORTAUDIO_DIR/lib -lportaudio -lrt -lm -pthread -lasound -ljack
 }
