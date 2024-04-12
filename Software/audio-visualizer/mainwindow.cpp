@@ -17,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     scanDevices();
 
-
     s_mainWindow = this;
 
 }
@@ -55,14 +54,11 @@ void MainWindow::scanDevices()
         qDebug() << "Max Output Channels: " << deviceInfo->maxOutputChannels;
         qDebug() << "Default Sample Rate: " << deviceInfo->defaultSampleRate;
 
-        if(deviceInfo->maxInputChannels > 0) {
+        if(deviceInfo->maxInputChannels > 0)
             ui->comboBox_AudioIn->addItem(deviceInfo->name,i);
-            //device_in = i; //default, da ne pukne program
-        }
-        if(deviceInfo->maxOutputChannels > 0) {
+
+        if(deviceInfo->maxOutputChannels > 0)
             ui->comboBox_AudioOut->addItem(deviceInfo->name,i);
-            //device_out = i; //default, da ne pukne program
-        }
 
         ui->textEdit_Uredaji->append(QString("Device: ").append(QString::number(i)));
         ui->textEdit_Uredaji->append(QString("  Name: ").append(deviceInfo->name));
@@ -94,11 +90,6 @@ void MainWindow::setDevices()
     outputParameters.suggestedLatency = Pa_GetDeviceInfo(device_out)->defaultLowInputLatency;
 }
 
-void MainWindow::test()
-{
-
-}
-
 int MainWindow::patestCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
 {
     float* in = (float*)inputBuffer;
@@ -111,9 +102,6 @@ int MainWindow::patestCallback(const void *inputBuffer, void *outputBuffer, unsi
         vol_l = max(vol_l, std::abs(in[i]));
         vol_r = max(vol_r, std::abs(in[i+1]));
     }
-
-    //here I need to update QProgressBars with the value of vol_l and vol_r
-    //test();
 
     s_mainWindow->ui->progressBar_Vol_L->setValue(static_cast<int>(vol_l*100));
     s_mainWindow->ui->progressBar_Vol_R->setValue(static_cast<int>(vol_r*100));
@@ -189,7 +177,11 @@ void MainWindow::on_pushButton_StartStop_clicked()
     }
 
     if(!isStreaming) ui->pushButton_StartStop->setText("Zaustavi stream");
-    else ui->pushButton_StartStop->setText("Započni stream");
+    else {
+        ui->pushButton_StartStop->setText("Započni stream");
+        ui->progressBar_Vol_L->setValue(0);
+        ui->progressBar_Vol_R->setValue(0);
+    }
 
     isStreaming = !isStreaming;
 
