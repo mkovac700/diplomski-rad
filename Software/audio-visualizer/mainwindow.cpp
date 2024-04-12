@@ -41,8 +41,14 @@ void MainWindow::scanDevices()
 {
     int numDevices = Pa_GetDeviceCount();
 
-    if(numDevices < 0) QMessageBox::critical(this,"Greška","Greška u pretraživanju uređaja!");
-    else if (numDevices == 0) QMessageBox::critical(this,"Greška","Nema dostupnih uređaja!");
+    if(numDevices < 0) {
+        QMessageBox::critical(this,"Greška","Greška u pretraživanju uređaja!");
+        return;
+    }
+    else if (numDevices == 0){
+        QMessageBox::critical(this,"Greška","Nema dostupnih uređaja!");
+        return;
+    }
 
     const PaDeviceInfo* deviceInfo;
     for (int i = 0; i < numDevices; i++) {

@@ -10,12 +10,10 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp \
-    paworker.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    mainwindow.h \
-    paworker.h
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui
@@ -37,4 +35,9 @@ win32 {
 
     # Link against the PortAudio library
     LIBS += -L$$PORTAUDIO_DIR/lib/.libs -lportaudio
+}
+
+linux-g++* {
+    INCLUDEPATH += $$PORTAUDIO_DIR/include
+    LIBS += -L$$PORTAUDIO_DIR/lib -lportaudio -lrt -lm -pthread -lasound #-ljack
 }
