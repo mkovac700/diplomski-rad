@@ -1,8 +1,10 @@
-# Upute za instalaciju
+# Upute za instalaciju i korištenje
 
 https://www.portaudio.com/docs/v19-doxydocs/tutorial_start.html
 
-### Windows
+## Windows
+
+### Instalacija
 
 1. Preuzeti PortAudio s adrese: https://files.portaudio.com/archives/pa_stable_v190700_20210406.tgz
 2. U korijenskom direktoriju Qt projekta
@@ -59,7 +61,13 @@ https://www.portaudio.com/docs/v19-doxydocs/tutorial_start.html
 <br/><br/>
 👉🏽 VAŽNO: Ako se pokreće .exe (debug ili release) izvan Qt Creator okruženja, javit će se greška da nije pronađen libportaudio-2.dll. Datoteka se nalazi u libs/portaudio/lib/.libs i treba ju smjestiti zajedno s .exe datotekom
 
-### Linux
+### Korištenje
+
+👉🏽 Mikrofon bi trebao biti automatski prepoznat. Za monitoring output uređaja, potrebno je omogućiti Stereo Mix. 
+
+## Linux
+
+### Instalacija
 
 1. Preuzeti PortAudio s adrese: https://files.portaudio.com/archives/pa_stable_v190700_20210406.tgz
 2. U korijenskom direktoriju Qt projekta
@@ -98,17 +106,27 @@ https://www.portaudio.com/docs/v19-doxydocs/tutorial_start.html
         sudo apt-get install libjack-dev
         ```
         
+    * PULSE AUDIO:
+    
+        Omogućava simultano korištenje audio uređaja. Rješava problem s nemogućnosti pronalaska mikrofona. Također omogućava monitoring output uređaja.
+        
+        ```bash
+        sudo apt-get install pulseaudio pulseaudio-utils
+        
+        sudo apt-get install pavumeter pavucontrol paprefs ubuntu-sounds
+        ```
+        
+        ⚠️VAŽNO: Nakon instalacije napraviti restart!
+        
 5. Izvršiti sljedeće naredbe:
 
-    ⚠️VAŽNO: Prije izvšavanja mora biti instalirana ALSA, kako bi ju skripta configure mogla pronaći
+    ⚠️VAŽNO: Prije izvšavanja mora biti instalirana ALSA i JACK, kako bi ih skripta configure mogla pronaći
 
     ```bash
     ./configure && make   
     
     sudo make install
     ```
-    
-
 
 6. Pokušati izvršiti build.
 
@@ -117,3 +135,29 @@ https://www.portaudio.com/docs/v19-doxydocs/tutorial_start.html
         ```bash
         sudo apt-get install libgl-dev libglfw3-dev
         ```
+
+### Korištenje
+
+Za korištenje mikrofona koristiti sljedeće postavke:    
+
+* U Sound Preferences:
+
+    * `Input > Built-in Audio Analog Stereo > Connector: Microphone / Microphone 1`
+    * `Output > bilo koja opcija`
+    
+* U aplikaciji:
+
+    * `Intel 82801AA-ICH` (trebao bi biti već zadan)
+    * Sample rate: 48000
+        
+Za korištenje monitoringa output uređaja:
+
+* U Sound Preferences:
+
+    * `Input > Monitor Source of Simultaneous output to Built-in Audio Analog Stereo`
+    * `Output > Simultaneous output to Built-in Audio Analog Stereo`
+    
+* U aplikaciji:
+
+    * Za ulaz i izlaz odabrati uređaj `pulse`
+    * Sample rate: 44100

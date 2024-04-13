@@ -33,6 +33,8 @@ private slots:
 
     void on_comboBox_SampleRate_currentIndexChanged(int index);
 
+    void on_pushButton_OsvjeziUredaje_clicked();
+
 private:
     Ui::MainWindow *ui;
 

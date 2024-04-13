@@ -39,6 +39,10 @@ float MainWindow::max(float a, float b)
 
 void MainWindow::scanDevices()
 {
+    ui->comboBox_AudioIn->clear();
+
+    ui->comboBox_AudioOut->clear();
+
     int numDevices = Pa_GetDeviceCount();
 
     if(numDevices < 0) {
@@ -200,5 +204,11 @@ void MainWindow::on_comboBox_SampleRate_currentIndexChanged(int index)
     Q_UNUSED(index)
 
     sample_rate = ui->comboBox_SampleRate->currentText().toInt();
+}
+
+
+void MainWindow::on_pushButton_OsvjeziUredaje_clicked()
+{
+    scanDevices();
 }
 
