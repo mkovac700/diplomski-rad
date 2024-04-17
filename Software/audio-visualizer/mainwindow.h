@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include <QMediaDevices>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -19,5 +21,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    QMediaDevices *m_devices = new QMediaDevices(this);
+
+    void loadDevices();
 };
 #endif // MAINWINDOW_H
