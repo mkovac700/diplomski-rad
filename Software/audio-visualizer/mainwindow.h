@@ -40,7 +40,7 @@ private:
     QScopedPointer<AudioListener> m_audioListener;
     QScopedPointer<QAudioSource> m_audioInput;
 
-    int m_sample_rate = 44100;
+    int m_sample_rate = 48000;
 
 private:
     void loadDevices();

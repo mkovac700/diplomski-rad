@@ -79,6 +79,8 @@ void MainWindow::initializeAudio(const QAudioDevice &inputDeviceInfo)
     connect(m_audioListener.data(), &AudioListener::level_l_Changed, this, &MainWindow::set_level_l);
     connect(m_audioListener.data(), &AudioListener::level_r_Changed, this, &MainWindow::set_level_r);
 
+    connect(m_audioListener.data(), &AudioListener::bufferChanged, ui->widget, &GLWidget::setBuffer);
+
     m_audioInput.reset(new QAudioSource(inputDeviceInfo, format));
 
     m_audioListener->start();
