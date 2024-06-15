@@ -8,8 +8,8 @@
 
 #define REAL 0
 #define IMAG 1
-#define N 440
-#define Fs 44100.0
+#define N 480
+#define Fs 48000.0
 
 class GLWidget2 : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -38,6 +38,8 @@ private:
     fftw_complex out[N];
 
     fftw_plan p;
+
+    QList<QPointF> dataPoints;
 };
 
 #endif // GLWIDGET2_H
