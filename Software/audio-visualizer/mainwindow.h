@@ -7,6 +7,8 @@
 
 #include <audiolistener.h>
 
+#include <audioplayer.h>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -32,6 +34,14 @@ private slots:
 
     void on_pushButton_OsvjeziUredaje_clicked();
 
+    void on_pushButton_play_clicked();
+
+    void on_pushButton_pause_clicked();
+
+    void on_pushButton_stop_clicked();
+
+    void on_pushButton_openFile_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -41,6 +51,8 @@ private:
     QScopedPointer<QAudioSource> m_audioInput;
 
     int m_sample_rate = 48000;
+
+    AudioPlayer *audioPlayer;
 
 private:
     void loadDevices();

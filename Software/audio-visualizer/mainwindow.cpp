@@ -6,6 +6,8 @@
 
 #include <QMessageBox>
 
+#include <QFileDialog>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -15,6 +17,18 @@ MainWindow::MainWindow(QWidget *parent)
     if(m_devices->audioInputs().isEmpty()) QMessageBox::critical(this,"Greška","Nema dostupnih uređaja!");
     loadDevices();
     // initializeAudio(QMediaDevices::defaultAudioInput());
+
+    audioPlayer = new AudioPlayer();
+
+    audioPlayer->prepare();
+
+    connect(audioPlayer->getPlayer(), &QMediaPlayer::positionChanged, this, [this](qint64 position) {
+        ui->horizontalSlider_Position->setValue(position);
+    });
+
+    connect(audioPlayer->getPlayer(), &QMediaPlayer::durationChanged, this, [this](qint64 duration) {
+        ui->horizontalSlider_Position->setMaximum(duration);
+    });
 }
 
 MainWindow::~MainWindow()
@@ -134,3 +148,29 @@ void MainWindow::on_pushButton_OsvjeziUredaje_clicked()
     loadDevices();
 }
 
+void MainWindow::on_pushButton_play_clicked()
+{
+    audioPlayer->play();
+}
+
+void MainWindow::on_pushButton_pause_clicked()
+{
+    audioPlayer->pause();
+}
+
+void MainWindow::on_pushButton_stop_clicked()
+{
+    audioPlayer->stop();
+}
+
+void MainWindow::on_pushButton_openFile_clicked()
+{
+    auto fileName = QFileDialog::getOpenFileName(this,
+                                                 tr("Open File"),
+                                                 "",
+                                                 tr("Audio Files (*.wav *.mp3)"));
+
+    qDebug() << fileName;
+
+    audioPlayer->setSource(fileName);
+}
