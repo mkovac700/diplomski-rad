@@ -34,7 +34,7 @@ private:
 
     QList<QPointF> m_buffer;
 
-    fftw_complex in[N];
+    fftw_complex in[N]; //N
     fftw_complex out[N];
 
     fftw_plan p;
