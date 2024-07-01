@@ -44,8 +44,7 @@ private:
     qint64 m_sampleCount;
 
 private:
-
-    void setSampleCount();
+    void init();
 };
 
 #endif // AUDIOLISTENER_H

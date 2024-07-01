@@ -18,15 +18,15 @@ MainWindow::MainWindow(QWidget *parent)
     loadDevices();
     // initializeAudio(QMediaDevices::defaultAudioInput());
 
-    audioPlayer = new AudioPlayer();
+    audioPlayer = new AudioPlayer(QMediaDevices::defaultAudioOutput());
 
     audioPlayer->prepare();
 
-    connect(audioPlayer->getPlayer(), &QMediaPlayer::positionChanged, this, [this](qint64 position) {
+    connect(audioPlayer->player(), &QMediaPlayer::positionChanged, this, [this](qint64 position) {
         ui->horizontalSlider_Position->setValue(position);
     });
 
-    connect(audioPlayer->getPlayer(), &QMediaPlayer::durationChanged, this, [this](qint64 duration) {
+    connect(audioPlayer->player(), &QMediaPlayer::durationChanged, this, [this](qint64 duration) {
         ui->horizontalSlider_Position->setMaximum(duration);
     });
 }
@@ -84,7 +84,7 @@ void MainWindow::loadDevices()
 void MainWindow::initializeAudio(const QAudioDevice &inputDeviceInfo)
 {
     QAudioFormat format;
-    format.setSampleRate(m_sample_rate); //8000
+    format.setSampleRate(inputDeviceInfo.preferredFormat().sampleRate()); //8000 //m_sample_rate
     format.setChannelCount(2);
     format.setSampleFormat(QAudioFormat::Int16);
 

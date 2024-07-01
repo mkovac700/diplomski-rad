@@ -2,20 +2,24 @@
 
 AudioListener::AudioListener(const QAudioFormat &format) : m_format(format)
 {
-
+    init();
 }
 
-void AudioListener::start()
+void AudioListener::init()
 {
-    open(QIODevice::OpenModeFlag::WriteOnly);
-
-    setSampleCount();
+    //podaci pristižu svakih 0.01 s, odnosno 10 ms --> 48000 / 100 = 480 sample-ova svakih 10 ms
+    m_sampleCount = m_format.sampleRate() / 100;
 
     if (m_buffer.isEmpty()) {
         m_buffer.reserve(m_sampleCount);
         for (int i = 0; i < m_sampleCount; ++i)
             m_buffer.append(QPointF(i, 0));
     }
+}
+
+void AudioListener::start()
+{
+    open(QIODevice::OpenModeFlag::WriteOnly);
 }
 
 void AudioListener::stop()
@@ -88,9 +92,4 @@ void AudioListener::writeBuffer(const char *data, qint64 len)
     for (int i = 0; i < numSamples; ++i, ptr += sampleBytes){ // ili channelBytes * 2
         m_buffer[i].setY(m_format.normalizedSampleValue(ptr));
     }
-}
-
-void AudioListener::setSampleCount()
-{
-    m_sampleCount = m_format.sampleRate() / 100; //podaci pristižu svakih 0.01 s, odnosno 10 ms --> 48000 / 100 = 480 sample-ova svakih 10 ms
 }

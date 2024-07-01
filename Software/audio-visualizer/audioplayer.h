@@ -1,6 +1,7 @@
 #ifndef AUDIOPLAYER_H
 #define AUDIOPLAYER_H
 
+#include <QAudioDecoder>
 #include <QAudioDevice>
 #include <QAudioOutput>
 #include <QMediaDevices>
@@ -11,7 +12,7 @@ class AudioPlayer : QObject
 {
     Q_OBJECT
 public:
-    AudioPlayer();
+    AudioPlayer(const QAudioDevice &device);
 
     void prepare();
     void setSource(QString path);
@@ -19,11 +20,15 @@ public:
     void pause();
     void stop();
 
-    QMediaPlayer *getPlayer();
+    QMediaPlayer *player() const { return m_player.get(); }
 
 private:
-    QMediaPlayer *player;
+    const QAudioDevice m_device;
+
+    QScopedPointer<QMediaPlayer> m_player;
     QAudioOutput *audioOutput;
+
+    QAudioDecoder *decoder;
 };
 
 #endif // AUDIOPLAYER_H

@@ -1,41 +1,39 @@
 #include "audioplayer.h"
 
-AudioPlayer::AudioPlayer()
+AudioPlayer::AudioPlayer(const QAudioDevice &device)
+    : m_device(device)
+    , m_player(new QMediaPlayer)
 {
-    player = new QMediaPlayer;
     audioOutput = new QAudioOutput;
+    decoder = new QAudioDecoder;
 }
 
 void AudioPlayer::prepare()
 {
-    const QAudioDevice &defaultOutputDevice = QMediaDevices::defaultAudioOutput();
-    audioOutput->setDevice(defaultOutputDevice);
+    audioOutput->setDevice(m_device);
 
-    player->setAudioOutput(audioOutput);
+    m_player->setAudioOutput(audioOutput);
 }
 
 void AudioPlayer::setSource(QString path)
 {
-    player->setSource(QUrl::fromLocalFile(path));
+    m_player->setSource(QUrl::fromLocalFile(path));
 }
 
 void AudioPlayer::play(float volume)
 {
     audioOutput->setVolume(volume);
-    player->play();
+    m_player->play();
+
+    //auto buf = decoder->read();
 }
 
 void AudioPlayer::pause()
 {
-    player->pause();
+    m_player->pause();
 }
 
 void AudioPlayer::stop()
 {
-    player->stop();
-}
-
-QMediaPlayer *AudioPlayer::getPlayer()
-{
-    return player;
+    m_player->stop();
 }

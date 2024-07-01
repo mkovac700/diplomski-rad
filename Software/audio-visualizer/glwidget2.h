@@ -6,10 +6,7 @@
 
 #include <fftw3.h>
 
-#define REAL 0
-#define IMAG 1
-#define N 480
-#define Fs 48000.0
+#include <signalprocessor.h>
 
 class GLWidget2 : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -19,9 +16,6 @@ public:
     ~GLWidget2();
 
     void setBuffer(QList<QPointF> buffer);
-
-    void calculateFrequenciesAndMagnitudes(
-        fftw_complex *out, int n, double fs, double minFreq, double maxFreq);
 
     // QOpenGLWidget interface
 protected:
@@ -34,12 +28,9 @@ private:
 
     QList<QPointF> m_buffer;
 
-    fftw_complex in[N]; //N
-    fftw_complex out[N];
-
-    fftw_plan p;
-
     QList<QPointF> dataPoints;
+
+    SignalProcessor signalProcessor;
 };
 
 #endif // GLWIDGET2_H

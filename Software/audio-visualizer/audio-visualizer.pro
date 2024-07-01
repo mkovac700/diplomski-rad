@@ -14,14 +14,16 @@ SOURCES += \
     glwidget.cpp \
     glwidget2.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    signalprocessor.cpp
 
 HEADERS += \
     audiolistener.h \
     audioplayer.h \
     glwidget.h \
     glwidget2.h \
-    mainwindow.h
+    mainwindow.h \
+    signalprocessor.h
 
 FORMS += \
     mainwindow.ui
