@@ -8,7 +8,7 @@
 #include <QMediaPlayer>
 #include <QObject>
 
-class AudioPlayer : QObject
+class AudioPlayer : public QObject
 {
     Q_OBJECT
 public:
@@ -22,13 +22,16 @@ public:
 
     QMediaPlayer *player() const { return m_player.get(); }
 
+public slots:
+    void readData();
+
 private:
     const QAudioDevice m_device;
 
     QScopedPointer<QMediaPlayer> m_player;
     QAudioOutput *audioOutput;
 
-    QAudioDecoder *decoder;
+    QScopedPointer<QAudioDecoder> decoder;
 };
 
 #endif // AUDIOPLAYER_H
