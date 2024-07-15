@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     audiolistener.cpp \
     audioplayer.cpp \
+    fileplayer.cpp \
     glwidget.cpp \
     glwidget2.cpp \
     main.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 HEADERS += \
     audiolistener.h \
     audioplayer.h \
+    fileplayer.h \
     glwidget.h \
     glwidget2.h \
     mainwindow.h \

@@ -9,6 +9,10 @@
 
 #include <audioplayer.h>
 
+#include <fileplayer.h>
+
+#include <QAudioSink>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -54,9 +58,16 @@ private:
 
     AudioPlayer *audioPlayer;
 
-private:
-    void loadDevices();
+    FilePlayer *filePlayer;
+    QScopedPointer<QAudioSink> m_audioOutput;
 
-    void initializeAudio(const QAudioDevice &inputDevice);
+private:
+    void loadInputDevices();
+
+    void initializeInputAudio(const QAudioDevice &inputDevice);
+
+    void loadOutputDevices();
+
+    void initializeOutputAudio(const QAudioDevice &outputDevice);
 };
 #endif // MAINWINDOW_H
