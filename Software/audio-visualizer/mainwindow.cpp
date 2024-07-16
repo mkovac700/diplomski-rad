@@ -184,6 +184,9 @@ void MainWindow::initializeOutputAudio(const QAudioDevice &outputDevice)
 
     filePlayer->setFormat(format);
 
+    connect(filePlayer, &FilePlayer::bufferChanged, ui->widget, &GLWidget::setBuffer);
+    connect(filePlayer, &FilePlayer::bufferChanged, ui->widget_2, &GLWidget2::setBuffer);
+
     if (!filePlayer->loadWavFile())
         qDebug() << "Error loading WAV file!";
     else

@@ -12,6 +12,14 @@ void FilePlayer::setSource(const QString &filePath)
 void FilePlayer::setFormat(const QAudioFormat &format)
 {
     m_format = format;
+
+    m_sampleCount = m_format.sampleRate() / 100;
+
+    if (m_chunkBuffer.isEmpty()) {
+        m_chunkBuffer.reserve(m_sampleCount);
+        for (int i = 0; i < m_sampleCount; ++i)
+            m_chunkBuffer.append(QPointF(i, 0));
+    }
 }
 
 void FilePlayer::start()
@@ -39,15 +47,34 @@ qint64 FilePlayer::readData(char *data, qint64 len)
     // return total;
 
     qint64 total = 0;
-    const qint64 chunkSize = m_format.sampleRate() * 0.01; // 10ms worth of samples
-    const qint64 chunkBytes = chunkSize
-                              * m_format.bytesPerFrame(); // Number of bytes in 10ms worth of samples
+    const qint64 bytesPerFrame = m_format.bytesPerFrame();
+    const qint64 chunkSize = m_format.sampleRate() * 0.01; // 10ms worth of samples: 44100/0.01=441
+    const qint64 chunkBytes
+        = chunkSize
+          * m_format.bytesPerFrame(); // Number of bytes in 10ms worth of samples: 441*4=1764
 
     if (!m_buffer.isEmpty() && m_playbackTime < m_totalDurationUs) {
         while (len - total >= chunkBytes && m_playbackTime < m_totalDurationUs) {
             const qint64 chunk = qMin((m_buffer.size() - m_pos), chunkBytes);
             memcpy(data + total, m_buffer.constData() + m_pos, chunk);
             m_pos = (m_pos + chunk) % m_buffer.size();
+
+            QByteArray chunkData(data + total, chunk);
+
+            //qint64 chunksize = chunkData.size();
+
+            //qDebug() << "chunk: " << chunk << ", chunksize: " << chunksize;
+
+            const char *d
+                = chunkData.constData(); //m_buffer.constData() + m_pos; //chunkData.constData();
+            const unsigned char *ptr = reinterpret_cast<const unsigned char *>(d);
+
+            for (int i = 0; i < chunkSize; ++i, ptr += bytesPerFrame) { // ili channelBytes * 2
+                m_chunkBuffer[i].setY(m_format.normalizedSampleValue(ptr));
+            }
+
+            emit bufferChanged(m_chunkBuffer);
+
             total += chunk;
             m_playbackTime += (chunk * 1000000)
                               / (m_format.sampleRate()

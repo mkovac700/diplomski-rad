@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QIODevice>
+#include <QPointF>
 
 class FilePlayer : public QIODevice
 {
@@ -38,6 +39,12 @@ private:
     qint64 m_totalDurationUs;
 
     QAudioFormat m_format;
+
+    qint64 m_sampleCount;
+    QList<QPointF> m_chunkBuffer;
+
+signals:
+    void bufferChanged(QList<QPointF> buffer);
 };
 
 #endif // FILEPLAYER_H
