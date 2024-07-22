@@ -26,6 +26,10 @@ public:
 
     bool loadWavFile();
 
+    QAudioFormat getFormat() { return m_format; }
+
+    void prepareBuffer();
+
 private:
     bool loadWavFile(const QString &filePath, const QAudioFormat &format);
 

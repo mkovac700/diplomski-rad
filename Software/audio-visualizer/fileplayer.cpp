@@ -16,7 +16,7 @@ void FilePlayer::setFormat(const QAudioFormat &format)
     m_sampleCount = m_format.sampleRate() / 100;
 
     if (m_chunkBuffer.isEmpty()) {
-        m_chunkBuffer.reserve(m_sampleCount);
+        m_chunkBuffer.reserve(m_sampleCount); //m_sampleCount
         for (int i = 0; i < m_sampleCount; ++i)
             m_chunkBuffer.append(QPointF(i, 0));
     }
@@ -161,20 +161,37 @@ bool FilePlayer::loadWavFile()
     qInfo() << "Data size: " << dataSize;
 
     // Read the audio data
+    m_buffer.clear();
     m_buffer.resize(dataSize);
     m_buffer = file.read(dataSize);
-
-    // Ensure the format matches
-    if (m_format.channelCount() != numChannels || m_format.sampleRate() != sampleRate
-        || (m_format.sampleFormat() != QAudioFormat::Int16 && bitsPerSample != 16)) {
-        qWarning() << "WAV file format does not match the expected format";
-        return false;
-    }
 
     m_totalDurationUs = (dataSize * (qint64) 1000000)
                         / (sampleRate * numChannels * (bitsPerSample / 8));
 
+    m_format.setSampleRate(sampleRate);
+    m_format.setChannelCount(numChannels);
+
+    switch (bitsPerSample) {
+    case 16:
+        m_format.setSampleFormat(QAudioFormat::SampleFormat::Int16);
+        break;
+    default:
+        m_format.setSampleFormat(QAudioFormat::SampleFormat::Unknown);
+        break;
+    }
+
+    prepareBuffer();
+
     return true;
 }
 
-bool FilePlayer::loadWavFile(const QString &filePath, const QAudioFormat &format) {}
+void FilePlayer::prepareBuffer()
+{
+    m_sampleCount = m_format.sampleRate() / 100;
+
+    if (m_chunkBuffer.isEmpty()) {
+        m_chunkBuffer.reserve(m_sampleCount); //m_sampleCount
+        for (int i = 0; i < m_sampleCount; ++i)
+            m_chunkBuffer.append(QPointF(i, 0));
+    }
+}

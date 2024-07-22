@@ -174,23 +174,33 @@ void MainWindow::loadOutputDevices()
 
 void MainWindow::initializeOutputAudio(const QAudioDevice &outputDevice)
 {
-    QAudioFormat format = outputDevice.preferredFormat();
+    // QAudioFormat format = outputDevice.preferredFormat();
 
-    format.setSampleRate(44100);
-    format.setChannelCount(2);
-    format.setSampleFormat(QAudioFormat::Int16);
+    // format.setSampleRate(44100);
+    // format.setChannelCount(2);
+    // format.setSampleFormat(QAudioFormat::Int16);
+
+    if (!filePlayer->loadWavFile()) {
+        qDebug() << "Error loading WAV file!";
+        return;
+    }
+
+    QAudioFormat format = filePlayer->getFormat();
 
     m_audioOutput.reset(new QAudioSink(outputDevice, format));
 
-    filePlayer->setFormat(format);
+    // filePlayer->setFormat(format);
 
     connect(filePlayer, &FilePlayer::bufferChanged, ui->widget, &GLWidget::setBuffer);
     connect(filePlayer, &FilePlayer::bufferChanged, ui->widget_2, &GLWidget2::setBuffer);
 
-    if (!filePlayer->loadWavFile())
-        qDebug() << "Error loading WAV file!";
-    else
-        filePlayer->start();
+    // if (!filePlayer->loadWavFile())
+    //     qDebug() << "Error loading WAV file!";
+    // else
+    //     filePlayer->start();
+
+    filePlayer->start();
+    m_audioOutput->start(filePlayer);
 }
 
 void MainWindow::on_pushButton_StartStop_clicked()
@@ -239,8 +249,8 @@ void MainWindow::on_pushButton_OsvjeziUredaje_clicked()
 void MainWindow::on_pushButton_play_clicked()
 {
     //audioPlayer->play();
+
     initializeOutputAudio(ui->comboBox_AudioOut->currentData().value<QAudioDevice>());
-    m_audioOutput->start(filePlayer);
 }
 
 void MainWindow::on_pushButton_pause_clicked()
@@ -254,6 +264,7 @@ void MainWindow::on_pushButton_stop_clicked()
 
     filePlayer->stop();
     m_audioOutput->stop();
+    m_audioOutput->disconnect(this);
 }
 
 void MainWindow::on_pushButton_openFile_clicked()
