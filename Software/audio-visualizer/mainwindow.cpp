@@ -36,11 +36,12 @@ MainWindow::MainWindow(QWidget *parent)
         ui->horizontalSlider_Position->setMaximum(duration);
     });
 
-    filePlayer = new FilePlayer(this);
+    //filePlayer = new FilePlayer(this);
 }
 
 MainWindow::~MainWindow()
 {
+    //delete filePlayer;
     delete ui;
 }
 
@@ -180,6 +181,9 @@ void MainWindow::initializeOutputAudio(const QAudioDevice &outputDevice)
     // format.setChannelCount(2);
     // format.setSampleFormat(QAudioFormat::Int16);
 
+    // if (filePlayer == nullptr)
+    //filePlayer = new FilePlayer(this);
+
     if (!filePlayer->loadWavFile()) {
         qDebug() << "Error loading WAV file!";
         return;
@@ -265,6 +269,8 @@ void MainWindow::on_pushButton_stop_clicked()
     filePlayer->stop();
     m_audioOutput->stop();
     m_audioOutput->disconnect(this);
+
+    delete filePlayer;
 }
 
 void MainWindow::on_pushButton_openFile_clicked()
@@ -277,6 +283,8 @@ void MainWindow::on_pushButton_openFile_clicked()
     qDebug() << fileName;
 
     audioPlayer->setSource(fileName);
+
+    filePlayer = new FilePlayer(this);
 
     filePlayer->setSource(fileName);
 }

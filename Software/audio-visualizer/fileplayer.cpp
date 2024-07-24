@@ -2,7 +2,14 @@
 
 FilePlayer::FilePlayer(QObject *parent)
     : QIODevice{parent}
-{}
+{
+    timer = new QTimer(this);
+}
+
+FilePlayer::~FilePlayer()
+{
+    delete timer;
+}
 
 void FilePlayer::setSource(const QString &filePath)
 {
@@ -29,6 +36,11 @@ void FilePlayer::start()
 
 void FilePlayer::stop()
 {
+    if (timer->isActive()) {
+        timer->stop();
+        timer->disconnect();
+    }
+
     m_pos = 0;
     close();
 }
@@ -48,40 +60,68 @@ qint64 FilePlayer::readData(char *data, qint64 len)
 
     qint64 total = 0;
     const qint64 bytesPerFrame = m_format.bytesPerFrame();
-    const qint64 chunkSize = m_format.sampleRate() * 0.01; // 10ms worth of samples: 44100/0.01=441
-    const qint64 chunkBytes
-        = chunkSize
-          * m_format.bytesPerFrame(); // Number of bytes in 10ms worth of samples: 441*4=1764
+    //88200/4 = 22050 => 441 x 50 (half second worth of samples)
+    qint64 numSamples = len / bytesPerFrame;
+
+    qDebug() << "len: " << len;
+    qDebug() << "num samples: " << numSamples;
 
     if (!m_buffer.isEmpty() && m_playbackTime < m_totalDurationUs) {
-        while (len - total >= chunkBytes && m_playbackTime < m_totalDurationUs) {
-            const qint64 chunk = qMin((m_buffer.size() - m_pos), chunkBytes);
+        while (len - total > 0 && m_playbackTime < m_totalDurationUs) {
+            const qint64 chunk = qMin((m_buffer.size() - m_pos), len - total);
             memcpy(data + total, m_buffer.constData() + m_pos, chunk);
             m_pos = (m_pos + chunk) % m_buffer.size();
 
             QByteArray chunkData(data + total, chunk);
-
-            //qint64 chunksize = chunkData.size();
-
-            //qDebug() << "chunk: " << chunk << ", chunksize: " << chunksize;
-
-            const char *d
-                = chunkData.constData(); //m_buffer.constData() + m_pos; //chunkData.constData();
+            const char *d = chunkData.constData();
             const unsigned char *ptr = reinterpret_cast<const unsigned char *>(d);
 
-            for (int i = 0; i < chunkSize; ++i, ptr += bytesPerFrame) { // ili channelBytes * 2
-                m_chunkBuffer[i].setY(m_format.normalizedSampleValue(ptr));
+            for (int i = 0; i < numSamples; ++i, ptr += bytesPerFrame) { // ili channelBytes * 2
+                m_bigBuffer[i].setY(m_format.normalizedSampleValue(ptr));
             }
 
-            emit bufferChanged(m_chunkBuffer);
-
             total += chunk;
+
             m_playbackTime += (chunk * 1000000)
                               / (m_format.sampleRate()
                                  * m_format.bytesPerFrame()); // Time in microseconds
+
+            qDebug() << "chunk: " << chunk;
         }
+        bigBufferChanged();
     }
     return total;
+}
+
+void FilePlayer::bigBufferChanged()
+{
+    timer->stop();
+    timer->disconnect();
+
+    int chunkSize = 441;
+    int currentIndex = 0;
+    //int total = m_bigBuffer.size() / chunkSize;
+
+    connect(timer, &QTimer::timeout, this, [chunkSize, currentIndex, this]() mutable {
+        if (currentIndex >= m_bigBuffer.size()) {
+            timer->stop();
+            qDebug() << "Processing complete.";
+            return;
+        }
+
+        m_chunkBuffer.clear();
+        for (int i = 0; i < chunkSize && (currentIndex + i) < m_bigBuffer.size(); ++i) {
+            m_chunkBuffer.append(m_bigBuffer[currentIndex + i]);
+        }
+
+        emit bufferChanged(m_chunkBuffer);
+
+        qDebug() << "emitted: " << QTime::currentTime();
+
+        currentIndex += chunkSize;
+    });
+
+    timer->start(10);
 }
 
 qint64 FilePlayer::writeData(const char *data, qint64 len)
@@ -193,5 +233,11 @@ void FilePlayer::prepareBuffer()
         m_chunkBuffer.reserve(m_sampleCount); //m_sampleCount
         for (int i = 0; i < m_sampleCount; ++i)
             m_chunkBuffer.append(QPointF(i, 0));
+    }
+
+    if (m_bigBuffer.isEmpty()) {
+        m_bigBuffer.reserve(22050); //m_sampleCount //22050
+        for (int i = 0; i < 22050; ++i)
+            m_bigBuffer.append(QPointF(i, 0));
     }
 }
