@@ -40,11 +40,11 @@ private slots:
 
     void on_pushButton_play_clicked();
 
-    void on_pushButton_pause_clicked();
-
     void on_pushButton_stop_clicked();
 
     void on_pushButton_openFile_clicked();
+
+    void on_pushButton_PlayPause_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -60,6 +60,8 @@ private:
 
     FilePlayer *filePlayer;
     QScopedPointer<QAudioSink> m_audioOutput;
+
+    QString m_currentFile;
 
 private:
     void loadInputDevices();

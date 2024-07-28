@@ -36,8 +36,10 @@ void FilePlayer::start()
 
 void FilePlayer::stop()
 {
-    if (timer->isActive()) {
-        timer->stop();
+    if (timer != nullptr) {
+        if (timer->isActive()) {
+            timer->stop();
+        }
         timer->disconnect();
     }
 
@@ -98,11 +100,11 @@ void FilePlayer::bigBufferChanged()
     timer->stop();
     timer->disconnect();
 
-    int chunkSize = 441;
+    //int chunkSize = 441;
     int currentIndex = 0;
     //int total = m_bigBuffer.size() / chunkSize;
 
-    connect(timer, &QTimer::timeout, this, [chunkSize, currentIndex, this]() mutable {
+    connect(timer, &QTimer::timeout, this, [currentIndex, this]() mutable {
         if (currentIndex >= m_bigBuffer.size()) {
             timer->stop();
             qDebug() << "Processing complete.";
@@ -110,7 +112,7 @@ void FilePlayer::bigBufferChanged()
         }
 
         m_chunkBuffer.clear();
-        for (int i = 0; i < chunkSize && (currentIndex + i) < m_bigBuffer.size(); ++i) {
+        for (int i = 0; i < m_sampleCount && (currentIndex + i) < m_bigBuffer.size(); ++i) {
             m_chunkBuffer.append(m_bigBuffer[currentIndex + i]);
         }
 
@@ -118,7 +120,7 @@ void FilePlayer::bigBufferChanged()
 
         qDebug() << "emitted: " << QTime::currentTime();
 
-        currentIndex += chunkSize;
+        currentIndex += m_sampleCount;
     });
 
     timer->start(10);

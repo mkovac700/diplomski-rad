@@ -184,6 +184,10 @@ void MainWindow::initializeOutputAudio(const QAudioDevice &outputDevice)
     // if (filePlayer == nullptr)
     //filePlayer = new FilePlayer(this);
 
+    filePlayer = new FilePlayer(this);
+
+    filePlayer->setSource(m_currentFile);
+
     if (!filePlayer->loadWavFile()) {
         qDebug() << "Error loading WAV file!";
         return;
@@ -253,18 +257,40 @@ void MainWindow::on_pushButton_OsvjeziUredaje_clicked()
 void MainWindow::on_pushButton_play_clicked()
 {
     //audioPlayer->play();
+    //audioPlayer->pause();
 
     initializeOutputAudio(ui->comboBox_AudioOut->currentData().value<QAudioDevice>());
 }
 
-void MainWindow::on_pushButton_pause_clicked()
+void MainWindow::on_pushButton_PlayPause_clicked()
 {
-    //audioPlayer->pause();
+    if (m_currentFile.isEmpty())
+        return;
+
+    if (m_audioOutput.isNull()) {
+        ui->pushButton_PlayPause->setText(tr("Pause"));
+        initializeOutputAudio(ui->comboBox_AudioOut->currentData().value<QAudioDevice>());
+        return;
+    }
+
+    if (m_audioOutput->state() == QAudio::SuspendedState) {
+        m_audioOutput->resume();
+        ui->pushButton_PlayPause->setText(tr("Pause"));
+    } else if (m_audioOutput->state() == QAudio::StoppedState) {
+        ui->pushButton_PlayPause->setText(tr("Pause"));
+        initializeOutputAudio(ui->comboBox_AudioOut->currentData().value<QAudioDevice>());
+    } else if (m_audioOutput->state() == QAudio::ActiveState) {
+        m_audioOutput->suspend();
+        ui->pushButton_PlayPause->setText(tr("Play"));
+    } else if (m_audioOutput->state() == QAudio::IdleState) {
+        // no-op
+    }
 }
 
 void MainWindow::on_pushButton_stop_clicked()
 {
     //audioPlayer->stop();
+    ui->pushButton_PlayPause->setText(tr("Play"));
 
     filePlayer->stop();
     m_audioOutput->stop();
@@ -275,16 +301,14 @@ void MainWindow::on_pushButton_stop_clicked()
 
 void MainWindow::on_pushButton_openFile_clicked()
 {
-    auto fileName = QFileDialog::getOpenFileName(this,
+    m_currentFile = QFileDialog::getOpenFileName(this,
                                                  tr("Open File"),
                                                  "",
                                                  tr("Audio Files (*.wav *.mp3)"));
 
-    qDebug() << fileName;
+    qDebug() << m_currentFile;
 
-    audioPlayer->setSource(fileName);
+    ui->statusbar->showMessage(QString("Datoteka: ").append(m_currentFile.split("/").last()));
 
-    filePlayer = new FilePlayer(this);
-
-    filePlayer->setSource(fileName);
+    //audioPlayer->setSource(fileName);
 }

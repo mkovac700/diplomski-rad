@@ -133,16 +133,9 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_play">
+       <widget class="QPushButton" name="pushButton_PlayPause">
         <property name="text">
          <string>Play</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_pause">
-        <property name="text">
-         <string>Pause</string>
         </property>
        </widget>
       </item>
