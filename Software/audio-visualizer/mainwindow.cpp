@@ -303,7 +303,8 @@ void MainWindow::on_pushButton_openFile_clicked()
 {
     m_currentFile = QFileDialog::getOpenFileName(this,
                                                  tr("Open File"),
-                                                 "",
+                                                 QStandardPaths::writableLocation(
+                                                     QStandardPaths::MusicLocation),
                                                  tr("Audio Files (*.wav *.mp3)"));
 
     qDebug() << m_currentFile;

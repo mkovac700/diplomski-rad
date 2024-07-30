@@ -13,6 +13,8 @@
 
 #include <QAudioSink>
 
+#include <QStandardPaths>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;

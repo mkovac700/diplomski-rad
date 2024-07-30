@@ -18,7 +18,6 @@ public:
     ~FilePlayer();
 
     void setSource(const QString &filePath);
-    void setFormat(const QAudioFormat &format);
     void start();
     void stop();
 

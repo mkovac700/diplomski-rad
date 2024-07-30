@@ -16,19 +16,6 @@ void FilePlayer::setSource(const QString &filePath)
     m_filePath = filePath;
 }
 
-void FilePlayer::setFormat(const QAudioFormat &format)
-{
-    m_format = format;
-
-    m_sampleCount = m_format.sampleRate() / 100;
-
-    if (m_chunkBuffer.isEmpty()) {
-        m_chunkBuffer.reserve(m_sampleCount); //m_sampleCount
-        for (int i = 0; i < m_sampleCount; ++i)
-            m_chunkBuffer.append(QPointF(i, 0));
-    }
-}
-
 void FilePlayer::start()
 {
     open(QIODevice::ReadOnly);
@@ -238,7 +225,7 @@ void FilePlayer::prepareBuffer()
     }
 
     if (m_bigBuffer.isEmpty()) {
-        m_bigBuffer.reserve(22050); //m_sampleCount //22050
+        m_bigBuffer.reserve(22050); //m_sampleCount //22050 //m_sampleCount(441) * 50
         for (int i = 0; i < 22050; ++i)
             m_bigBuffer.append(QPointF(i, 0));
     }
