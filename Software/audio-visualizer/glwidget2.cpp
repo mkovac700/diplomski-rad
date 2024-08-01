@@ -72,6 +72,7 @@ void GLWidget2::paintGL()
     // glEnd();
     // glFlush();
 
+    //zapravo: 8192 * (48000/16384) = 8192*2.92=~24000
     float xScale = width() / (float) 20000; //(float) width() / 10000;
 
     for (const QPointF point : dataPoints) {

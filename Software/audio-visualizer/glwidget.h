@@ -14,6 +14,9 @@ public:
 
     void setBuffer(QList<QPointF> buffer);
 
+public slots:
+    void bufferChanged(QList<qreal> &buffer);
+
 signals:
 
     // QOpenGLWidget interface
@@ -26,6 +29,7 @@ private:
     QSurfaceFormat m_format;
 
     QList<QPointF> m_buffer;
+    QList<qreal> m_buffer2;
 };
 
 #endif // GLWIDGET_H

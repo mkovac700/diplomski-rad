@@ -5,7 +5,7 @@
 #define ENGINE_H
 
 #include "spectrum.h"
-// #include "spectrumanalyser.h"
+#include "spectrumanalyser.h"
 
 #include <QAudioDevice>
 #include <QAudioFormat>
@@ -203,12 +203,15 @@ signals:
      */
     void bufferChanged(qint64 position, qint64 length, const QByteArray &buffer);
 
+    void buffer2Changed(QList<qreal> &buffer);
+
 private slots:
     void initAudioDevices();
     void audioNotify();
     void audioStateChanged(QAudio::State state);
     void audioDataReady();
     void spectrumChanged(const FrequencySpectrum &spectrum);
+    void bufferChanged(QList<qreal> &buffer);
 
 private:
     void resetAudioDevices();
@@ -276,7 +279,7 @@ private:
 
     int m_spectrumBufferLength;
     QByteArray m_spectrumBuffer;
-    // SpectrumAnalyser m_spectrumAnalyser;
+    SpectrumAnalyser m_spectrumAnalyser;
     qint64 m_spectrumPosition;
 
     int m_count;

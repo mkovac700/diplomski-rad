@@ -1,4 +1,5 @@
 #include "glwidget.h"
+#include <QTime>
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -18,6 +19,13 @@ void GLWidget::setBuffer(QList<QPointF> buffer)
     update();
 
     //qDebug() << "Buffer received! First value: (" << m_buffer.first().x() << ", " << m_buffer.first().y() << ")";
+}
+
+void GLWidget::bufferChanged(QList<qreal> &buffer)
+{
+    qDebug() << "opengl received: " << QTime::currentTime();
+    m_buffer2 = buffer;
+    update();
 }
 
 void GLWidget::initializeGL()
@@ -52,11 +60,19 @@ void GLWidget::paintGL()
 
     float xScale = 1;
 
-    if(!m_buffer.empty()) xScale = width() / static_cast<float>(m_buffer.size());
+    //if(!m_buffer.empty()) xScale = width() / static_cast<float>(m_buffer.size());
+    if (!m_buffer2.empty())
+        xScale = width() / static_cast<float>(m_buffer2.size());
 
-    for(int i = 0; i < m_buffer.size(); i++){
-        auto x = m_buffer[i].x() * xScale;
-        auto y = m_buffer[i].y();
+    // for(int i = 0; i < m_buffer.size(); i++){
+    //     auto x = m_buffer[i].x() * xScale;
+    //     auto y = m_buffer[i].y();
+    //     glVertex2f(x, y);
+    // }
+
+    for (int i = 0; i < m_buffer2.size(); i++) {
+        auto x = i * xScale;
+        auto y = m_buffer2[i];
         glVertex2f(x, y);
     }
 

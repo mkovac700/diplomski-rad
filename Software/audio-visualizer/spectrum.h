@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 
 // Number of audio samples used to calculate the frequency spectrum
-const int SpectrumLengthSamples = 4096; //PowerOfTwo<FFTLengthPowerOfTwo>::Result;
+const int SpectrumLengthSamples = 1024; //PowerOfTwo<FFTLengthPowerOfTwo>::Result; //4096
 
 // Number of bands in the frequency spectrum
 const int SpectrumNumBands = 500; //100
@@ -26,7 +26,7 @@ const qreal SpectrumLowFreq = 0.0; // Hz
 const qreal SpectrumHighFreq = 10000.0; // Hz //1000 /10000
 
 // Waveform window size in microseconds
-const qint64 WaveformWindowDuration = 500 * 1000;
+const qint64 WaveformWindowDuration = 10 * 1000; //500 * 1000;
 
 // Length of waveform tiles in bytes
 // Ideally, these would match the QAudio*::bufferSize(), but that isn't

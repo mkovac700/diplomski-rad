@@ -19,6 +19,7 @@ SOURCES += \
     engine.cpp \
     frequencyspectrum.cpp \
     utils.cpp \
+    spectrumanalyser.cpp
 
 HEADERS += \
     audiolistener.h \
@@ -30,7 +31,8 @@ HEADERS += \
     engine.h \
     frequencyspectrum.h \
     spectrum.h \
-    utils.h
+    utils.h \
+    spectrumanalyser.h
 
 FORMS += \
     mainwindow.ui

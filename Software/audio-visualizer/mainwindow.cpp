@@ -38,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     //filePlayer = new FilePlayer(this);
+
+    connect(m_engine, &Engine::buffer2Changed, ui->widget, &GLWidget::bufferChanged);
 }
 
 MainWindow::~MainWindow()

@@ -1,4 +1,5 @@
 #include "signalprocessor.h"
+#include "qdebug.h"
 
 SignalProcessor::SignalProcessor()
 {
@@ -71,11 +72,11 @@ QList<QPointF> SignalProcessor::calculateFrequenciesAndMagnitudes(double minFreq
 
     for (k = 0; k <= N / 2; ++k) { // We only need the first N/2 + 1 bins
         freq = k * deltaF;
-        if (freq >= minFreq && freq <= maxFreq) {
-            magnitude = sqrt(out[k][0] * out[k][0] + out[k][1] * out[k][1]);
-            //printf("Frequency: %f Hz, Magnitude: %f\n", freq, magnitude);
-            buffer_out.append({freq, magnitude});
-        }
+        //if (freq >= minFreq && freq <= maxFreq) {
+        magnitude = sqrt(out[k][0] * out[k][0] + out[k][1] * out[k][1]);
+        //printf("Frequency: %f Hz, Magnitude: %f\n", freq, magnitude);
+        buffer_out.append({freq, magnitude});
+        //}
     }
 
     return buffer_out;

@@ -14,11 +14,15 @@
 #include <QSet>
 #include <QThread>
 
+#include <glwidget.h>
+
 #if QT_CONFIG(permissions)
   #include <QPermission>
 #endif
 
 #include <math.h>
+
+#include <QTime>
 
 //-----------------------------------------------------------------------------
 // Constants
@@ -56,9 +60,15 @@ Engine::Engine(QObject *parent)
       m_spectrumPosition(0),
       m_count(0)
 {
-    // connect(&m_spectrumAnalyser,
-    //         QOverload<const FrequencySpectrum &>::of(&SpectrumAnalyser::spectrumChanged), this,
-    //         QOverload<const FrequencySpectrum &>::of(&Engine::spectrumChanged));
+    connect(&m_spectrumAnalyser,
+            QOverload<const FrequencySpectrum &>::of(&SpectrumAnalyser::spectrumChanged),
+            this,
+            QOverload<const FrequencySpectrum &>::of(&Engine::spectrumChanged));
+
+    connect(&m_spectrumAnalyser,
+            QOverload<QList<qreal> &>::of(&SpectrumAnalyser::bufferChanged),
+            this,
+            QOverload<QList<qreal> &>::of(&Engine::bufferChanged));
 
     // This code might misinterpret things like "-something -category".  But
     // it's unlikely that that needs to be supported so we'll let it go.
@@ -297,6 +307,8 @@ void Engine::initAudioDevices()
 
 void Engine::audioNotify()
 {
+    qDebug() << "audioNotify: " << QTime::currentTime();
+
     switch (m_mode) {
     case QAudioDevice::Input: {
         const qint64 recordPosition =
@@ -314,20 +326,25 @@ void Engine::audioNotify()
     case QAudioDevice::Output: {
         const qint64 playPosition = m_format.bytesForDuration(m_audioOutput->processedUSecs());
         setPlayPosition(qMin(bufferLength(), playPosition));
-        const qint64 levelPosition = playPosition - m_levelBufferLength;
+        // const qint64 levelPosition = playPosition - m_levelBufferLength;
         const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
         if (m_file) {
-            if (levelPosition > m_bufferPosition || spectrumPosition > m_bufferPosition
-                || qMax(m_levelBufferLength, m_spectrumBufferLength) > m_dataLength) {
+            // if (levelPosition > m_bufferPosition || spectrumPosition > m_bufferPosition
+            //     || qMax(m_levelBufferLength, m_spectrumBufferLength) > m_dataLength) {
+            if (spectrumPosition > m_bufferPosition || m_spectrumBufferLength > m_dataLength) {
                 m_bufferPosition = 0;
                 m_dataLength = 0;
                 // Data needs to be read into m_buffer in order to be analysed
-                const qint64 readPos = qMax(qint64(0), qMin(levelPosition, spectrumPosition));
+                // const qint64 readPos = qMax(qint64(0), qMin(levelPosition, spectrumPosition));
+                const qint64 readPos = qMax(qint64(0), spectrumPosition);
+                // const qint64 readEnd = qMin(m_analysisFile->getDevice()->size(),
+                //                             qMax(levelPosition + m_levelBufferLength,
+                //                                  spectrumPosition + m_spectrumBufferLength));
+
                 const qint64 readEnd = qMin(m_analysisFile->getDevice()->size(),
-                                            qMax(levelPosition + m_levelBufferLength,
-                                                 spectrumPosition + m_spectrumBufferLength));
-                const qint64 readLen =
-                        readEnd - readPos + m_format.bytesForDuration(WaveformWindowDuration);
+                                            spectrumPosition + m_spectrumBufferLength);
+                const qint64 readLen = readEnd - readPos
+                                       + m_format.bytesForDuration(WaveformWindowDuration); //500000
                 qDebug() << "Engine::audioNotify [1]"
                          << "analysisFileSize" << m_analysisFile->getDevice()->size() << "readPos"
                          << readPos << "readLen" << readLen;
@@ -336,24 +353,30 @@ void Engine::audioNotify()
                     m_bufferPosition = readPos;
                     m_dataLength = m_analysisFile->read(m_buffer.data(), readLen);
                     qDebug() << "Engine::audioNotify [2]"
-                             << "bufferPosition" << m_bufferPosition << "dataLength"
-                             << m_dataLength;
+                             << "playPosition" << playPosition << "bufferPosition"
+                             << m_bufferPosition << "dataLength" << m_dataLength;
                 } else {
                     qDebug() << "Engine::audioNotify [2]"
                              << "file seek error";
                 }
-                emit bufferChanged(m_bufferPosition, m_dataLength, m_buffer);
+                //emit bufferChanged(m_bufferPosition, m_dataLength, m_buffer);
             }
         } else {
-            if (playPosition >= m_dataLength)
+            if (playPosition >= m_dataLength) {
                 stopPlayback();
+                //TODO emit "natural" stop tako da se ažuriraju gumbovi
+            }
         }
-        if (levelPosition >= 0
-            && levelPosition + m_levelBufferLength < m_bufferPosition + m_dataLength)
-            calculateLevel(levelPosition, m_levelBufferLength);
+        // if (levelPosition >= 0
+        //     && levelPosition + m_levelBufferLength < m_bufferPosition + m_dataLength)
+        //     calculateLevel(levelPosition, m_levelBufferLength);
         if (spectrumPosition >= 0
-            && spectrumPosition + m_spectrumBufferLength < m_bufferPosition + m_dataLength)
+            && spectrumPosition + m_spectrumBufferLength < m_bufferPosition + m_dataLength) {
             calculateSpectrum(spectrumPosition);
+            qDebug() << "calculateSpectrum: " << QTime::currentTime()
+                     << "play position: " << playPosition
+                     << "spectrum position: " << spectrumPosition;
+        }
     } break;
     default:
         break;
@@ -414,6 +437,13 @@ void Engine::spectrumChanged(const FrequencySpectrum &spectrum)
     ENGINE_DEBUG << "Engine::spectrumChanged"
                  << "pos" << m_spectrumPosition;
     emit spectrumChanged(m_spectrumPosition, m_spectrumBufferLength, spectrum);
+}
+
+void Engine::bufferChanged(QList<qreal> &buffer)
+{
+    qDebug() << "emitted: " << QTime::currentTime();
+
+    emit buffer2Changed(buffer);
 }
 
 //-----------------------------------------------------------------------------
@@ -661,12 +691,18 @@ void Engine::calculateSpectrum(qint64 position)
     // ENGINE_DEBUG << "Engine::calculateSpectrum" << QThread::currentThread() << "count" << m_count
     //              << "pos" << position << "buffer pos" << m_bufferPosition;
 
-    // if (m_spectrumAnalyser.isReady()) {
-    //     m_spectrumBuffer = QByteArray::fromRawData(
-    //             m_buffer.constData() + position - m_bufferPosition, m_spectrumBufferLength);
-    //     m_spectrumPosition = position;
-    //     m_spectrumAnalyser.calculate(m_spectrumBuffer, m_format);
-    // }
+    if (m_spectrumAnalyser.isReady()) {
+        m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData() + position
+                                                       - m_bufferPosition,
+                                                   m_spectrumBufferLength);
+        m_spectrumPosition = position;
+        m_spectrumAnalyser.calculate(m_spectrumBuffer, m_format);
+    }
+
+    // m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData() + position - m_bufferPosition,
+    //                                            m_spectrumBufferLength);
+    // m_spectrumPosition = position;
+
 #endif
 }
 
