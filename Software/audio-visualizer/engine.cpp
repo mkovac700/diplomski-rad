@@ -109,6 +109,7 @@ bool Engine::loadFile(const QString &fileName)
     Q_ASSERT(!m_file);
     Q_ASSERT(!fileName.isEmpty());
     QIODevice *file = new QFile(fileName);
+    QIODevice *file2 = new QFile(fileName);
     if (file->open(QIODevice::ReadOnly)) {
         m_file = new QWaveDecoder(file, this);
         if (m_file->open(QIODevice::ReadOnly)) {
@@ -124,9 +125,11 @@ bool Engine::loadFile(const QString &fileName)
         emit errorMessage(tr("Could not open file"), fileName);
     }
     if (result) {
-        file->close();
-        file->open(QIODevice::ReadOnly);
-        m_analysisFile = new QWaveDecoder(file, this);
+        // file->close();
+        // file->open(QIODevice::ReadOnly);
+        file2->open(QIODevice::ReadOnly);
+        // m_analysisFile = new QWaveDecoder(file, this);
+        m_analysisFile = new QWaveDecoder(file2, this);
         m_analysisFile->open(QIODevice::ReadOnly);
     }
     return result;
@@ -237,10 +240,10 @@ void Engine::startPlayback()
                 m_dataLength = 0;
                 m_audioOutput->start(m_file->getDevice());
             } else {
-                m_audioOutputIODevice.close();
-                m_audioOutputIODevice.setBuffer(&m_buffer);
-                m_audioOutputIODevice.open(QIODevice::ReadOnly);
-                m_audioOutput->start(&m_audioOutputIODevice);
+                // m_audioOutputIODevice.close();
+                // m_audioOutputIODevice.setBuffer(&m_buffer);
+                // m_audioOutputIODevice.open(QIODevice::ReadOnly);
+                // m_audioOutput->start(&m_audioOutputIODevice);
             }
         }
         m_notifyTimer->start();
@@ -324,8 +327,10 @@ void Engine::audioNotify()
         emit bufferChanged(0, m_dataLength, m_buffer);
     } break;
     case QAudioDevice::Output: {
-        const qint64 playPosition = m_format.bytesForDuration(m_audioOutput->processedUSecs());
-        setPlayPosition(qMin(bufferLength(), playPosition));
+        // const qint64 playPosition = m_format.bytesForDuration(m_audioOutput->processedUSecs());
+        processedUSecs += 10 * 1000;
+        const qint64 playPosition = m_format.bytesForDuration(processedUSecs);
+        //setPlayPosition(qMin(bufferLength(), playPosition));
         // const qint64 levelPosition = playPosition - m_levelBufferLength;
         const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
         if (m_file) {
@@ -363,6 +368,7 @@ void Engine::audioNotify()
             }
         } else {
             if (playPosition >= m_dataLength) {
+                processedUSecs = 0;
                 stopPlayback();
                 //TODO emit "natural" stop tako da se ažuriraju gumbovi
             }

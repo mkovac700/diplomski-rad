@@ -285,6 +285,8 @@ private:
     int m_count;
     QTimer *m_notifyTimer = nullptr;
 
+    qint64 processedUSecs = 0;
+
 #ifdef DUMP_DATA
     QDir m_outputDir;
 #endif

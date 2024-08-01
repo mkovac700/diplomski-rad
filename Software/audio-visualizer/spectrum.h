@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 
 // Number of audio samples used to calculate the frequency spectrum
-const int SpectrumLengthSamples = 1024; //PowerOfTwo<FFTLengthPowerOfTwo>::Result; //4096
+const int SpectrumLengthSamples = 441; //PowerOfTwo<FFTLengthPowerOfTwo>::Result; //4096
 
 // Number of bands in the frequency spectrum
 const int SpectrumNumBands = 500; //100
