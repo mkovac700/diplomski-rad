@@ -326,5 +326,7 @@ void MainWindow::on_pushButton_openFile_clicked()
 
     //audioPlayer->setSource(fileName);
 
+    m_engine->reset();
+
     m_engine->loadFile(m_currentFile);
 }

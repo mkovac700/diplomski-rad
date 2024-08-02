@@ -38,27 +38,28 @@ const int LevelWindowUs = 0.1 * 1000000;
 //-----------------------------------------------------------------------------
 
 Engine::Engine(QObject *parent)
-    : QObject(parent),
-      m_mode(QAudioDevice::Input),
-      m_state(QAudio::StoppedState),
-      m_devices(new QMediaDevices(this)),
-      m_generateTone(false),
-      m_file(nullptr),
-      m_analysisFile(nullptr),
-      m_audioInput(nullptr),
-      m_audioInputIODevice(nullptr),
-      m_recordPosition(0),
-      m_audioOutput(nullptr),
-      m_playPosition(0),
-      m_bufferPosition(0),
-      m_bufferLength(0),
-      m_dataLength(0),
-      m_levelBufferLength(0),
-      m_rmsLevel(0.0),
-      m_peakLevel(0.0),
-      m_spectrumBufferLength(0),
-      m_spectrumPosition(0),
-      m_count(0)
+    : QObject(parent)
+    , m_mode(QAudioDevice::Input)
+    , m_state(QAudio::StoppedState)
+    , m_devices(new QMediaDevices(this))
+    , m_generateTone(false)
+    , m_file(nullptr)
+    , m_analysisFile(nullptr)
+    , m_audioInput(nullptr)
+    , m_audioInputIODevice(nullptr)
+    , m_recordPosition(0)
+    , m_audioOutput(nullptr)
+    , m_playPosition(0)
+    , m_bufferPosition(0)
+    , m_bufferLength(0)
+    , m_dataLength(0)
+    , m_levelBufferLength(0)
+    , m_rmsLevel(0.0)
+    , m_peakLevel(0.0)
+    , m_spectrumBufferLength(0)
+    , m_spectrumPosition(0)
+    , m_count(0)
+    , m_processedUSecs(0)
 {
     connect(&m_spectrumAnalyser,
             QOverload<const FrequencySpectrum &>::of(&SpectrumAnalyser::spectrumChanged),
@@ -236,6 +237,7 @@ void Engine::startPlayback()
             m_count = 0;
             if (m_file) {
                 m_file->seek(0);
+                //m_analysisFile->seek(0);
                 m_bufferPosition = 0;
                 m_dataLength = 0;
                 m_audioOutput->start(m_file->getDevice());
@@ -328,9 +330,9 @@ void Engine::audioNotify()
     } break;
     case QAudioDevice::Output: {
         // const qint64 playPosition = m_format.bytesForDuration(m_audioOutput->processedUSecs());
-        processedUSecs += 10 * 1000;
-        const qint64 playPosition = m_format.bytesForDuration(processedUSecs);
-        //setPlayPosition(qMin(bufferLength(), playPosition));
+        m_processedUSecs += 10 * 1000;
+        const qint64 playPosition = m_format.bytesForDuration(m_processedUSecs);
+        //setPlayPosition(qMin(bufferLength(), playPosition)); --> za slider
         // const qint64 levelPosition = playPosition - m_levelBufferLength;
         const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
         if (m_file) {
@@ -350,6 +352,7 @@ void Engine::audioNotify()
                                             spectrumPosition + m_spectrumBufferLength);
                 const qint64 readLen = readEnd - readPos
                                        + m_format.bytesForDuration(WaveformWindowDuration); //500000
+                // const qint64 readLen = readEnd - readPos;
                 qDebug() << "Engine::audioNotify [1]"
                          << "analysisFileSize" << m_analysisFile->getDevice()->size() << "readPos"
                          << readPos << "readLen" << readLen;
@@ -368,7 +371,6 @@ void Engine::audioNotify()
             }
         } else {
             if (playPosition >= m_dataLength) {
-                processedUSecs = 0;
                 stopPlayback();
                 //TODO emit "natural" stop tako da se ažuriraju gumbovi
             }
@@ -484,6 +486,7 @@ void Engine::reset()
     m_bufferPosition = 0;
     m_bufferLength = 0;
     m_dataLength = 0;
+    m_processedUSecs = 0;
     emit dataLengthChanged(0);
     resetAudioDevices();
 }
@@ -610,6 +613,7 @@ void Engine::stopPlayback()
         QCoreApplication::instance()->processEvents();
         m_audioOutput->disconnect();
         setPlayPosition(0);
+        m_processedUSecs = 0;
     }
     m_notifyTimer->stop();
 }
