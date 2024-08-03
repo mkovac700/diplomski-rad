@@ -40,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent)
     //filePlayer = new FilePlayer(this);
 
     connect(m_engine, &Engine::buffer2Changed, ui->widget, &GLWidget::bufferChanged);
+    connect(m_engine,
+            QOverload<qint64, qint64, const FrequencySpectrum &>::of(&Engine::spectrumChanged),
+            ui->widget_2,
+            QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLWidget2::spectrumChanged));
 }
 
 MainWindow::~MainWindow()

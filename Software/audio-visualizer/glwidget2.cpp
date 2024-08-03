@@ -14,6 +14,23 @@ void GLWidget2::setBuffer(QList<QPointF> buffer)
     update();
 }
 
+void GLWidget2::spectrumChanged(const FrequencySpectrum &spectrum)
+{ //TODO: dodati inputFrequency (spectrumanalyzer.cpp)
+    m_spectrum = spectrum;
+
+    update();
+}
+
+void GLWidget2::spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum)
+{
+    Q_UNUSED(position)
+    Q_UNUSED(length)
+
+    m_spectrum = spectrum;
+
+    update();
+}
+
 void GLWidget2::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -74,16 +91,35 @@ void GLWidget2::paintGL()
 
     //zapravo: 8192 * (48000/16384) = 8192*2.92=~24000
     float xScale = width() / (float) 20000; //(float) width() / 10000;
+    float yScale = height() / (float) 1.5f;
 
-    for (const QPointF point : dataPoints) {
+    // for (const QPointF point : dataPoints) {
+    //     glBegin(GL_LINE_STRIP);
+
+    //     glVertex2f(point.x() * xScale, 0.0f);           // Start point (x, 0)
+    //     glVertex2f(point.x() * xScale, point.y() * 10); // End point (x, y) //* 100
+
+    //     glEnd();
+    // }
+
+    // //glEnd();
+    // glFlush();
+
+    FrequencySpectrum::iterator i = m_spectrum.begin();
+    const FrequencySpectrum::iterator end = m_spectrum.end();
+    for (; i != end; ++i) {
+        const FrequencySpectrum::Element e = *i;
+
         glBegin(GL_LINE_STRIP);
 
-        glVertex2f(point.x() * xScale, 0.0f);           // Start point (x, 0)
-        glVertex2f(point.x() * xScale, point.y() * 10); // End point (x, y) //* 100
+        // glVertex2f(e.frequency * xScale, 0.0f);              // Start point (x, 0)
+        // glVertex2f(e.frequency * xScale, e.amplitude * 100); // End point (x, y) //* 100 //*10
+
+        glVertex2f(e.frequency * xScale, 0.0f * yScale);        // Start point (x, 0)
+        glVertex2f(e.frequency * xScale, e.amplitude * yScale); // End point (x, y) //* 100 //*10
 
         glEnd();
     }
 
-    //glEnd();
     glFlush();
 }
