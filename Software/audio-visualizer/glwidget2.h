@@ -8,6 +8,8 @@
 
 #include <signalprocessor.h>
 
+#include <frequencyspectrum.h>
+
 class GLWidget2 : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -16,6 +18,10 @@ public:
     ~GLWidget2();
 
     void setBuffer(QList<QPointF> buffer);
+
+public slots:
+    void spectrumChanged(const FrequencySpectrum &spectrum);
+    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
 
     // QOpenGLWidget interface
 protected:
@@ -31,6 +37,8 @@ private:
     QList<QPointF> dataPoints;
 
     SignalProcessor signalProcessor;
+
+    FrequencySpectrum m_spectrum;
 };
 
 #endif // GLWIDGET2_H

@@ -96,6 +96,23 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Audio izlaz:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox_AudioOut">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="pushButton_openFile">
         <property name="text">
          <string>Odaberi datoteku...</string>
@@ -103,16 +120,22 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_play">
-        <property name="text">
-         <string>Play</string>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_pause">
+       <widget class="QPushButton" name="pushButton_PlayPause">
         <property name="text">
-         <string>Pause</string>
+         <string>Play</string>
         </property>
        </widget>
       </item>

@@ -15,7 +15,11 @@ SOURCES += \
     glwidget2.cpp \
     main.cpp \
     mainwindow.cpp \
-    signalprocessor.cpp
+    signalprocessor.cpp \
+    engine.cpp \
+    frequencyspectrum.cpp \
+    utils.cpp \
+    spectrumanalyser.cpp
 
 HEADERS += \
     audiolistener.h \
@@ -23,7 +27,12 @@ HEADERS += \
     glwidget.h \
     glwidget2.h \
     mainwindow.h \
-    signalprocessor.h
+    signalprocessor.h \
+    engine.h \
+    frequencyspectrum.h \
+    spectrum.h \
+    utils.h \
+    spectrumanalyser.h
 
 FORMS += \
     mainwindow.ui

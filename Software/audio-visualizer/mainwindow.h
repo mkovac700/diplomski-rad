@@ -9,6 +9,14 @@
 
 #include <audioplayer.h>
 
+//#include <fileplayer.h>
+
+#include <QAudioSink>
+
+#include <QStandardPaths>
+
+#include <engine.h>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -34,13 +42,11 @@ private slots:
 
     void on_pushButton_OsvjeziUredaje_clicked();
 
-    void on_pushButton_play_clicked();
-
-    void on_pushButton_pause_clicked();
-
     void on_pushButton_stop_clicked();
 
     void on_pushButton_openFile_clicked();
+
+    void on_pushButton_PlayPause_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -54,9 +60,22 @@ private:
 
     AudioPlayer *audioPlayer;
 
-private:
-    void loadDevices();
+    //FilePlayer *filePlayer;
+    QScopedPointer<QAudioSink> m_audioOutput;
 
-    void initializeAudio(const QAudioDevice &inputDevice);
+    QString m_currentFile;
+
+    Engine *m_engine;
+
+    bool playing = false;
+
+private:
+    void loadInputDevices();
+
+    void initializeInputAudio(const QAudioDevice &inputDevice);
+
+    void loadOutputDevices();
+
+    void initializeOutputAudio(const QAudioDevice &outputDevice);
 };
 #endif // MAINWINDOW_H
