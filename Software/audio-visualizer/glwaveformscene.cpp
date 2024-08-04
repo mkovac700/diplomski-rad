@@ -1,5 +1,4 @@
 #include "glwaveformscene.h"
-#include "glwidget.h"
 
 GLWaveformScene::GLWaveformScene() {}
 
@@ -57,5 +56,14 @@ void GLWaveformScene::bufferChanged(QList<qreal> &buffer)
 
 void GLWaveformScene::spectrumChanged(FrequencySpectrum &spectrum)
 {
+    Q_UNUSED(spectrum)
+}
+
+void GLWaveformScene::spectrumChanged(qint64 position,
+                                      qint64 length,
+                                      const FrequencySpectrum &spectrum)
+{
+    Q_UNUSED(position)
+    Q_UNUSED(length)
     Q_UNUSED(spectrum)
 }

@@ -1,22 +1,22 @@
-#ifndef GLWAVEFORMSCENE_H
-#define GLWAVEFORMSCENE_H
+#ifndef GLBARSPECTRUMSCENE_H
+#define GLBARSPECTRUMSCENE_H
 
 #include "glwidget.h"
+#include <frequencyspectrum.h>
 #include <glscene.h>
 
-class GLWaveformScene : public GLScene
+class GLBarSpectrumScene : public GLScene
 {
     Q_OBJECT
 public:
-    GLWaveformScene();
-    explicit GLWaveformScene(GLWidget *glWidget)
+    GLBarSpectrumScene();
+    explicit GLBarSpectrumScene(GLWidget *glWidget)
         : GLScene(glWidget)
     {}
-    // QTC_TEMP
+
     // GLScene interface
 public:
     void initialize() override;
-    // void update() override;
     void paint() override;
     void resize(int w, int h) override;
 
@@ -26,7 +26,7 @@ public slots:
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum) override;
 
 private:
-    QList<qreal> m_buffer;
+    FrequencySpectrum m_spectrum;
 };
 
-#endif // GLWAVEFORMSCENE_H
+#endif // GLBARSPECTRUMSCENE_H

@@ -24,23 +24,31 @@ void GLWidget::setScene(GLScene *scene)
     if (currentScene) {
         currentScene->initialize();
         connect(this, &GLWidget::bufferChanged, currentScene, &GLScene::bufferChanged);
-        connect(this, &GLWidget::spectrumChanged, currentScene, &GLScene::spectrumChanged);
+        connect(this,
+                QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLWidget::spectrumChanged),
+                currentScene,
+                QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLScene::spectrumChanged));
     }
 }
 
 void GLWidget::handleBufferChanged(QList<qreal> &buffer)
 {
     emit bufferChanged(buffer);
-    // if (currentScene) {
-    //     currentScene->paint();
-    // }
     update(); // Zove paintGL()
 }
 
 void GLWidget::handleSpectrumChanged(FrequencySpectrum &spectrum)
 {
     emit spectrumChanged(spectrum);
-    update();
+    update(); // Zove paintGL()
+}
+
+void GLWidget::handleSpectrumChanged(qint64 position,
+                                     qint64 length,
+                                     const FrequencySpectrum &spectrum)
+{
+    emit spectrumChanged(position, length, spectrum);
+    update(); // Zove paintGL()
 }
 
 void GLWidget::initializeGL()

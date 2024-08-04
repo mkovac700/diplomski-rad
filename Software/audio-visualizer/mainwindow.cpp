@@ -8,6 +8,7 @@
 
 #include <QFileDialog>
 
+#include <glbarspectrumscene.h>
 #include <glwaveformscene.h>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -47,11 +48,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_engine, &Engine::buffer2Changed, ui->widget, &GLWidget::handleBufferChanged);
     connect(m_engine,
             QOverload<qint64, qint64, const FrequencySpectrum &>::of(&Engine::spectrumChanged),
-            ui->widget_2,
-            QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLWidget2::spectrumChanged));
+            ui->widget,
+            QOverload<qint64, qint64, const FrequencySpectrum &>::of(
+                &GLWidget::handleSpectrumChanged));
+    // connect(m_engine,
+    //         QOverload<qint64, qint64, const FrequencySpectrum &>::of(&Engine::spectrumChanged),
+    //         ui->widget_2,
+    //         QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLWidget2::spectrumChanged));
 
     //mora se osigurati da je widget do kraja inicijaliziran prije postavljanja defaultne scene
-    QTimer::singleShot(0, this, [this]() { ui->widget->setScene(new GLWaveformScene(ui->widget)); });
+    // QTimer::singleShot(0, this, [this]() { ui->widget->setScene(new GLWaveformScene(ui->widget)); });
+    QTimer::singleShot(0, this, [this]() {
+        ui->widget->setScene(new GLBarSpectrumScene(ui->widget));
+    });
 }
 
 MainWindow::~MainWindow()
