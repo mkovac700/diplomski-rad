@@ -2,8 +2,10 @@
 #define GLWIDGET_H
 
 //#include <QWidget>
-#include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include <QOpenGLWidget>
+#include <frequencyspectrum.h>
+#include <glscene.h>
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -12,12 +14,17 @@ public:
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
-    void setBuffer(QList<QPointF> buffer);
-
-public slots:
-    void bufferChanged(QList<qreal> &buffer);
+    void setScene(GLScene *scene);
 
 signals:
+    void bufferChanged(QList<qreal> &buffer);
+    void spectrumChanged(FrequencySpectrum &spectrum);
+    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
+
+public slots:
+    void handleBufferChanged(QList<qreal> &buffer);
+    void handleSpectrumChanged(FrequencySpectrum &spectrum);
+    void handleSpectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
 
     // QOpenGLWidget interface
 protected:
@@ -26,10 +33,9 @@ protected:
     void paintGL() override;
 
 private:
-    QSurfaceFormat m_format;
+    //QSurfaceFormat m_format;
 
-    QList<QPointF> m_buffer;
-    QList<qreal> m_buffer2;
+    GLScene *currentScene;
 };
 
 #endif // GLWIDGET_H

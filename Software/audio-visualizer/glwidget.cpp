@@ -3,6 +3,7 @@
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
+    , currentScene(nullptr)
 {
 
 }
@@ -12,70 +13,61 @@ GLWidget::~GLWidget()
 
 }
 
-void GLWidget::setBuffer(QList<QPointF> buffer)
+void GLWidget::setScene(GLScene *scene)
 {
-    m_buffer = buffer;
-
-    update();
-
-    //qDebug() << "Buffer received! First value: (" << m_buffer.first().x() << ", " << m_buffer.first().y() << ")";
+    if (currentScene) {
+        // Prekini sve signale povezane s trenutnom scenom
+        disconnect(this, nullptr, currentScene, nullptr);
+        delete currentScene;
+    }
+    currentScene = scene;
+    if (currentScene) {
+        currentScene->initialize();
+        connect(this, &GLWidget::bufferChanged, currentScene, &GLScene::bufferChanged);
+        connect(this,
+                QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLWidget::spectrumChanged),
+                currentScene,
+                QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLScene::spectrumChanged));
+    }
 }
 
-void GLWidget::bufferChanged(QList<qreal> &buffer)
+void GLWidget::handleBufferChanged(QList<qreal> &buffer)
 {
-    qDebug() << "opengl received: " << QTime::currentTime();
-    m_buffer2 = buffer;
-    update();
+    emit bufferChanged(buffer);
+    update(); // Zove paintGL()
+}
+
+void GLWidget::handleSpectrumChanged(FrequencySpectrum &spectrum)
+{
+    emit spectrumChanged(spectrum);
+    update(); // Zove paintGL()
+}
+
+void GLWidget::handleSpectrumChanged(qint64 position,
+                                     qint64 length,
+                                     const FrequencySpectrum &spectrum)
+{
+    emit spectrumChanged(position, length, spectrum);
+    update(); // Zove paintGL()
 }
 
 void GLWidget::initializeGL()
 {
-
-    initializeOpenGLFunctions();
-
-    glClearColor(0, 0, 0, 1);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, width(), -1, 1, -1, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    if (currentScene) {
+        currentScene->initialize();
+    }
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
-    glViewport(0, 0, w, h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, w, -1, 1, -1, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    if (currentScene) {
+        currentScene->resize(w, h);
+    }
 }
 
 void GLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glColor3f(1, 1, 1);
-    glBegin(GL_LINE_STRIP);
-
-    float xScale = 1;
-
-    //if(!m_buffer.empty()) xScale = width() / static_cast<float>(m_buffer.size());
-    if (!m_buffer2.empty())
-        xScale = width() / static_cast<float>(m_buffer2.size());
-
-    // for(int i = 0; i < m_buffer.size(); i++){
-    //     auto x = m_buffer[i].x() * xScale;
-    //     auto y = m_buffer[i].y();
-    //     glVertex2f(x, y);
-    // }
-
-    for (int i = 0; i < m_buffer2.size(); i++) {
-        auto x = i * xScale;
-        auto y = m_buffer2[i];
-        glVertex2f(x, y);
+    if (currentScene) {
+        currentScene->paint();
     }
-
-    glEnd();
-    glFlush();
 }

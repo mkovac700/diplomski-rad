@@ -8,6 +8,9 @@
 
 #include <QFileDialog>
 
+#include <glbarspectrumscene.h>
+#include <glwaveformscene.h>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -39,11 +42,25 @@ MainWindow::MainWindow(QWidget *parent)
 
     //filePlayer = new FilePlayer(this);
 
-    connect(m_engine, &Engine::buffer2Changed, ui->widget, &GLWidget::bufferChanged);
+    // ui->widget->setScene(new GLWaveformScene(ui->widget));
+
+    //connect(m_engine, &Engine::buffer2Changed, ui->widget, &GLWidget::bufferChanged);
+    connect(m_engine, &Engine::buffer2Changed, ui->widget, &GLWidget::handleBufferChanged);
     connect(m_engine,
             QOverload<qint64, qint64, const FrequencySpectrum &>::of(&Engine::spectrumChanged),
-            ui->widget_2,
-            QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLWidget2::spectrumChanged));
+            ui->widget,
+            QOverload<qint64, qint64, const FrequencySpectrum &>::of(
+                &GLWidget::handleSpectrumChanged));
+    // connect(m_engine,
+    //         QOverload<qint64, qint64, const FrequencySpectrum &>::of(&Engine::spectrumChanged),
+    //         ui->widget_2,
+    //         QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLWidget2::spectrumChanged));
+
+    //mora se osigurati da je widget do kraja inicijaliziran prije postavljanja defaultne scene
+    // QTimer::singleShot(0, this, [this]() { ui->widget->setScene(new GLWaveformScene(ui->widget)); });
+    QTimer::singleShot(0, this, [this]() {
+        ui->widget->setScene(new GLBarSpectrumScene(ui->widget));
+    });
 }
 
 MainWindow::~MainWindow()
@@ -109,7 +126,7 @@ void MainWindow::initializeInputAudio(const QAudioDevice &inputDeviceInfo)
     connect(m_audioListener.data(), &AudioListener::level_l_Changed, this, &MainWindow::set_level_l);
     connect(m_audioListener.data(), &AudioListener::level_r_Changed, this, &MainWindow::set_level_r);
 
-    connect(m_audioListener.data(), &AudioListener::bufferChanged, ui->widget, &GLWidget::setBuffer);
+    //connect(m_audioListener.data(), &AudioListener::bufferChanged, ui->widget, &GLWidget::setBuffer);
     connect(m_audioListener.data(),
             &AudioListener::bufferChanged,
             ui->widget_2,
