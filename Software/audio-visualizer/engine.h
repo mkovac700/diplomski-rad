@@ -120,6 +120,13 @@ public:
     qint64 bufferLength() const;
 
     /**
+     * Duration of the internal engine buffer.
+     * @author Marijan K
+     * @return Buffer duration in microseconds.
+     */
+    qint64 bufferDuration() const;
+
+    /**
      * Amount of data held in the buffer.
      * \return Data length in bytes.
      */
@@ -179,6 +186,12 @@ signals:
      * \param position Position in bytes
      */
     void playPositionChanged(qint64 position);
+
+    /**
+     * Number of processed microseconds has changed.
+     * @param processedUSecs Processed microseconds
+     */
+    void processedUSecsChanged(qint64 processedUSecs);
 
     /**
      * Level changed

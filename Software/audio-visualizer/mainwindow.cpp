@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     initializeMenuMedia();
+
+    connect(m_engine, &Engine::processedUSecsChanged, this, &MainWindow::processedUSecsChanged);
 }
 
 MainWindow::~MainWindow()
@@ -69,6 +71,38 @@ void MainWindow::updateMenuMedia()
     ui->actionStream->setChecked(m_mode == Mode::StreamMode);
 
     MAINWINDOW_DEBUG << (m_mode == Mode::LoadFileMode) << (m_mode == Mode::StreamMode);
+}
+
+void MainWindow::updateLabelDuration(qint64 duration)
+{
+    qint64 durationMs = duration / 1000;
+
+    QTime time(0, 0);
+    time = time.addMSecs(durationMs);
+    QString formattedTime = time.toString("m:ss");
+
+    ui->label_Duration->setText(formattedTime);
+}
+
+void MainWindow::updateHorizontalSlider(qint64 maxValue)
+{
+    ui->horizontalSlider_Position->setMaximum(maxValue);
+}
+
+void MainWindow::updateHorizontalSliderPosition(qint64 processedUSecs)
+{
+    ui->horizontalSlider_Position->setSliderPosition(processedUSecs);
+}
+
+void MainWindow::updateLabelSeek(qint64 uSecs)
+{
+    qint64 mSecs = uSecs / 1000;
+
+    QTime time(0, 0);
+    time = time.addMSecs(mSecs);
+    QString formattedTime = time.toString("m:ss");
+
+    ui->label_Seek->setText(formattedTime);
 }
 
 void MainWindow::loadInputDevices()
@@ -191,6 +225,8 @@ void MainWindow::openFile()
 {
     setMode(Mode::LoadFileMode);
 
+    updateLabelDuration(0);
+
     m_currentFile = QFileDialog::getOpenFileName(this,
                                                  tr("Open File"),
                                                  QStandardPaths::writableLocation(
@@ -207,9 +243,21 @@ void MainWindow::openFile()
     m_engine->reset();
 
     m_engine->loadFile(m_currentFile);
+
+    qDebug() << "buffer duration (us): " << m_engine->bufferDuration();
+
+    updateLabelDuration(m_engine->bufferDuration());
+    updateHorizontalSlider(m_engine->bufferDuration());
 }
 
 void MainWindow::openStream()
 {
     setMode(Mode::StreamMode);
+    updateLabelDuration(0);
+}
+
+void MainWindow::processedUSecsChanged(qint64 processedUSecs)
+{
+    updateHorizontalSliderPosition(processedUSecs);
+    updateLabelSeek(processedUSecs);
 }

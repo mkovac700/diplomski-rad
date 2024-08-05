@@ -41,6 +41,8 @@ private slots:
 
     void openStream();
 
+    void processedUSecsChanged(qint64 processedUSecs);
+
 private:
     void loadInputDevices();
 
@@ -59,6 +61,15 @@ private:
     void initializeMenuMedia();
 
     void updateMenuMedia();
+
+    /**
+     * Set new value of format mm:ss for label_Duration
+     * @param duration Duration in microseconds
+     */
+    void updateLabelDuration(qint64 duration);
+    void updateHorizontalSlider(qint64 maxValue);
+    void updateHorizontalSliderPosition(qint64 processedUSecs);
+    void updateLabelSeek(qint64 uSecs);
 
 private:
     Ui::MainWindow *ui;
