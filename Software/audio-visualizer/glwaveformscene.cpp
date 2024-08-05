@@ -1,7 +1,5 @@
 #include "glwaveformscene.h"
 
-GLWaveformScene::GLWaveformScene() {}
-
 void GLWaveformScene::initialize()
 {
     initializeOpenGLFunctions();
@@ -66,4 +64,11 @@ void GLWaveformScene::spectrumChanged(qint64 position,
     Q_UNUSED(position)
     Q_UNUSED(length)
     Q_UNUSED(spectrum)
+}
+
+void GLWaveformScene::reinitialize()
+{
+    glWidget->makeCurrent();
+    initialize();
+    glWidget->doneCurrent();
 }

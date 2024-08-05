@@ -45,13 +45,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     //mora se osigurati da je widget do kraja inicijaliziran prije postavljanja defaultne scene
     // QTimer::singleShot(0, this, [this]() { ui->widget->setScene(new GLWaveformScene(ui->widget)); });
-    QTimer::singleShot(0, this, [this]() {
-        ui->widget->setScene(new GLBarSpectrumScene(ui->widget));
-    });
+    // QTimer::singleShot(0, this, [this]() {
+    //     ui->widget->setScene(new GLBarSpectrumScene(ui->widget));
+    // });
 
     initializeMenuMedia();
 
     connect(m_engine, &Engine::processedUSecsChanged, this, &MainWindow::processedUSecsChanged);
+
+    initializeScenes();
 }
 
 MainWindow::~MainWindow()
@@ -103,6 +105,14 @@ void MainWindow::updateLabelSeek(qint64 uSecs)
     QString formattedTime = time.toString("m:ss");
 
     ui->label_Seek->setText(formattedTime);
+}
+
+void MainWindow::initializeScenes()
+{
+    glScenes.append(new GLWaveformScene(ui->widget));
+    glScenes.append(new GLBarSpectrumScene(ui->widget));
+
+    QTimer::singleShot(0, this, [this]() { ui->widget->setScene(glScenes[0]); });
 }
 
 void MainWindow::loadInputDevices()
@@ -260,4 +270,28 @@ void MainWindow::processedUSecsChanged(qint64 processedUSecs)
 {
     updateHorizontalSliderPosition(processedUSecs);
     updateLabelSeek(processedUSecs);
+}
+
+void MainWindow::on_pushButton_PreviousScene_clicked()
+{
+    if (currentGLScene == 0) {
+        currentGLScene = glScenes.size() - 1;
+    } else {
+        currentGLScene--;
+    }
+
+    ui->widget->setScene(glScenes[currentGLScene]);
+    ui->label_CurrentScene->setText(glScenes[currentGLScene]->getName());
+}
+
+void MainWindow::on_pushButton_NextScene_clicked()
+{
+    if (currentGLScene == glScenes.size() - 1) {
+        currentGLScene = 0;
+    } else {
+        currentGLScene++;
+    }
+
+    ui->widget->setScene(glScenes[currentGLScene]);
+    ui->label_CurrentScene->setText(glScenes[currentGLScene]->getName());
 }

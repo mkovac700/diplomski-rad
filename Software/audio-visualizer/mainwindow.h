@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "glbarspectrumscene.h"
+#include "glscene.h"
+#include "glwaveformscene.h"
 
 #include <QMediaDevices>
 
@@ -88,5 +91,19 @@ private:
     bool playing = false;
 
     Mode m_mode;
+
+    //------------------------------------------------
+    // SCENES
+    //------------------------------------------------
+private:
+    QVector<GLScene *> glScenes;
+    int currentGLScene = 0;
+
+private:
+    void initializeScenes();
+
+private slots:
+    void on_pushButton_PreviousScene_clicked();
+    void on_pushButton_NextScene_clicked();
 };
 #endif // MAINWINDOW_H

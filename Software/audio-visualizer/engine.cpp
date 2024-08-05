@@ -338,7 +338,11 @@ void Engine::audioNotify()
     case QAudioDevice::Output: {
         // const qint64 playPosition = m_format.bytesForDuration(m_audioOutput->processedUSecs());
         m_processedUSecs += 10 * 1000;
-        emit processedUSecsChanged(m_processedUSecs); //->za slider
+
+        qDebug() << "Engine::audioNotify[3]" << "m_processedUSec:" << m_processedUSecs
+                 << "processedUSecs" << m_audioOutput->processedUSecs();
+
+        //emit processedUSecsChanged(m_processedUSecs); //->za slider
         const qint64 playPosition = m_format.bytesForDuration(m_processedUSecs);
         //setPlayPosition(qMin(bufferLength(), playPosition)); --> za slider
         // const qint64 levelPosition = playPosition - m_levelBufferLength;
