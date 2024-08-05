@@ -180,7 +180,7 @@ qint64 Engine::bufferLength() const
 
 void Engine::setWindowFunction(WindowFunction type)
 {
-    // m_spectrumAnalyser.setWindowFunction(type);
+    m_spectrumAnalyser.setWindowFunction(type);
 }
 
 //-----------------------------------------------------------------------------

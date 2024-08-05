@@ -7,15 +7,15 @@
 
 #include <audiolistener.h>
 
-#include <audioplayer.h>
-
-//#include <fileplayer.h>
-
 #include <QAudioSink>
 
 #include <QStandardPaths>
 
 #include <engine.h>
+
+#include <utils.h>
+
+#define LOG_MAINWINDOW
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -31,16 +31,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void set_level_l(qreal value);
-    void set_level_r(qreal value);
-
 private slots:
 
     void on_pushButton_StartStop_clicked();
-
-    void on_comboBox_SampleRate_currentTextChanged(const QString &arg1);
-
-    void on_pushButton_OsvjeziUredaje_clicked();
 
     void on_pushButton_stop_clicked();
 
@@ -48,26 +41,7 @@ private slots:
 
     void on_pushButton_PlayPause_clicked();
 
-private:
-    Ui::MainWindow *ui;
-
-    QMediaDevices *m_devices = new QMediaDevices(this);
-
-    QScopedPointer<AudioListener> m_audioListener;
-    QScopedPointer<QAudioSource> m_audioInput;
-
-    int m_sample_rate = 48000;
-
-    AudioPlayer *audioPlayer;
-
-    //FilePlayer *filePlayer;
-    QScopedPointer<QAudioSink> m_audioOutput;
-
-    QString m_currentFile;
-
-    Engine *m_engine;
-
-    bool playing = false;
+    void openFile();
 
 private:
     void loadInputDevices();
@@ -77,5 +51,33 @@ private:
     void loadOutputDevices();
 
     void initializeOutputAudio(const QAudioDevice &outputDevice);
+
+    //MenuBar
+
+    enum Mode { NoMode, StreamMode, GenerateToneMode, LoadFileMode };
+
+    void setMode(Mode mode);
+
+    void initializeMenuMedia();
+
+    void updateMenuMedia();
+
+private:
+    Ui::MainWindow *ui;
+
+    QMediaDevices *m_devices = new QMediaDevices(this);
+
+    QScopedPointer<AudioListener> m_audioListener;
+    QScopedPointer<QAudioSource> m_audioInput;
+
+    QScopedPointer<QAudioSink> m_audioOutput;
+
+    QString m_currentFile;
+
+    Engine *m_engine;
+
+    bool playing = false;
+
+    Mode m_mode;
 };
 #endif // MAINWINDOW_H

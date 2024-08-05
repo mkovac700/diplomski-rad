@@ -58,6 +58,12 @@ inline NullDebug nullDebug()
     return NullDebug();
 }
 
+#ifdef LOG_MAINWINDOW
+#define MAINWINDOW_DEBUG qDebug()
+#else
+#define MAINWINDOW_DEBUG nullDebug()
+#endif
+
 #ifdef LOG_ENGINE
 #    define ENGINE_DEBUG qDebug()
 #else

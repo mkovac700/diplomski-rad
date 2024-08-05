@@ -10,11 +10,9 @@ CONFIG += c++17
 
 SOURCES += \
     audiolistener.cpp \
-    audioplayer.cpp \
     glbarspectrumscene.cpp \
     glwaveformscene.cpp \
     glwidget.cpp \
-    glwidget2.cpp \
     main.cpp \
     mainwindow.cpp \
     signalprocessor.cpp \
@@ -25,12 +23,10 @@ SOURCES += \
 
 HEADERS += \
     audiolistener.h \
-    audioplayer.h \
     glbarspectrumscene.h \
     glscene.h \
     glwaveformscene.h \
     glwidget.h \
-    glwidget2.h \
     mainwindow.h \
     signalprocessor.h \
     engine.h \
