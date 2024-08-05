@@ -33,15 +33,13 @@ public:
 
 private slots:
 
-    void on_pushButton_StartStop_clicked();
-
     void on_pushButton_stop_clicked();
-
-    void on_pushButton_openFile_clicked();
 
     void on_pushButton_PlayPause_clicked();
 
     void openFile();
+
+    void openStream();
 
 private:
     void loadInputDevices();

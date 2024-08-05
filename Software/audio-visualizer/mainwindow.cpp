@@ -60,13 +60,15 @@ MainWindow::~MainWindow()
 void MainWindow::initializeMenuMedia()
 {
     connect(ui->actionFile, &QAction::triggered, this, &MainWindow::openFile);
-    //connect(ui->actionStream, &QAction::triggered, this, &QMainWindow::openStream); //todo
+    connect(ui->actionStream, &QAction::triggered, this, &MainWindow::openStream); //todo
 }
 
 void MainWindow::updateMenuMedia()
 {
     ui->actionFile->setChecked(m_mode == Mode::LoadFileMode);
     ui->actionStream->setChecked(m_mode == Mode::StreamMode);
+
+    MAINWINDOW_DEBUG << (m_mode == Mode::LoadFileMode) << (m_mode == Mode::StreamMode);
 }
 
 void MainWindow::loadInputDevices()
@@ -137,37 +139,39 @@ void MainWindow::setMode(Mode mode)
     updateMenuMedia();
 }
 
-void MainWindow::on_pushButton_StartStop_clicked()
-{
-    // if(m_audioInput.isNull()){ //prvi put -> jos nije inicijaliziran pointer m_audioInput
-    //     ui->pushButton_StartStop->setText("Zaustavi stream");
-    //     initializeInputAudio(ui->comboBox_AudioIn->currentData().value<QAudioDevice>());
-    //     return;
-    // }
+// void MainWindow::on_pushButton_StartStop_clicked()
+// {
+// if(m_audioInput.isNull()){ //prvi put -> jos nije inicijaliziran pointer m_audioInput
+//     ui->pushButton_StartStop->setText("Zaustavi stream");
+//     initializeInputAudio(ui->comboBox_AudioIn->currentData().value<QAudioDevice>());
+//     return;
+// }
 
-    // switch (m_audioInput->state()) {
-    // case QtAudio::StoppedState:
-    //     ui->pushButton_StartStop->setText("Zaustavi stream");
-    //     initializeInputAudio(ui->comboBox_AudioIn->currentData().value<QAudioDevice>());
-    //     break;
-    // case QtAudio::ActiveState:
-    //     ui->pushButton_StartStop->setText("Započni stream");
-    //     m_audioListener->stop();
-    //     m_audioInput->stop();
-    //     m_audioInput->disconnect(this);
-    // default:
-    //     break;
-    // }
-}
+// switch (m_audioInput->state()) {
+// case QtAudio::StoppedState:
+//     ui->pushButton_StartStop->setText("Zaustavi stream");
+//     initializeInputAudio(ui->comboBox_AudioIn->currentData().value<QAudioDevice>());
+//     break;
+// case QtAudio::ActiveState:
+//     ui->pushButton_StartStop->setText("Započni stream");
+//     m_audioListener->stop();
+//     m_audioInput->stop();
+//     m_audioInput->disconnect(this);
+// default:
+//     break;
+// }
+// }
 
 void MainWindow::on_pushButton_PlayPause_clicked()
 {
     if (playing) {
         m_engine->suspend();
-        ui->pushButton_PlayPause->setText(tr("Play"));
+        ui->pushButton_PlayPause->setToolTip(tr("Play"));
+        ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-play-96-2.png"));
     } else {
         m_engine->startPlayback();
-        ui->pushButton_PlayPause->setText(tr("Pause"));
+        ui->pushButton_PlayPause->setToolTip(tr("Pause"));
+        ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-pause-96-2.png"));
     }
 
     playing = !playing;
@@ -175,30 +179,12 @@ void MainWindow::on_pushButton_PlayPause_clicked()
 
 void MainWindow::on_pushButton_stop_clicked()
 {
-    ui->pushButton_PlayPause->setText(tr("Play"));
+    ui->pushButton_PlayPause->setToolTip(tr("Play"));
+
+    ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-play-96-2.png"));
 
     m_engine->stopPlayback();
     playing = false;
-}
-
-void MainWindow::on_pushButton_openFile_clicked()
-{
-    m_currentFile = QFileDialog::getOpenFileName(this,
-                                                 tr("Open File"),
-                                                 QStandardPaths::writableLocation(
-                                                     QStandardPaths::MusicLocation),
-                                                 tr("Audio Files (*.wav)"));
-
-    qDebug() << m_currentFile;
-
-    ui->statusbar->showMessage(QString("Datoteka: ").append(m_currentFile.split("/").last()));
-
-    if (m_currentFile.isEmpty())
-        return;
-
-    m_engine->reset();
-
-    m_engine->loadFile(m_currentFile);
 }
 
 void MainWindow::openFile()
@@ -221,4 +207,9 @@ void MainWindow::openFile()
     m_engine->reset();
 
     m_engine->loadFile(m_currentFile);
+}
+
+void MainWindow::openStream()
+{
+    setMode(Mode::StreamMode);
 }

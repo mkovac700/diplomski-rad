@@ -42,8 +42,24 @@
       </item>
       <item>
        <widget class="QPushButton" name="pushButton_PreviousScene">
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	background-color: transparent;
+	border: none;
+}</string>
+        </property>
         <property name="text">
-         <string>&lt;</string>
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="icons.qrc">
+          <normaloff>:/icons/icons8-back-96.png</normaloff>:/icons/icons8-back-96.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -59,8 +75,24 @@
       </item>
       <item>
        <widget class="QPushButton" name="pushButton_NextScene">
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	background-color: transparent;
+	border: none;
+}</string>
+        </property>
         <property name="text">
-         <string>&gt;</string>
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="icons.qrc">
+          <normaloff>:/icons/icons8-forward-96.png</normaloff>:/icons/icons8-forward-96.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -104,15 +136,47 @@
       </item>
       <item>
        <widget class="QPushButton" name="pushButton_PlayPause">
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	background-color: transparent;
+	border: none;
+}</string>
+        </property>
         <property name="text">
-         <string>Play</string>
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="icons.qrc">
+          <normaloff>:/icons/icons8-play-96-2.png</normaloff>:/icons/icons8-play-96-2.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="pushButton_stop">
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	background-color: transparent;
+	border: none;
+}</string>
+        </property>
         <property name="text">
-         <string>Stop</string>
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="icons.qrc">
+          <normaloff>:/icons/icons8-stop-96-2.png</normaloff>:/icons/icons8-stop-96-2.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -168,16 +232,6 @@
     <string>Strujanje</string>
    </property>
   </action>
-  <action name="actionDefault">
-   <property name="text">
-    <string>Default</string>
-   </property>
-  </action>
-  <action name="actionDefault_2">
-   <property name="text">
-    <string>Default</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -187,6 +241,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -51,3 +51,6 @@ LIBS += -L/$$PWD/libs/fftw-3.3.5-dll64/ -llibfftw3-3
 LIBS += -L/$$PWD/libs/fftw-3.3.5-dll64/ -llibfftw3f-3
 LIBS += -L/$$PWD/libs/fftw-3.3.5-dll64/ -llibfftw3l-3
 QMAKE_CXXFLAGS += I$$PWD/libs/fftw-3.3.5-dll64
+
+RESOURCES += \
+    icons.qrc
