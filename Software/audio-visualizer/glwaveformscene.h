@@ -8,15 +8,12 @@ class GLWaveformScene : public GLScene
 {
     Q_OBJECT
 public:
-    GLWaveformScene();
     explicit GLWaveformScene(GLWidget *glWidget)
         : GLScene(glWidget)
     {}
-    // QTC_TEMP
     // GLScene interface
 public:
     void initialize() override;
-    // void update() override;
     void paint() override;
     void resize(int w, int h) override;
 
@@ -27,6 +24,17 @@ public slots:
 
 private:
     QList<qreal> m_buffer;
+
+    // GLScene interface
+public:
+    QString getName() const override { return name; };
+
+private:
+    QString name = "Waveform";
+
+    // GLScene interface
+public:
+    void reinitialize() override;
 };
 
 #endif // GLWAVEFORMSCENE_H

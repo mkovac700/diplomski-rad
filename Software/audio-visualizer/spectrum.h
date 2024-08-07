@@ -26,7 +26,7 @@ const qreal SpectrumLowFreq = 0.0; // Hz
 const qreal SpectrumHighFreq = 10000.0; // Hz //1000 /10000
 
 // Waveform window size in microseconds
-const qint64 WaveformWindowDuration = 10 * 1000; //500 * 1000;
+const qint64 WaveformWindowDuration = 500 * 1000; //10 * 1000; //500 * 1000;
 
 // Length of waveform tiles in bytes
 // Ideally, these would match the QAudio*::bufferSize(), but that isn't

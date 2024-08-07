@@ -110,7 +110,6 @@ bool Engine::loadFile(const QString &fileName)
     Q_ASSERT(!m_file);
     Q_ASSERT(!fileName.isEmpty());
     QIODevice *file = new QFile(fileName);
-    QIODevice *file2 = new QFile(fileName);
     if (file->open(QIODevice::ReadOnly)) {
         m_file = new QWaveDecoder(file, this);
         if (m_file->open(QIODevice::ReadOnly)) {
@@ -126,6 +125,7 @@ bool Engine::loadFile(const QString &fileName)
         emit errorMessage(tr("Could not open file"), fileName);
     }
     if (result) {
+        QIODevice *file2 = new QFile(fileName);
         // file->close();
         // file->open(QIODevice::ReadOnly);
         file2->open(QIODevice::ReadOnly);
@@ -178,9 +178,16 @@ qint64 Engine::bufferLength() const
     return m_file ? m_file->getDevice()->size() : m_bufferLength;
 }
 
+qint64 Engine::bufferDuration() const
+{
+    qint64 bytes = m_file->getDevice()->size();
+
+    return m_format.durationForBytes(bytes);
+}
+
 void Engine::setWindowFunction(WindowFunction type)
 {
-    // m_spectrumAnalyser.setWindowFunction(type);
+    m_spectrumAnalyser.setWindowFunction(type);
 }
 
 //-----------------------------------------------------------------------------
@@ -331,6 +338,11 @@ void Engine::audioNotify()
     case QAudioDevice::Output: {
         // const qint64 playPosition = m_format.bytesForDuration(m_audioOutput->processedUSecs());
         m_processedUSecs += 10 * 1000;
+
+        qDebug() << "Engine::audioNotify[3]" << "m_processedUSec:" << m_processedUSecs
+                 << "processedUSecs" << m_audioOutput->processedUSecs();
+
+        //emit processedUSecsChanged(m_processedUSecs); //->za slider
         const qint64 playPosition = m_format.bytesForDuration(m_processedUSecs);
         //setPlayPosition(qMin(bufferLength(), playPosition)); --> za slider
         // const qint64 levelPosition = playPosition - m_levelBufferLength;

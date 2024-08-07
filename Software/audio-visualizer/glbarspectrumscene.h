@@ -9,7 +9,6 @@ class GLBarSpectrumScene : public GLScene
 {
     Q_OBJECT
 public:
-    GLBarSpectrumScene();
     explicit GLBarSpectrumScene(GLWidget *glWidget)
         : GLScene(glWidget)
     {}
@@ -25,8 +24,18 @@ public slots:
     void spectrumChanged(FrequencySpectrum &spectrum) override;
     void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum) override;
 
+    // GLScene interface
+public:
+    QString getName() const override { return name; };
+
 private:
     FrequencySpectrum m_spectrum;
+
+    QString name = "Bar Spectrum";
+
+    // GLScene interface
+public:
+    void reinitialize() override;
 };
 
 #endif // GLBARSPECTRUMSCENE_H

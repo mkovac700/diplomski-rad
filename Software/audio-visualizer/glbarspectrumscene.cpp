@@ -1,7 +1,5 @@
 #include "glbarspectrumscene.h"
 
-GLBarSpectrumScene::GLBarSpectrumScene() {}
-
 void GLBarSpectrumScene::initialize()
 {
     initializeOpenGLFunctions();
@@ -72,4 +70,11 @@ void GLBarSpectrumScene::spectrumChanged(qint64 position,
     Q_UNUSED(position)
     Q_UNUSED(length)
     m_spectrum = spectrum;
+}
+
+void GLBarSpectrumScene::reinitialize()
+{
+    glWidget->makeCurrent();
+    initialize();
+    glWidget->doneCurrent();
 }

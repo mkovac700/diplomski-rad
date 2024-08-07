@@ -36,6 +36,7 @@ private:
     //QSurfaceFormat m_format;
 
     GLScene *currentScene;
+    bool busy = false;
 };
 
 #endif // GLWIDGET_H
