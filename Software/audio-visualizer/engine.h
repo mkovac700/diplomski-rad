@@ -299,6 +299,7 @@ private:
     QTimer *m_notifyTimer = nullptr;
 
     qint64 m_processedUSecs;
+    qint64 m_originalProcessedUSecs;
 
 #ifdef DUMP_DATA
     QDir m_outputDir;

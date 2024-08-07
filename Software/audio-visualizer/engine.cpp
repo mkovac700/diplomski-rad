@@ -248,6 +248,8 @@ void Engine::startPlayback()
                 m_bufferPosition = 0;
                 m_dataLength = 0;
                 m_audioOutput->start(m_file->getDevice());
+                m_processedUSecs = m_audioOutput->processedUSecs();
+                qDebug() << "processedUSecs on start:" << m_processedUSecs;
             } else {
                 // m_audioOutputIODevice.close();
                 // m_audioOutputIODevice.setBuffer(&m_buffer);
@@ -337,10 +339,21 @@ void Engine::audioNotify()
     } break;
     case QAudioDevice::Output: {
         // const qint64 playPosition = m_format.bytesForDuration(m_audioOutput->processedUSecs());
+
         m_processedUSecs += 10 * 1000;
 
         qDebug() << "Engine::audioNotify[3]" << "m_processedUSec:" << m_processedUSecs
                  << "processedUSecs" << m_audioOutput->processedUSecs();
+
+        //sync audio processedUSecs with custom timer processedUSecs
+        if (m_originalProcessedUSecs != m_audioOutput->processedUSecs()) {
+            m_originalProcessedUSecs = m_audioOutput->processedUSecs();
+            //emit processedUSecsChanged(m_processedUSecs); //->za slider
+            if (m_processedUSecs != m_originalProcessedUSecs) {
+                qDebug() << "synced";
+                m_processedUSecs = m_originalProcessedUSecs - WaveformWindowDuration;
+            }
+        }
 
         //emit processedUSecsChanged(m_processedUSecs); //->za slider
         const qint64 playPosition = m_format.bytesForDuration(m_processedUSecs);
