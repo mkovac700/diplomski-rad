@@ -110,9 +110,9 @@ void MainWindow::updateLabelSeek(qint64 uSecs)
 
 void MainWindow::initializeScenes()
 {
-    glScenes.append(new GL3DSpectrogramScene(ui->widget));
     glScenes.append(new GLWaveformScene(ui->widget));
     glScenes.append(new GLBarSpectrumScene(ui->widget));
+    glScenes.append(new GL3DSpectrogramScene(ui->widget));
 
     QTimer::singleShot(0, this, [this]() {
         ui->widget->setScene(glScenes[0]);

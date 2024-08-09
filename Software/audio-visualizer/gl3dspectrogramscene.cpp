@@ -6,13 +6,7 @@ GL3DSpectrogramScene::GL3DSpectrogramScene(GLWidget *glWidget)
     , m_rotationY(0)
     , m_rotationZ(0)
     , m_distance(-20)
-{
-    std::srand(
-        static_cast<unsigned>(std::time(nullptr))); // Inicijaliziraj generator slučajnih brojeva
-
-    // Inicijalizacija timera
-    connect(&timer, &QTimer::timeout, this, &GL3DSpectrogramScene::updatePeaks);
-}
+{}
 
 void GL3DSpectrogramScene::initialize()
 {
@@ -45,8 +39,6 @@ void GL3DSpectrogramScene::initialize()
         }
         initialized = true;
     }
-
-    //timer.start(10);
 }
 
 void GL3DSpectrogramScene::resize(int w, int h)
