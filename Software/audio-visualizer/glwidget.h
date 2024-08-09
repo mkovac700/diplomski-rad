@@ -15,6 +15,7 @@ public:
     ~GLWidget();
 
     void setScene(GLScene *scene);
+    void resetState();
 
 signals:
     void bufferChanged(QList<qreal> &buffer);
@@ -37,6 +38,12 @@ private:
 
     GLScene *currentScene;
     bool busy = false;
+
+    // QWidget interface
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 };
 
 #endif // GLWIDGET_H

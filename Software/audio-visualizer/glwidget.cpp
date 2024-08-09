@@ -40,6 +40,28 @@ void GLWidget::setScene(GLScene *scene)
     busy = false;
 }
 
+void GLWidget::resetState()
+{
+    initializeOpenGLFunctions();
+
+    // Resetiranje matrica
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // Resetiranje osnovnih stanja
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_TEXTURE_2D);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    // Resetiranje viewporta
+    glViewport(0, 0, width(), height());
+}
+
 void GLWidget::handleBufferChanged(QList<qreal> &buffer)
 {
     if (!busy) {
@@ -85,4 +107,27 @@ void GLWidget::paintGL()
     if (currentScene) {
         currentScene->paint();
     }
+}
+
+void GLWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (currentScene) {
+        currentScene->mousePressEvent(event);
+    }
+}
+
+void GLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (currentScene) {
+        currentScene->mouseMoveEvent(event);
+    }
+    update();
+}
+
+void GLWidget::wheelEvent(QWheelEvent *event)
+{
+    if (currentScene) {
+        currentScene->wheelEvent(event);
+    }
+    update();
 }

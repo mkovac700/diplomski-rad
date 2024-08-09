@@ -2,6 +2,8 @@
 
 void GLWaveformScene::initialize()
 {
+    glWidget->resetState();
+
     initializeOpenGLFunctions();
 
     glClearColor(0, 0, 0, 1);
@@ -71,4 +73,19 @@ void GLWaveformScene::reinitialize()
     glWidget->makeCurrent();
     initialize();
     glWidget->doneCurrent();
+}
+
+void GLWaveformScene::mousePressEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void GLWaveformScene::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void GLWaveformScene::wheelEvent(QWheelEvent *event)
+{
+    Q_UNUSED(event)
 }

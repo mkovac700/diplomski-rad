@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     audiolistener.cpp \
+    gl3dspectrogramscene.cpp \
     glbarspectrumscene.cpp \
     glwaveformscene.cpp \
     glwidget.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 
 HEADERS += \
     audiolistener.h \
+    gl3dspectrogramscene.h \
     glbarspectrumscene.h \
     glscene.h \
     glwaveformscene.h \

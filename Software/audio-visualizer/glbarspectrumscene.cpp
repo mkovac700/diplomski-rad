@@ -2,6 +2,8 @@
 
 void GLBarSpectrumScene::initialize()
 {
+    glWidget->resetState();
+
     initializeOpenGLFunctions();
 
     glClearColor(0, 0, 0, 1);
@@ -77,4 +79,19 @@ void GLBarSpectrumScene::reinitialize()
     glWidget->makeCurrent();
     initialize();
     glWidget->doneCurrent();
+}
+
+void GLBarSpectrumScene::mousePressEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void GLBarSpectrumScene::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void GLBarSpectrumScene::wheelEvent(QWheelEvent *event)
+{
+    Q_UNUSED(event)
 }
