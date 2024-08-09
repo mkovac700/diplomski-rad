@@ -8,6 +8,7 @@
 
 #include <QFileDialog>
 
+#include <gl3dspectrogramscene.h>
 #include <glbarspectrumscene.h>
 #include <glwaveformscene.h>
 
@@ -109,10 +110,14 @@ void MainWindow::updateLabelSeek(qint64 uSecs)
 
 void MainWindow::initializeScenes()
 {
+    glScenes.append(new GL3DSpectrogramScene(ui->widget));
     glScenes.append(new GLWaveformScene(ui->widget));
     glScenes.append(new GLBarSpectrumScene(ui->widget));
 
-    QTimer::singleShot(0, this, [this]() { ui->widget->setScene(glScenes[0]); });
+    QTimer::singleShot(0, this, [this]() {
+        ui->widget->setScene(glScenes[0]);
+        ui->label_CurrentScene->setText(glScenes[0]->getName());
+    });
 }
 
 void MainWindow::loadInputDevices()

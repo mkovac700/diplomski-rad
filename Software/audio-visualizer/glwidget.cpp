@@ -86,3 +86,26 @@ void GLWidget::paintGL()
         currentScene->paint();
     }
 }
+
+void GLWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (currentScene) {
+        currentScene->mousePressEvent(event);
+    }
+}
+
+void GLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (currentScene) {
+        currentScene->mouseMoveEvent(event);
+    }
+    update();
+}
+
+void GLWidget::wheelEvent(QWheelEvent *event)
+{
+    if (currentScene) {
+        currentScene->wheelEvent(event);
+    }
+    update();
+}

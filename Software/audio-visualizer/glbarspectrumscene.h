@@ -36,6 +36,12 @@ private:
     // GLScene interface
 public:
     void reinitialize() override;
+
+    // GLScene interface
+public:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 };
 
 #endif // GLBARSPECTRUMSCENE_H

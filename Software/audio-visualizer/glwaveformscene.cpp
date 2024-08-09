@@ -72,3 +72,18 @@ void GLWaveformScene::reinitialize()
     initialize();
     glWidget->doneCurrent();
 }
+
+void GLWaveformScene::mousePressEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void GLWaveformScene::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void GLWaveformScene::wheelEvent(QWheelEvent *event)
+{
+    Q_UNUSED(event)
+}

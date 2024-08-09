@@ -2,9 +2,11 @@
 #define GLSCENE_H
 
 #include <QList>
+#include <QMouseEvent>
 #include <QObject>
 #include <QOpenGLFunctions>
 #include <QString>
+#include <QWheelEvent>
 #include <frequencyspectrum.h>
 
 class GLWidget;
@@ -21,10 +23,14 @@ public:
     virtual ~GLScene() = default;
     virtual QString getName() const = 0;
     virtual void initialize() = 0;
-    // virtual void update() = 0;
+    virtual void reinitialize() = 0;
     virtual void resize(int w, int h) = 0;
     virtual void paint() = 0;
-    virtual void reinitialize() = 0;
+
+    virtual void mousePressEvent(QMouseEvent *event) = 0;
+    virtual void mouseMoveEvent(QMouseEvent *event) = 0;
+    virtual void wheelEvent(QWheelEvent *event) = 0;
+
 public slots:
     virtual void bufferChanged(QList<qreal> &buffer) = 0;
     virtual void spectrumChanged(FrequencySpectrum &spectrum) = 0;

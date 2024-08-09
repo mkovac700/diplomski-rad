@@ -92,7 +92,7 @@ Engine::Engine(QObject *parent)
 #endif
 
     m_notifyTimer = new QTimer(this);
-    m_notifyTimer->setInterval(10); //1000
+    m_notifyTimer->setInterval(50); //1000
     connect(m_notifyTimer, &QTimer::timeout, this, &Engine::audioNotify);
 }
 
@@ -340,7 +340,7 @@ void Engine::audioNotify()
     case QAudioDevice::Output: {
         // const qint64 playPosition = m_format.bytesForDuration(m_audioOutput->processedUSecs());
 
-        m_processedUSecs += 10 * 1000;
+        m_processedUSecs += 50 * 1000;
 
         qDebug() << "Engine::audioNotify[3]" << "m_processedUSec:" << m_processedUSecs
                  << "processedUSecs" << m_audioOutput->processedUSecs();
