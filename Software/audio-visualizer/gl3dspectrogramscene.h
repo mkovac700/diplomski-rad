@@ -2,6 +2,8 @@
 #define GL3DSPECTROGRAMSCENE_H
 
 #include <QMatrix4x4>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QTimer>
 #include "glscene.h"
 #include "glwidget.h"
@@ -39,10 +41,11 @@ private:
     float m_distance;
     QPoint m_lastMousePosition;
 
-    int m_numLines;
-    int m_numPoints;
+    const int m_numLines = 50;
+    const int m_numPoints = SpectrumLengthSamples / 2 + 1;
 
-    const float m_spacing = 0.1f;   //0.2f
+    const float m_spacingX = 0.02f;
+    const float m_spacingZ = 0.3f;  //0.2f
     const float m_maxHeight = 0.5f; //0.5f
 
     std::vector<std::vector<qreal>> m_peaks;
@@ -50,6 +53,8 @@ private:
     QMatrix4x4 m_projectionMatrix;
 
     QTimer timer;
+
+    QMutex m_mutex;
 
 private:
     void updatePeaks();
