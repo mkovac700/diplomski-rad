@@ -16,6 +16,8 @@ GL3DSpectrogramScene::GL3DSpectrogramScene(GLWidget *glWidget)
 
 void GL3DSpectrogramScene::initialize()
 {
+    glWidget->resetState();
+
     initializeOpenGLFunctions();
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -35,10 +37,13 @@ void GL3DSpectrogramScene::initialize()
     // glGenBuffers(1, &vao);
     // glGenBuffers(1, &vbo);
 
-    // Inicijalizacija peakova (postavljanje svih na 0)
-    for (int i = 0; i < m_numLines; ++i) {
-        std::vector<qreal> linePeaks(m_numPoints, 0.0f);
-        m_peaks.push_back(linePeaks);
+    if (!initialized) {
+        // Inicijalizacija peakova (postavljanje svih na 0)
+        for (int i = 0; i < m_numLines; ++i) {
+            std::vector<qreal> linePeaks(m_numPoints, 0.0f);
+            m_peaks.push_back(linePeaks);
+        }
+        initialized = true;
     }
 
     //timer.start(10);

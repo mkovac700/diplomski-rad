@@ -56,6 +56,8 @@ private:
 
     QMutex m_mutex;
 
+    bool initialized = false;
+
 private:
     void updatePeaks();
 

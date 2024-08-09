@@ -15,6 +15,7 @@ public:
     ~GLWidget();
 
     void setScene(GLScene *scene);
+    void resetState();
 
 signals:
     void bufferChanged(QList<qreal> &buffer);

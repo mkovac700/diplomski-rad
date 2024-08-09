@@ -2,6 +2,8 @@
 
 void GLBarSpectrumScene::initialize()
 {
+    glWidget->resetState();
+
     initializeOpenGLFunctions();
 
     glClearColor(0, 0, 0, 1);
