@@ -144,6 +144,7 @@ public slots:
     void suspend();
     void setAudioInputDevice(const QAudioDevice &device);
     void setAudioOutputDevice(const QAudioDevice &device);
+    void setUpdateInterval(int updateInterval);
 
 signals:
     void stateChanged(QAudioDevice::Mode mode, QAudio::State state);
@@ -217,6 +218,11 @@ signals:
     void bufferChanged(qint64 position, qint64 length, const QByteArray &buffer);
 
     void buffer2Changed(QList<qreal> &buffer);
+
+    /**
+     * File processing completed.
+     */
+    void processingComplete();
 
 private slots:
     void initAudioDevices();
@@ -297,6 +303,7 @@ private:
 
     int m_count;
     QTimer *m_notifyTimer = nullptr;
+    int m_updateInterval;
 
     qint64 m_processedUSecs;
     qint64 m_originalProcessedUSecs;

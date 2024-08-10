@@ -59,6 +59,7 @@ Engine::Engine(QObject *parent)
     , m_spectrumBufferLength(0)
     , m_spectrumPosition(0)
     , m_count(0)
+    , m_updateInterval(10)
     , m_processedUSecs(0)
 {
     connect(&m_spectrumAnalyser,
@@ -92,7 +93,7 @@ Engine::Engine(QObject *parent)
 #endif
 
     m_notifyTimer = new QTimer(this);
-    m_notifyTimer->setInterval(10); //1000
+    //m_notifyTimer->setInterval(10); //1000
     connect(m_notifyTimer, &QTimer::timeout, this, &Engine::audioNotify);
 }
 
@@ -215,7 +216,7 @@ void Engine::startRecording()
             m_audioInputIODevice = m_audioInput->start();
             connect(m_audioInputIODevice, &QIODevice::readyRead, this, &Engine::audioDataReady);
         }
-        m_notifyTimer->start();
+        m_notifyTimer->start(m_updateInterval);
     }
 }
 
@@ -257,7 +258,7 @@ void Engine::startPlayback()
                 // m_audioOutput->start(&m_audioOutputIODevice);
             }
         }
-        m_notifyTimer->start();
+        m_notifyTimer->start(m_updateInterval);
     }
 }
 
@@ -292,6 +293,11 @@ void Engine::setAudioOutputDevice(const QAudioDevice &device)
         m_audioOutputDevice = device;
         initialize();
     }
+}
+
+void Engine::setUpdateInterval(int updateInterval)
+{
+    m_updateInterval = updateInterval;
 }
 
 //-----------------------------------------------------------------------------
@@ -340,7 +346,7 @@ void Engine::audioNotify()
     case QAudioDevice::Output: {
         // const qint64 playPosition = m_format.bytesForDuration(m_audioOutput->processedUSecs());
 
-        m_processedUSecs += 10 * 1000;
+        m_processedUSecs += m_updateInterval * 1000;
 
         qDebug() << "Engine::audioNotify[3]" << "m_processedUSec:" << m_processedUSecs
                  << "processedUSecs" << m_audioOutput->processedUSecs();
@@ -348,7 +354,7 @@ void Engine::audioNotify()
         //sync audio processedUSecs with custom timer processedUSecs
         if (m_originalProcessedUSecs != m_audioOutput->processedUSecs()) {
             m_originalProcessedUSecs = m_audioOutput->processedUSecs();
-            //emit processedUSecsChanged(m_processedUSecs); //->za slider
+            emit processedUSecsChanged(m_processedUSecs); //->za slider
             if (m_processedUSecs != m_originalProcessedUSecs) {
                 qDebug() << "synced";
                 m_processedUSecs = m_originalProcessedUSecs - WaveformWindowDuration;
@@ -641,6 +647,7 @@ void Engine::stopPlayback()
         m_processedUSecs = 0;
     }
     m_notifyTimer->stop();
+    emit processingComplete();
 }
 
 void Engine::setState(QAudio::State state)
