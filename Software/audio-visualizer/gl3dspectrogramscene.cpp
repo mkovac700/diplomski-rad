@@ -5,6 +5,8 @@ GL3DSpectrogramScene::GL3DSpectrogramScene(GLWidget *glWidget)
     , m_rotationX(10)
     , m_rotationY(0)
     , m_rotationZ(0)
+    , m_positionX(0)
+    , m_positionY(0)
     , m_distance(-20)
 {}
 
@@ -58,7 +60,7 @@ void GL3DSpectrogramScene::paint()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     QMatrix4x4 modelViewMatrix;
-    modelViewMatrix.translate(0.0f, 0.0f, m_distance);
+    modelViewMatrix.translate(m_positionX, m_positionY, m_distance);
     modelViewMatrix.rotate(m_rotationX, 1.0f, 0.0f, 0.0f);
     modelViewMatrix.rotate(m_rotationY, 0.0f, 1.0f, 0.0f);
     // modelViewMatrix.rotate(rotationZ, 0.0f, 0.0f, 1.0f);
@@ -78,7 +80,7 @@ void GL3DSpectrogramScene::paint()
 
     glBegin(GL_LINES);
     for (int i = 0; i < m_numLines; ++i) {
-        float z = i * m_spacingZ;
+        float z = (i - m_numLines / 2) * m_spacingZ;
         for (int j = 0; j < m_numPoints - 1; ++j) {
             float x1 = (j - m_numPoints / 2) * m_spacingX;
             float x2 = ((j + 1) - m_numPoints / 2) * m_spacingX;
@@ -92,6 +94,7 @@ void GL3DSpectrogramScene::paint()
         }
     }
     glEnd();
+    glFlush();
 }
 
 void GL3DSpectrogramScene::reinitialize()
@@ -179,6 +182,11 @@ void GL3DSpectrogramScene::mouseMoveEvent(QMouseEvent *event)
         m_rotationX += dy;
         m_rotationY += dx;
         // rotationZ += dx;
+    }
+
+    if (event->buttons() & Qt::MiddleButton) {
+        m_positionX += dx * 0.1f;
+        m_positionY += dy * 0.1f;
     }
 
     m_lastMousePosition = event->pos();

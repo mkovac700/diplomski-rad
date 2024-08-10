@@ -38,6 +38,8 @@ private:
     float m_rotationX;
     float m_rotationY;
     float m_rotationZ;
+    float m_positionX;
+    float m_positionY;
     float m_distance;
     QPoint m_lastMousePosition;
 
