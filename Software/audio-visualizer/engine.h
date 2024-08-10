@@ -218,6 +218,11 @@ signals:
 
     void buffer2Changed(QList<qreal> &buffer);
 
+    /**
+     * File processing completed.
+     */
+    void processingComplete();
+
 private slots:
     void initAudioDevices();
     void audioNotify();

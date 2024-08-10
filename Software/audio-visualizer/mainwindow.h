@@ -46,6 +46,8 @@ private slots:
 
     void processedUSecsChanged(qint64 processedUSecs);
 
+    void processingComplete();
+
 private:
     void loadInputDevices();
 

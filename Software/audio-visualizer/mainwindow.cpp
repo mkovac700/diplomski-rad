@@ -54,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_engine, &Engine::processedUSecsChanged, this, &MainWindow::processedUSecsChanged);
 
+    connect(m_engine, &Engine::processingComplete, this, &MainWindow::processingComplete);
+
     initializeScenes();
 }
 
@@ -275,6 +277,18 @@ void MainWindow::processedUSecsChanged(qint64 processedUSecs)
 {
     updateHorizontalSliderPosition(processedUSecs);
     updateLabelSeek(processedUSecs);
+}
+
+void MainWindow::processingComplete()
+{
+    //todo reset slider, reset seek, reset play/pause button
+
+    updateHorizontalSliderPosition(0);
+    updateLabelSeek(0);
+    ui->pushButton_PlayPause->setToolTip(tr("Play"));
+    ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-play-96-2.png"));
+
+    playing = false;
 }
 
 void MainWindow::on_pushButton_PreviousScene_clicked()

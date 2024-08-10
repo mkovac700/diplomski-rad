@@ -348,7 +348,7 @@ void Engine::audioNotify()
         //sync audio processedUSecs with custom timer processedUSecs
         if (m_originalProcessedUSecs != m_audioOutput->processedUSecs()) {
             m_originalProcessedUSecs = m_audioOutput->processedUSecs();
-            //emit processedUSecsChanged(m_processedUSecs); //->za slider
+            emit processedUSecsChanged(m_processedUSecs); //->za slider
             if (m_processedUSecs != m_originalProcessedUSecs) {
                 qDebug() << "synced";
                 m_processedUSecs = m_originalProcessedUSecs - WaveformWindowDuration;
@@ -641,6 +641,7 @@ void Engine::stopPlayback()
         m_processedUSecs = 0;
     }
     m_notifyTimer->stop();
+    emit processingComplete();
 }
 
 void Engine::setState(QAudio::State state)
