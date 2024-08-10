@@ -48,6 +48,10 @@ private slots:
 
     void processingComplete();
 
+    void changeAudioIn();
+
+    void changeAudioOut();
+
 private:
     void loadInputDevices();
 

@@ -126,17 +126,21 @@ void MainWindow::loadInputDevices()
 {
     const QAudioDevice &defaultInputDevice = QMediaDevices::defaultAudioInput();
 
-    QAction *action = new QAction(tr("Default"), this);
+    QAction *action = new QAction(tr("Default"), ui->menuAudioIn);
     action->setCheckable(true);
     action->setChecked(true);
     action->setData(QVariant::fromValue(defaultInputDevice));
     ui->menuAudioIn->addAction(action);
 
+    connect(action, &QAction::triggered, this, &MainWindow::changeAudioIn);
+
     for (auto &inputDevice : m_devices->audioInputs()) {
-        QAction *action = new QAction(inputDevice.description(), this);
+        QAction *action = new QAction(inputDevice.description(), ui->menuAudioIn);
         action->setCheckable(true);
         action->setData(QVariant::fromValue(inputDevice));
         ui->menuAudioIn->addAction(action);
+
+        connect(action, &QAction::triggered, this, &MainWindow::changeAudioIn);
     }
 }
 
@@ -165,17 +169,53 @@ void MainWindow::loadOutputDevices()
 {
     const QAudioDevice &defaultOutputDevice = QMediaDevices::defaultAudioOutput();
 
-    QAction *action = new QAction(tr("Default"), this);
+    QAction *action = new QAction(tr("Default"), ui->menuAudioOut);
     action->setCheckable(true);
     action->setChecked(true);
     action->setData(QVariant::fromValue(defaultOutputDevice));
     ui->menuAudioOut->addAction(action);
 
+    connect(action, &QAction::triggered, this, &MainWindow::changeAudioOut);
+
     for (auto &outputDevice : m_devices->audioOutputs()) {
-        QAction *action = new QAction(outputDevice.description(), this);
+        QAction *action = new QAction(outputDevice.description(), ui->menuAudioOut);
         action->setCheckable(true);
         action->setData(QVariant::fromValue(outputDevice));
         ui->menuAudioOut->addAction(action);
+
+        connect(action, &QAction::triggered, this, &MainWindow::changeAudioOut);
+    }
+}
+
+void MainWindow::changeAudioIn()
+{
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (action && action->isCheckable()) {
+        // Poništi sve ostale QAction unutar istog QMenu
+        QMenu *menu = qobject_cast<QMenu *>(action->parent());
+        for (QAction *act : menu->actions()) {
+            if (act != action) {
+                act->setChecked(false);
+            }
+        }
+        action->setChecked(true);
+        m_engine->setAudioInputDevice(action->data().value<QAudioDevice>());
+    }
+}
+
+void MainWindow::changeAudioOut()
+{
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (action && action->isCheckable()) {
+        // Poništi sve ostale QAction unutar istog QMenu
+        QMenu *menu = qobject_cast<QMenu *>(action->parent());
+        for (QAction *act : menu->actions()) {
+            if (act != action) {
+                act->setChecked(false);
+            }
+        }
+        action->setChecked(true);
+        m_engine->setAudioOutputDevice(action->data().value<QAudioDevice>());
     }
 }
 
