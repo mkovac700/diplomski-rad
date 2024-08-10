@@ -66,6 +66,10 @@ void SpectrumAnalyserThread::calculateWindow()
         case HannWindow:
             x = 0.5 * (1 - qCos((2 * M_PI * i) / (m_numSamples - 1)));
             break;
+        case BlackmanWindow:
+            x = 0.42 - 0.5 * qCos(2 * M_PI * i / (m_numSamples - 1))
+                + 0.08 * qCos(4 * M_PI * i / (m_numSamples - 1));
+            break;
         default:
             Q_ASSERT(false);
         }
@@ -88,8 +92,9 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
         const qreal realSample = pcmToReal(pcmSample);
         // const DataType windowedSample = realSample * m_window[i];
         // m_input[i] = windowedSample;
-        m_input[i] = realSample;
-        in[i][REAL] = realSample;
+        const qreal windowedSample = realSample * m_window[i];
+        m_input[i] = windowedSample;
+        in[i][REAL] = windowedSample;
         in[i][IMAG] = 0.0f;
         ptr += bytesPerFrame;
     }
