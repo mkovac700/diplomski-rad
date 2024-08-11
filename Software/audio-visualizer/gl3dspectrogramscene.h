@@ -38,6 +38,8 @@ private:
     float m_rotationX;
     float m_rotationY;
     float m_rotationZ;
+    float m_positionX;
+    float m_positionY;
     float m_distance;
     QPoint m_lastMousePosition;
 
@@ -66,6 +68,9 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+
+private:
+    void HSVtoRGB(float H, float S, float V, float &r, float &g, float &b);
 };
 
 #endif // GL3DSPECTROGRAMSCENE_H

@@ -5,6 +5,8 @@ GL3DSpectrogramScene::GL3DSpectrogramScene(GLWidget *glWidget)
     , m_rotationX(10)
     , m_rotationY(0)
     , m_rotationZ(0)
+    , m_positionX(0)
+    , m_positionY(0)
     , m_distance(-20)
 {}
 
@@ -53,12 +55,53 @@ void GL3DSpectrogramScene::resize(int w, int h)
                                    1000.0f); //static_cast<float>(m_numPoints) //1000.0f
 }
 
+void GL3DSpectrogramScene::HSVtoRGB(float H, float S, float V, float &r, float &g, float &b)
+{
+    float C = V * S;
+    float X = C * (1 - fabs(fmod(H / 60.0, 2) - 1));
+    float m = V - C;
+
+    if (0 <= H && H < 60) {
+        r = C;
+        g = X;
+        b = 0;
+    } else if (60 <= H && H < 120) {
+        r = X;
+        g = C;
+        b = 0;
+    } else if (120 <= H && H < 180) {
+        r = 0;
+        g = C;
+        b = X;
+    } else if (180 <= H && H < 240) {
+        r = 0;
+        g = X;
+        b = C;
+    } else if (240 <= H && H < 300) {
+        r = X;
+        g = 0;
+        b = C;
+    } else if (300 <= H && H < 360) {
+        r = C;
+        g = 0;
+        b = X;
+    } else {
+        r = 0;
+        g = 0;
+        b = 0;
+    }
+
+    r += m;
+    g += m;
+    b += m;
+}
+
 void GL3DSpectrogramScene::paint()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     QMatrix4x4 modelViewMatrix;
-    modelViewMatrix.translate(0.0f, 0.0f, m_distance);
+    modelViewMatrix.translate(m_positionX, m_positionY, m_distance);
     modelViewMatrix.rotate(m_rotationX, 1.0f, 0.0f, 0.0f);
     modelViewMatrix.rotate(m_rotationY, 0.0f, 1.0f, 0.0f);
     // modelViewMatrix.rotate(rotationZ, 0.0f, 0.0f, 1.0f);
@@ -70,7 +113,7 @@ void GL3DSpectrogramScene::paint()
 
     // 2D mreža
 
-    glColor3f(1.0f, 1.0f, 1.0f); // Bijela boja za linije
+    //glColor3f(1.0f, 1.0f, 1.0f); // Bijela boja za linije
 
     //updatePeaks();
 
@@ -78,7 +121,13 @@ void GL3DSpectrogramScene::paint()
 
     glBegin(GL_LINES);
     for (int i = 0; i < m_numLines; ++i) {
-        float z = i * m_spacingZ;
+        float hue = (i * 360.0f) / m_numLines;
+        float r, g, b;
+        HSVtoRGB(hue, 1.0f, 1.0f, r, g, b);
+
+        glColor3f(r, g, b);
+
+        float z = (i - m_numLines / 2) * m_spacingZ;
         for (int j = 0; j < m_numPoints - 1; ++j) {
             float x1 = (j - m_numPoints / 2) * m_spacingX;
             float x2 = ((j + 1) - m_numPoints / 2) * m_spacingX;
@@ -92,6 +141,7 @@ void GL3DSpectrogramScene::paint()
         }
     }
     glEnd();
+    glFlush();
 }
 
 void GL3DSpectrogramScene::reinitialize()
@@ -179,6 +229,11 @@ void GL3DSpectrogramScene::mouseMoveEvent(QMouseEvent *event)
         m_rotationX += dy;
         m_rotationY += dx;
         // rotationZ += dx;
+    }
+
+    if (event->buttons() & Qt::MiddleButton) {
+        m_positionX += dx * 0.1f;
+        m_positionY += dy * 0.1f;
     }
 
     m_lastMousePosition = event->pos();
