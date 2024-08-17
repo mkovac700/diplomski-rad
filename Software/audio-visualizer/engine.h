@@ -75,6 +75,11 @@ public:
     bool loadFile(const QString &fileName);
 
     /**
+     * Initialize stream
+     */
+    bool openStream();
+
+    /**
      * Generate tone
      */
     bool generateTone(const Tone &tone);
@@ -139,6 +144,8 @@ public:
 
 public slots:
     void startRecording();
+    void startStream();
+    void stopStream();
     void startPlayback();
     void stopPlayback();
     void suspend();
@@ -245,6 +252,7 @@ private:
     void setPlayPosition(qint64 position, bool forceEmit = false);
     void calculateLevel(qint64 position, qint64 length);
     void calculateSpectrum(qint64 position);
+    void calculateSpectrum();
     void setLevel(qreal rmsLevel, qreal peakLevel, int numSamples);
     void emitError(QAudio::Error error);
 
