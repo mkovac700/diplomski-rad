@@ -245,7 +245,7 @@ void Engine::stopStream()
 {
     if (m_audioInput) {
         m_audioInput->stop();
-        QCoreApplication::instance()->processEvents();
+        //QCoreApplication::instance()->processEvents();
         m_audioInput->disconnect();
     }
     m_audioInputIODevice = nullptr;
@@ -382,6 +382,7 @@ void Engine::audioNotify()
 
         qint64 len = qMin(m_audioInput->bytesAvailable(), m_spectrumBufferLength);
         //QByteArray buffer(m_spectrumBufferLength, 0);
+        m_buffer.clear();
         m_buffer.resize(m_spectrumBufferLength, 0);
         qint64 l = m_audioInputIODevice->read(m_buffer.data(), len);
         qDebug() << "bytes read: " << l << "buffer size: " << m_buffer.size();
@@ -431,8 +432,9 @@ void Engine::audioNotify()
 
                 const qint64 readEnd = qMin(m_analysisFile->getDevice()->size(),
                                             spectrumPosition + m_spectrumBufferLength);
-                const qint64 readLen = readEnd - readPos
-                                       + m_format.bytesForDuration(WaveformWindowDuration); //500000
+                const qint64 readLen
+                    = readEnd - readPos
+                      + m_spectrumBufferLength; //m_format.bytesForDuration(WaveformWindowDuration); //500000
                 // const qint64 readLen = readEnd - readPos;
                 qDebug() << "Engine::audioNotify [1]"
                          << "analysisFileSize" << m_analysisFile->getDevice()->size() << "readPos"
