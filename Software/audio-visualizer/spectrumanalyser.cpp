@@ -118,12 +118,17 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
         qreal imag = out[i][IMAG];
 
         const qreal magnitude = qSqrt(real * real + imag * imag);
+
+        m_spectrum[i].magnitude = magnitude;
+
         qreal amplitude = SpectrumAnalyserMultiplier * qLn(magnitude);
+
+        //qreal amplitude = 2.0f * qLn(magnitude);
 
         // Bound amplitude to [0.0, 1.0]
         m_spectrum[i].clipped = (amplitude > 1.0);
         amplitude = qMax(qreal(0.0), amplitude);
-        amplitude = qMin(qreal(1.0), amplitude);
+        //amplitude = qMin(qreal(1.0), amplitude);
         m_spectrum[i].amplitude = amplitude;
     }
 #endif

@@ -37,7 +37,9 @@ void GL3DSpectrogramScene::initialize()
         // Inicijalizacija peakova (postavljanje svih na 0)
         for (int i = 0; i < m_numLines; ++i) {
             std::vector<qreal> linePeaks(m_numPoints, 0.0f);
+            std::vector<qreal> lineFreqs(m_numPoints, 0.0f);
             m_peaks.push_back(linePeaks);
+            m_freqs.push_back(lineFreqs);
         }
         initialized = true;
     }
@@ -129,8 +131,17 @@ void GL3DSpectrogramScene::paint()
 
         float z = (i - m_numLines / 2) * m_spacingZ;
         for (int j = 0; j < m_numPoints - 1; ++j) {
-            float x1 = (j - m_numPoints / 2) * m_spacingX;
-            float x2 = ((j + 1) - m_numPoints / 2) * m_spacingX;
+            // float x1 = (j - m_numPoints / 2) * m_spacingX;
+            // float x2 = ((j + 1) - m_numPoints / 2) * m_spacingX;
+
+            // float x1 = m_freqs[i][j] * (j - m_numPoints / 2) * m_spacingX;
+            // float x2 = m_freqs[i][j + 1] * ((j + 1) - m_numPoints / 2) * m_spacingX;
+
+            // float x1 = m_freqs[i][j] * 0.01f;
+            // float x2 = m_freqs[i][j + 1] * 0.01f;
+
+            float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
+            float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
 
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
@@ -180,6 +191,7 @@ void GL3DSpectrogramScene::updatePeaks()
 {
     // Generiranje novih peakova za prvu liniju
     std::vector<qreal> linePeaks(m_numPoints, 0.0f);
+    std::vector<qreal> lineFreqs(m_numPoints, 0.0f);
 
     FrequencySpectrum::iterator i = m_spectrum.begin();
     const FrequencySpectrum::iterator end = m_spectrum.end();
@@ -192,7 +204,10 @@ void GL3DSpectrogramScene::updatePeaks()
 
     for (int j = 0; j < m_numPoints && i != end; ++j) {
         const FrequencySpectrum::Element e = *i;
-        linePeaks[j] = e.amplitude * 10;
+        lineFreqs[j] = e.frequency;
+        linePeaks[j] = e.magnitude * 0.5f;
+        //linePeaks[j] = e.amplitude * 10;
+        //linePeaks[j] = e.amplitude; //e.magnitude; //e.amplitude * 10;
         i++;
     }
 
@@ -207,9 +222,11 @@ void GL3DSpectrogramScene::updatePeaks()
     // Pomicanje starih peakova i dodavanje novih
     // peaks.insert(peaks.begin(), linePeaks); // Dodavanje novih peakova na početak --> obrnuti smjer
     m_peaks.push_back(linePeaks); // Dodavanje novih peakova na kraj
+    m_freqs.push_back(lineFreqs);
     if (m_peaks.size() > static_cast<unsigned long long>(m_numLines)) {
         // peaks.pop_back(); // Uklanjanje viška peakova na kraju --> obrnuti smjer
         m_peaks.erase(m_peaks.begin()); // Uklanjanje viška peakova na početku
+        m_freqs.erase(m_freqs.begin());
     }
 
     // glWidget->update();
