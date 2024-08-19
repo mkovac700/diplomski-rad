@@ -260,7 +260,10 @@ void MainWindow::on_pushButton_PlayPause_clicked()
         ui->pushButton_PlayPause->setToolTip(tr("Play"));
         ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-play-96-2.png"));
     } else {
-        m_engine->startPlayback();
+        if (m_mode == Mode::LoadFileMode)
+            m_engine->startPlayback();
+        else if (m_mode == Mode::StreamMode)
+            m_engine->startStream();
         ui->pushButton_PlayPause->setToolTip(tr("Pause"));
         ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-pause-96-2.png"));
     }
@@ -274,7 +277,11 @@ void MainWindow::on_pushButton_stop_clicked()
 
     ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-play-96-2.png"));
 
-    m_engine->stopPlayback();
+    if (m_mode == Mode::LoadFileMode)
+        m_engine->stopPlayback();
+    else if (m_mode == Mode::StreamMode)
+        m_engine->stopStream();
+
     playing = false;
 }
 
@@ -311,6 +318,9 @@ void MainWindow::openStream()
 {
     setMode(Mode::StreamMode);
     updateLabelDuration(0);
+
+    m_engine->reset();
+    m_engine->openStream();
 }
 
 void MainWindow::processedUSecsChanged(qint64 processedUSecs)
