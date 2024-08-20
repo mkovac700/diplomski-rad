@@ -7,7 +7,7 @@ GL3DSpectrogramScene::GL3DSpectrogramScene(GLWidget *glWidget)
     , m_rotationZ(0)
     , m_positionX(0)
     , m_positionY(0)
-    , m_distance(-20)
+    , m_distance(-200)
 {}
 
 void GL3DSpectrogramScene::initialize()
@@ -140,6 +140,21 @@ void GL3DSpectrogramScene::paint()
             float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
             float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
 
+            // float x1 = (m_freqs[i][j] - 11025.0f);
+            // float x2 = (m_freqs[i][j + 1] - 11025.0f);
+
+            // float x1 = (m_freqs[i][j] - 22050.0f) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1] - 22050.0f) * 0.01f;
+
+            // float x1 = (m_freqs[i][j]) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1]) * 0.01f;
+
+            // if (j == 0) {
+            //     qDebug() << "m_freqs[i][j]" << m_freqs[i][j] << "m_freqs[i][j + 1]"
+            //              << m_freqs[i][j + 1];
+            //     qDebug() << "x1: " << x1 << "x2: " << x2;
+            // }
+
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
 
@@ -176,6 +191,12 @@ void GL3DSpectrogramScene::paint()
 
             float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
             float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
+
+            // float x1 = (m_freqs[i][j] - 22050.0f) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1] - 22050.0f) * 0.01f;
+
+            // float x1 = (m_freqs[i][j]) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1]) * 0.01f;
 
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
@@ -221,6 +242,27 @@ void GL3DSpectrogramScene::spectrumChanged(qint64 position,
     //glWidget->update();
 }
 
+std::vector<qreal> linearToLogFreqs(const std::vector<qreal> &freqs,
+                                    qreal f_min,
+                                    qreal f_max,
+                                    qreal alpha)
+{
+    std::vector<double> scaledLogFrequencies;
+    scaledLogFrequencies.reserve(freqs.size());
+
+    qreal logF_min = std::log10(f_min);
+    qreal logF_max = std::log10(f_max);
+
+    for (qreal f : freqs) {
+        qreal logF = std::log10(f);
+        qreal scaledLogF = alpha
+                           * ((logF - logF_min) / (logF_max - logF_min) * (f_max - f_min) + f_min);
+        scaledLogFrequencies.push_back(scaledLogF);
+    }
+
+    return scaledLogFrequencies;
+}
+
 void GL3DSpectrogramScene::updatePeaks()
 {
     // Generiranje novih peakova za prvu liniju
@@ -246,6 +288,11 @@ void GL3DSpectrogramScene::updatePeaks()
         i++;
     }
 
+    qreal f_min = lineFreqs[1];     //0 ili 44..
+    qreal f_max = lineFreqs.back(); //22050
+
+    std::vector<qreal> lineFreqsLogScaled = linearToLogFreqs(lineFreqs, f_min, f_max, 1);
+
     // Generiranje novih peakova za prvu liniju
     // std::vector<qreal> linePeaks(m_numPoints, 0.0f);
     // for (int j = 0; j < m_numPoints; ++j) {
@@ -257,7 +304,8 @@ void GL3DSpectrogramScene::updatePeaks()
     // Pomicanje starih peakova i dodavanje novih
     // peaks.insert(peaks.begin(), linePeaks); // Dodavanje novih peakova na početak --> obrnuti smjer
     m_peaks.push_back(linePeaks); // Dodavanje novih peakova na kraj
-    m_freqs.push_back(lineFreqs);
+    // m_freqs.push_back(lineFreqs);
+    m_freqs.push_back(lineFreqsLogScaled);
     if (m_peaks.size() > static_cast<unsigned long long>(m_numLines)) {
         // peaks.pop_back(); // Uklanjanje viška peakova na kraju --> obrnuti smjer
         m_peaks.erase(m_peaks.begin()); // Uklanjanje viška peakova na početku
