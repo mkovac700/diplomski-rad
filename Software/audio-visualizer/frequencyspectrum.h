@@ -20,6 +20,7 @@ public:
         Element()
             : frequency(0.0)
             , magnitude(0.0)
+            , db(0.0)
             , amplitude(0.0)
             , phase(0.0)
             , clipped(false)
@@ -34,6 +35,11 @@ public:
          * Magnitude
          */
         qreal magnitude;
+
+        /**
+         * Power in decibels
+         */
+        qreal db;
 
         /**
          * Amplitude in range [0.0, 1.0]

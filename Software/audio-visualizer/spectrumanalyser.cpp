@@ -123,6 +123,12 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
 
         qreal amplitude = SpectrumAnalyserMultiplier * qLn(magnitude);
 
+        qreal db = 20 * std::log10(magnitude);
+
+        db = qMax(qreal(0.0), db);
+
+        m_spectrum[i].db = db;
+
         //qreal amplitude = 2.0f * qLn(magnitude);
 
         // Bound amplitude to [0.0, 1.0]

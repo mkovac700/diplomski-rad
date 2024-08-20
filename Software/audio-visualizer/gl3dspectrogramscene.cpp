@@ -239,7 +239,8 @@ void GL3DSpectrogramScene::updatePeaks()
     for (int j = 0; j < m_numPoints && i != end; ++j) {
         const FrequencySpectrum::Element e = *i;
         lineFreqs[j] = e.frequency;
-        linePeaks[j] = e.magnitude * 0.5f;
+        linePeaks[j] = e.db;
+        //linePeaks[j] = e.magnitude * 0.5f;
         //linePeaks[j] = e.amplitude * 10;
         //linePeaks[j] = e.amplitude; //e.magnitude; //e.amplitude * 10;
         i++;
