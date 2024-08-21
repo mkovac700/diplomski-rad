@@ -48,7 +48,7 @@ const int NullMessageTimeout = -1;
 enum WindowFunction { NoWindow, HannWindow, BlackmanWindow };
 Q_DECLARE_METATYPE(WindowFunction)
 
-const WindowFunction DefaultWindowFunction = HannWindow;
+const WindowFunction DefaultWindowFunction = BlackmanWindow;
 
 struct Tone
 {

@@ -44,7 +44,7 @@ private:
     QPoint m_lastMousePosition;
 
     const int m_numLines = 275;
-    const int m_numPoints = SpectrumLengthSamples / 2 + 1;
+    const int m_numPoints = SpectrumLengthSamples / 2; //SpectrumLengthSamples / 2 + 1
 
     const float m_spacingX = 0.1f;  //0.02f
     const float m_spacingZ = 0.3f;  //0.2f

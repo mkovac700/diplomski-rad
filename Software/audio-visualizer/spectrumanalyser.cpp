@@ -106,7 +106,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
     fftw_execute(p);
 
     // Analyze output to obtain amplitude and phase for each frequency
-    for (int i = 0; i <= m_numSamples / 2; ++i) { // i = 2 ?!
+    for (int i = 1; i <= m_numSamples / 2; ++i) { // i = 2 ?!
         // Calculate frequency of this complex sample
         m_spectrum[i].frequency = qreal(i * inputFrequency) / (m_numSamples);
 
