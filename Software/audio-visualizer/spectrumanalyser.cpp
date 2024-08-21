@@ -106,7 +106,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
     fftw_execute(p);
 
     // Analyze output to obtain amplitude and phase for each frequency
-    for (int i = 0; i <= m_numSamples / 2; ++i) { // i = 2 ?!
+    for (int i = 1; i <= m_numSamples / 2; ++i) { // i = 2 ?!
         // Calculate frequency of this complex sample
         m_spectrum[i].frequency = qreal(i * inputFrequency) / (m_numSamples);
 
@@ -118,12 +118,23 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
         qreal imag = out[i][IMAG];
 
         const qreal magnitude = qSqrt(real * real + imag * imag);
+
+        m_spectrum[i].magnitude = magnitude;
+
         qreal amplitude = SpectrumAnalyserMultiplier * qLn(magnitude);
+
+        qreal db = 20 * std::log10(magnitude);
+
+        db = qMax(qreal(0.0), db);
+
+        m_spectrum[i].db = db;
+
+        //qreal amplitude = 2.0f * qLn(magnitude);
 
         // Bound amplitude to [0.0, 1.0]
         m_spectrum[i].clipped = (amplitude > 1.0);
         amplitude = qMax(qreal(0.0), amplitude);
-        amplitude = qMin(qreal(1.0), amplitude);
+        //amplitude = qMin(qreal(1.0), amplitude);
         m_spectrum[i].amplitude = amplitude;
     }
 #endif

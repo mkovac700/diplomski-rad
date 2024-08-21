@@ -17,12 +17,29 @@ public:
 
     struct Element
     {
-        Element() : frequency(0.0), amplitude(0.0), phase(0.0), clipped(false) { }
+        Element()
+            : frequency(0.0)
+            , magnitude(0.0)
+            , db(0.0)
+            , amplitude(0.0)
+            , phase(0.0)
+            , clipped(false)
+        {}
 
         /**
          * Frequency in Hertz
          */
         qreal frequency;
+
+        /**
+         * Magnitude
+         */
+        qreal magnitude;
+
+        /**
+         * Power in decibels
+         */
+        qreal db;
 
         /**
          * Amplitude in range [0.0, 1.0]

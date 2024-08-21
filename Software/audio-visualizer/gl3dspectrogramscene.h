@@ -43,14 +43,15 @@ private:
     float m_distance;
     QPoint m_lastMousePosition;
 
-    const int m_numLines = 50;
-    const int m_numPoints = SpectrumLengthSamples / 2 + 1;
+    const int m_numLines = 275;
+    const int m_numPoints = SpectrumLengthSamples / 2; //SpectrumLengthSamples / 2 + 1
 
     const float m_spacingX = 0.1f;  //0.02f
     const float m_spacingZ = 0.3f;  //0.2f
     const float m_maxHeight = 0.5f; //0.5f
 
     std::vector<std::vector<qreal>> m_peaks;
+    std::vector<std::vector<qreal>> m_freqs;
 
     QMatrix4x4 m_projectionMatrix;
 

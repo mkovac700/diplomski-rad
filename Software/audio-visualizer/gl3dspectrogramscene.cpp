@@ -7,7 +7,7 @@ GL3DSpectrogramScene::GL3DSpectrogramScene(GLWidget *glWidget)
     , m_rotationZ(0)
     , m_positionX(0)
     , m_positionY(0)
-    , m_distance(-20)
+    , m_distance(-200)
 {}
 
 void GL3DSpectrogramScene::initialize()
@@ -16,6 +16,14 @@ void GL3DSpectrogramScene::initialize()
 
     initializeOpenGLFunctions();
     glEnable(GL_DEPTH_TEST);
+
+    // Enable line smoothing
+    // glEnable(GL_LINE_SMOOTH);
+    // glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+    // Enable multisampling for better anti-aliasing (if supported)
+    // glEnable(GL_MULTISAMPLE);
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     int w = glWidget->width(), h = glWidget->height();
@@ -37,7 +45,9 @@ void GL3DSpectrogramScene::initialize()
         // Inicijalizacija peakova (postavljanje svih na 0)
         for (int i = 0; i < m_numLines; ++i) {
             std::vector<qreal> linePeaks(m_numPoints, 0.0f);
+            std::vector<qreal> lineFreqs(m_numPoints, 0.0f);
             m_peaks.push_back(linePeaks);
+            m_freqs.push_back(lineFreqs);
         }
         initialized = true;
     }
@@ -119,6 +129,47 @@ void GL3DSpectrogramScene::paint()
 
     QMutexLocker locker(&m_mutex);
 
+    // // First Pass: Draw the black background under the lines
+
+    // glColor3f(0.0f, 0.0f, 0.0f);
+
+    // glBegin(GL_QUADS);
+    // for (int i = 0; i < m_numLines; ++i) {
+    //     float z = (i - m_numLines / 2) * m_spacingZ;
+    //     for (int j = 0; j < m_numPoints - 1; ++j) {
+    //         float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
+    //         float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
+
+    //         // float x1 = (m_freqs[i][j] - 11025.0f);
+    //         // float x2 = (m_freqs[i][j + 1] - 11025.0f);
+
+    //         // float x1 = (m_freqs[i][j] - 22050.0f) * 0.01f;
+    //         // float x2 = (m_freqs[i][j + 1] - 22050.0f) * 0.01f;
+
+    //         // float x1 = (m_freqs[i][j]) * 0.01f;
+    //         // float x2 = (m_freqs[i][j + 1]) * 0.01f;
+
+    //         // if (j == 0) {
+    //         //     qDebug() << "m_freqs[i][j]" << m_freqs[i][j] << "m_freqs[i][j + 1]"
+    //         //              << m_freqs[i][j + 1];
+    //         //     qDebug() << "x1: " << x1 << "x2: " << x2;
+    //         // }
+
+    //         float y1 = m_peaks[i][j];
+    //         float y2 = m_peaks[i][j + 1];
+
+    //         // Draw quad from x1, y1 to x2, y2, extending to the bottom of the screen (y=0)
+    //         glVertex3f(x1, 0.0f, z); // Bottom left
+    //         glVertex3f(x2, 0.0f, z); // Bottom right
+    //         glVertex3f(x2, y2, z);   // Top right
+    //         glVertex3f(x1, y1, z);   // Top left
+    //     }
+    // }
+    // glEnd();
+    // glFlush();
+
+    //Second Pass: Draw the lines themselves
+
     glBegin(GL_LINES);
     for (int i = 0; i < m_numLines; ++i) {
         float hue = (i * 360.0f) / m_numLines;
@@ -129,8 +180,23 @@ void GL3DSpectrogramScene::paint()
 
         float z = (i - m_numLines / 2) * m_spacingZ;
         for (int j = 0; j < m_numPoints - 1; ++j) {
-            float x1 = (j - m_numPoints / 2) * m_spacingX;
-            float x2 = ((j + 1) - m_numPoints / 2) * m_spacingX;
+            // float x1 = (j - m_numPoints / 2) * m_spacingX;
+            // float x2 = ((j + 1) - m_numPoints / 2) * m_spacingX;
+
+            // float x1 = m_freqs[i][j] * (j - m_numPoints / 2) * m_spacingX;
+            // float x2 = m_freqs[i][j + 1] * ((j + 1) - m_numPoints / 2) * m_spacingX;
+
+            // float x1 = m_freqs[i][j] * 0.01f;
+            // float x2 = m_freqs[i][j + 1] * 0.01f;
+
+            float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
+            float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
+
+            // float x1 = (m_freqs[i][j] - 22050.0f) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1] - 22050.0f) * 0.01f;
+
+            // float x1 = (m_freqs[i][j]) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1]) * 0.01f;
 
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
@@ -176,10 +242,33 @@ void GL3DSpectrogramScene::spectrumChanged(qint64 position,
     //glWidget->update();
 }
 
+std::vector<qreal> linearToLogFreqs(const std::vector<qreal> &freqs,
+                                    qreal f_min,
+                                    qreal f_max,
+                                    qreal alpha)
+{
+    std::vector<double> scaledLogFrequencies;
+    scaledLogFrequencies.reserve(freqs.size());
+
+    qreal logF_min = f_min == 0 ? 0 : std::log10(f_min);
+    qreal logF_max = std::log10(f_max);
+
+    for (qreal f : freqs) {
+        // qreal logF = std::log10(f);
+        qreal logF = f == 0 ? 0 : std::log10(f);
+        qreal scaledLogF = alpha
+                           * ((logF - logF_min) / (logF_max - logF_min) * (f_max - f_min) + f_min);
+        scaledLogFrequencies.push_back(scaledLogF);
+    }
+
+    return scaledLogFrequencies;
+}
+
 void GL3DSpectrogramScene::updatePeaks()
 {
     // Generiranje novih peakova za prvu liniju
     std::vector<qreal> linePeaks(m_numPoints, 0.0f);
+    std::vector<qreal> lineFreqs(m_numPoints, 0.0f);
 
     FrequencySpectrum::iterator i = m_spectrum.begin();
     const FrequencySpectrum::iterator end = m_spectrum.end();
@@ -192,9 +281,20 @@ void GL3DSpectrogramScene::updatePeaks()
 
     for (int j = 0; j < m_numPoints && i != end; ++j) {
         const FrequencySpectrum::Element e = *i;
-        linePeaks[j] = e.amplitude * 10;
+        lineFreqs[j] = e.frequency;
+        linePeaks[j] = e.db;
+        //linePeaks[j] = e.magnitude * 0.5f;
+        //linePeaks[j] = e.amplitude * 10;
+        //linePeaks[j] = e.amplitude; //e.magnitude; //e.amplitude * 10;
         i++;
     }
+
+    qreal f_min = lineFreqs[0];     //0 ili 44..
+    qreal f_max = lineFreqs.back(); //22050
+
+    //qDebug() << "fmin " << f_min;
+
+    std::vector<qreal> lineFreqsLogScaled = linearToLogFreqs(lineFreqs, f_min, f_max, 1);
 
     // Generiranje novih peakova za prvu liniju
     // std::vector<qreal> linePeaks(m_numPoints, 0.0f);
@@ -207,9 +307,12 @@ void GL3DSpectrogramScene::updatePeaks()
     // Pomicanje starih peakova i dodavanje novih
     // peaks.insert(peaks.begin(), linePeaks); // Dodavanje novih peakova na početak --> obrnuti smjer
     m_peaks.push_back(linePeaks); // Dodavanje novih peakova na kraj
+    //m_freqs.push_back(lineFreqs);
+    m_freqs.push_back(lineFreqsLogScaled);
     if (m_peaks.size() > static_cast<unsigned long long>(m_numLines)) {
         // peaks.pop_back(); // Uklanjanje viška peakova na kraju --> obrnuti smjer
         m_peaks.erase(m_peaks.begin()); // Uklanjanje viška peakova na početku
+        m_freqs.erase(m_freqs.begin());
     }
 
     // glWidget->update();
