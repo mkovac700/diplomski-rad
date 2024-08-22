@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , m_engine(new Engine(this))
     , m_mode(Mode::NoMode)
+    , m_settingsDialog(new SettingsDialog(this))
 {
     ui->setupUi(this);
 
@@ -67,7 +68,8 @@ MainWindow::~MainWindow()
 void MainWindow::initializeMenuMedia()
 {
     connect(ui->actionFile, &QAction::triggered, this, &MainWindow::openFile);
-    connect(ui->actionStream, &QAction::triggered, this, &MainWindow::openStream); //todo
+    connect(ui->actionStream, &QAction::triggered, this, &MainWindow::openStream);
+    connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::showSettingsDialog);
 }
 
 void MainWindow::updateMenuMedia()
@@ -216,6 +218,17 @@ void MainWindow::changeAudioOut()
         }
         action->setChecked(true);
         m_engine->setAudioOutputDevice(action->data().value<QAudioDevice>());
+    }
+}
+
+void MainWindow::showSettingsDialog()
+{
+    m_settingsDialog->exec();
+    if (m_settingsDialog->result() == QDialog::Accepted) {
+        qDebug() << "settings dialog: accepted";
+        // m_engine->setAudioInputDevice(m_settingsDialog->inputDevice());
+        // m_engine->setAudioOutputDevice(m_settingsDialog->outputDevice());
+        // m_engine->setWindowFunction(m_settingsDialog->windowFunction());
     }
 }
 

@@ -16,6 +16,8 @@ SOURCES += \
     glwidget.cpp \
     main.cpp \
     mainwindow.cpp \
+    settings.cpp \
+    settingsdialog.cpp \
     signalprocessor.cpp \
     engine.cpp \
     frequencyspectrum.cpp \
@@ -30,6 +32,8 @@ HEADERS += \
     glwaveformscene.h \
     glwidget.h \
     mainwindow.h \
+    settings.h \
+    settingsdialog.h \
     signalprocessor.h \
     engine.h \
     frequencyspectrum.h \
@@ -38,7 +42,8 @@ HEADERS += \
     spectrumanalyser.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    settingsdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
