@@ -212,6 +212,8 @@
     <addaction name="separator"/>
     <addaction name="menuAudioIn"/>
     <addaction name="menuAudioOut"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
    </widget>
    <addaction name="menuMedia"/>
   </widget>
@@ -230,6 +232,11 @@
    </property>
    <property name="text">
     <string>Strujanje</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Postavke</string>
    </property>
   </action>
  </widget>

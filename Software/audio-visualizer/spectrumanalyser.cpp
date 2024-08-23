@@ -16,16 +16,14 @@ SpectrumAnalyserThread::SpectrumAnalyserThread(QObject *parent)
 // ,
 // m_fft(new FFTRealWrapper)
 #endif
-      ,
-      m_numSamples(SpectrumLengthSamples),
-      m_windowFunction(DefaultWindowFunction),
-      m_window(SpectrumLengthSamples, 0.0),
-      m_input(SpectrumLengthSamples, 0.0),
-      m_output(SpectrumLengthSamples, 0.0),
-      m_spectrum(SpectrumLengthSamples)
+    , m_numSamples(Settings::instance().fftSize())
+    , m_windowFunction(Settings::instance().windowFunction())
+    , m_window(Settings::instance().fftSize(), 0.0)
+    , m_input(Settings::instance().fftSize(), 0.0)
+    , m_output(Settings::instance().fftSize(), 0.0)
+    , m_spectrum(Settings::instance().fftSize())
 #ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
-      ,
-      m_thread(new QThread(this))
+    , m_thread(new QThread(this))
 #endif
 {
 #ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
@@ -34,7 +32,10 @@ SpectrumAnalyserThread::SpectrumAnalyserThread(QObject *parent)
     moveToThread(m_thread);
     m_thread->start();
 #endif
-    p = fftw_plan_dft_1d(SpectrumLengthSamples, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    in = new fftw_complex[m_numSamples];
+    out = new fftw_complex[m_numSamples];
+
+    p = fftw_plan_dft_1d(Settings::instance().fftSize(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
     calculateWindow();
 }

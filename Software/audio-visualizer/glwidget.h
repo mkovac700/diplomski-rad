@@ -16,6 +16,7 @@ public:
 
     void setScene(GLScene *scene);
     void resetState();
+    void reinitialize();
 
 signals:
     void bufferChanged(QList<qreal> &buffer);

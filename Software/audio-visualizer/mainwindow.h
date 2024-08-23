@@ -18,6 +18,10 @@
 
 #include <utils.h>
 
+#include <settingsdialog.h>
+
+#include <settings.h>
+
 #define LOG_MAINWINDOW
 
 QT_BEGIN_NAMESPACE
@@ -51,6 +55,8 @@ private slots:
     void changeAudioIn();
 
     void changeAudioOut();
+
+    void showSettingsDialog();
 
 private:
     void loadInputDevices();
@@ -97,6 +103,8 @@ private:
     bool playing = false;
 
     Mode m_mode;
+
+    SettingsDialog *m_settingsDialog;
 
     //------------------------------------------------
     // SCENES

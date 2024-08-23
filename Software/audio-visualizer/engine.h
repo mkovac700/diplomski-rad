@@ -306,7 +306,7 @@ private:
 
     int m_spectrumBufferLength;
     QByteArray m_spectrumBuffer;
-    SpectrumAnalyser m_spectrumAnalyser;
+    SpectrumAnalyser *m_spectrumAnalyser;
     qint64 m_spectrumPosition;
 
     int m_count;
