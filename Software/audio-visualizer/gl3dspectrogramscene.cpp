@@ -41,15 +41,23 @@ void GL3DSpectrogramScene::initialize()
     // glGenBuffers(1, &vao);
     // glGenBuffers(1, &vbo);
 
-    if (!initialized) {
-        // Inicijalizacija peakova (postavljanje svih na 0)
-        for (int i = 0; i < m_numLines; ++i) {
-            std::vector<qreal> linePeaks(m_numPoints, 0.0f);
-            std::vector<qreal> lineFreqs(m_numPoints, 0.0f);
-            m_peaks.push_back(linePeaks);
-            m_freqs.push_back(lineFreqs);
-        }
-        initialized = true;
+    // if (!initialized) {
+
+    //     initialized = true;
+    // }
+
+    m_numPoints = Settings::instance().fftSize() / 2;
+    m_peaks.clear();
+    m_freqs.clear();
+
+    //qDebug() << "num points changed to: " << m_numPoints;
+
+    // Inicijalizacija peakova (postavljanje svih na 0)
+    for (int i = 0; i < m_numLines; ++i) {
+        std::vector<qreal> linePeaks(m_numPoints, 0.0f);
+        std::vector<qreal> lineFreqs(m_numPoints, 0.0f);
+        m_peaks.push_back(linePeaks);
+        m_freqs.push_back(lineFreqs);
     }
 }
 

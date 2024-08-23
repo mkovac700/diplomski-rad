@@ -57,17 +57,18 @@ Engine::Engine(QObject *parent)
     , m_rmsLevel(0.0)
     , m_peakLevel(0.0)
     , m_spectrumBufferLength(0)
+    , m_spectrumAnalyser(new SpectrumAnalyser(this))
     , m_spectrumPosition(0)
     , m_count(0)
     , m_updateInterval(10)
     , m_processedUSecs(0)
 {
-    connect(&m_spectrumAnalyser,
+    connect(m_spectrumAnalyser,
             QOverload<const FrequencySpectrum &>::of(&SpectrumAnalyser::spectrumChanged),
             this,
             QOverload<const FrequencySpectrum &>::of(&Engine::spectrumChanged));
 
-    connect(&m_spectrumAnalyser,
+    connect(m_spectrumAnalyser,
             QOverload<QList<qreal> &>::of(&SpectrumAnalyser::bufferChanged),
             this,
             QOverload<QList<qreal> &>::of(&Engine::bufferChanged));
@@ -194,7 +195,7 @@ qint64 Engine::bufferDuration() const
 
 void Engine::setWindowFunction(WindowFunction type)
 {
-    m_spectrumAnalyser.setWindowFunction(type);
+    m_spectrumAnalyser->setWindowFunction(type);
 }
 
 //-----------------------------------------------------------------------------
@@ -267,7 +268,7 @@ void Engine::startPlayback()
 #endif
             m_audioOutput->resume();
         } else {
-            m_spectrumAnalyser.cancelCalculation();
+            m_spectrumAnalyser->cancelCalculation();
             emit spectrumChanged(0, 0, FrequencySpectrum());
             setPlayPosition(0, true);
             stopRecording();
@@ -577,6 +578,8 @@ void Engine::reset()
     m_processedUSecs = 0;
     emit dataLengthChanged(0);
     resetAudioDevices();
+    delete m_spectrumAnalyser;
+    m_spectrumAnalyser = nullptr;
 }
 
 bool Engine::initialize()
@@ -634,6 +637,20 @@ bool Engine::initialize()
                  << "m_dataLength" << m_dataLength;
     ENGINE_DEBUG << "Engine::initialize"
                  << "format" << m_format;
+
+    if (result && m_spectrumAnalyser == nullptr) {
+        m_spectrumAnalyser = new SpectrumAnalyser(this);
+
+        connect(m_spectrumAnalyser,
+                QOverload<const FrequencySpectrum &>::of(&SpectrumAnalyser::spectrumChanged),
+                this,
+                QOverload<const FrequencySpectrum &>::of(&Engine::spectrumChanged));
+
+        connect(m_spectrumAnalyser,
+                QOverload<QList<qreal> &>::of(&SpectrumAnalyser::bufferChanged),
+                this,
+                QOverload<QList<qreal> &>::of(&Engine::bufferChanged));
+    }
 
     return result;
 }
@@ -790,12 +807,12 @@ void Engine::calculateSpectrum(qint64 position)
     // ENGINE_DEBUG << "Engine::calculateSpectrum" << QThread::currentThread() << "count" << m_count
     //              << "pos" << position << "buffer pos" << m_bufferPosition;
 
-    if (m_spectrumAnalyser.isReady()) {
+    if (m_spectrumAnalyser->isReady()) {
         m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData() + position
                                                        - m_bufferPosition,
                                                    m_spectrumBufferLength);
         m_spectrumPosition = position;
-        m_spectrumAnalyser.calculate(m_spectrumBuffer, m_format);
+        m_spectrumAnalyser->calculate(m_spectrumBuffer, m_format);
     }
 
     // m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData() + position - m_bufferPosition,
@@ -809,9 +826,9 @@ void Engine::calculateSpectrum()
 {
     Q_ASSERT(0 == m_spectrumBufferLength % 2); // constraint of FFT algorithm
 
-    if (m_spectrumAnalyser.isReady()) {
+    if (m_spectrumAnalyser->isReady()) {
         m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData(), m_spectrumBufferLength);
-        m_spectrumAnalyser.calculate(m_spectrumBuffer, m_format);
+        m_spectrumAnalyser->calculate(m_spectrumBuffer, m_format);
     }
 }
 
@@ -820,7 +837,7 @@ void Engine::setFormat(const QAudioFormat &format)
     const bool changed = (format != m_format);
     m_format = format;
     m_levelBufferLength = m_format.bytesForDuration(LevelWindowUs);
-    m_spectrumBufferLength = SpectrumLengthSamples * format.bytesPerFrame();
+    m_spectrumBufferLength = Settings::instance().fftSize() * format.bytesPerFrame();
     if (changed)
         emit formatChanged(m_format);
 }

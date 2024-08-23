@@ -42,7 +42,7 @@ private:
     Settings &operator=(const Settings &) = delete;
 
     WindowFunction m_windowFunction = DefaultWindowFunction;
-    int m_fftSize = SpectrumLengthSamples;
+    int m_fftSize = 1024;
     int m_updateIntervalMs = 10;
 
     // Mutex to protect access to the settings

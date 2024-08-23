@@ -229,6 +229,8 @@ void MainWindow::showSettingsDialog()
         Settings::instance().setWindowFunction(m_settingsDialog->windowFunction());
         Settings::instance().setFFTSize(m_settingsDialog->fftSize());
         Settings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
+
+        ui->widget->reinitialize();
     }
 }
 

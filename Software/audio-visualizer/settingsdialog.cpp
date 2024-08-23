@@ -14,7 +14,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
         int pwr = qPow(2, i);
         ui->comboBox_FFTSize->addItem(QString::number(pwr), QVariant::fromValue(pwr));
     }
-    ui->comboBox_FFTSize->setCurrentIndex(0);
+    ui->comboBox_FFTSize->setCurrentIndex(
+        ui->comboBox_FFTSize->findData(QVariant::fromValue(Settings::instance().fftSize())));
 
     ui->comboBox_windowFunction->addItem(tr("None"),
                                          QVariant::fromValue(int(WindowFunction::NoWindow)));

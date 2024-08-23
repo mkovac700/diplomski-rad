@@ -62,6 +62,11 @@ void GLWidget::resetState()
     glViewport(0, 0, width(), height());
 }
 
+void GLWidget::reinitialize()
+{
+    currentScene->reinitialize();
+}
+
 void GLWidget::handleBufferChanged(QList<qreal> &buffer)
 {
     if (!busy) {

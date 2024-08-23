@@ -13,6 +13,8 @@
 
 #include <fftw3.h>
 
+#include <settings.h>
+
 #define REAL 0
 #define IMAG 1
 
@@ -60,8 +62,10 @@ private:
 #ifndef DISABLE_FFT
     // FFTRealWrapper *m_fft;
     fftw_plan p;
-    fftw_complex in[SpectrumLengthSamples];
-    fftw_complex out[SpectrumLengthSamples];
+    // fftw_complex in[SpectrumLengthSamples];
+    // fftw_complex out[SpectrumLengthSamples];
+    fftw_complex *in;
+    fftw_complex *out;
 #endif
 
     const int m_numSamples;
