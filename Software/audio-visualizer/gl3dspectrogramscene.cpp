@@ -18,8 +18,8 @@ void GL3DSpectrogramScene::initialize()
     glEnable(GL_DEPTH_TEST);
 
     // Enable line smoothing
-    // glEnable(GL_LINE_SMOOTH);
-    // glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
     // Enable multisampling for better anti-aliasing (if supported)
     // glEnable(GL_MULTISAMPLE);
@@ -135,46 +135,46 @@ void GL3DSpectrogramScene::paint()
 
     //updatePeaks();
 
-    QMutexLocker locker(&m_mutex);
+    //QMutexLocker locker(&m_mutex);
 
-    // // First Pass: Draw the black background under the lines
+    // First Pass: Draw the black background under the lines
 
-    // glColor3f(0.0f, 0.0f, 0.0f);
+    glColor3f(0.0f, 0.0f, 0.0f);
 
-    // glBegin(GL_QUADS);
-    // for (int i = 0; i < m_numLines; ++i) {
-    //     float z = (i - m_numLines / 2) * m_spacingZ;
-    //     for (int j = 0; j < m_numPoints - 1; ++j) {
-    //         float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
-    //         float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
+    glBegin(GL_QUADS);
+    for (int i = 0; i < m_numLines; ++i) {
+        float z = (i - m_numLines / 2) * m_spacingZ;
+        for (int j = 0; j < m_numPoints - 1; ++j) {
+            float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
+            float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
 
-    //         // float x1 = (m_freqs[i][j] - 11025.0f);
-    //         // float x2 = (m_freqs[i][j + 1] - 11025.0f);
+            // float x1 = (m_freqs[i][j] - 11025.0f);
+            // float x2 = (m_freqs[i][j + 1] - 11025.0f);
 
-    //         // float x1 = (m_freqs[i][j] - 22050.0f) * 0.01f;
-    //         // float x2 = (m_freqs[i][j + 1] - 22050.0f) * 0.01f;
+            // float x1 = (m_freqs[i][j] - 22050.0f) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1] - 22050.0f) * 0.01f;
 
-    //         // float x1 = (m_freqs[i][j]) * 0.01f;
-    //         // float x2 = (m_freqs[i][j + 1]) * 0.01f;
+            // float x1 = (m_freqs[i][j]) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1]) * 0.01f;
 
-    //         // if (j == 0) {
-    //         //     qDebug() << "m_freqs[i][j]" << m_freqs[i][j] << "m_freqs[i][j + 1]"
-    //         //              << m_freqs[i][j + 1];
-    //         //     qDebug() << "x1: " << x1 << "x2: " << x2;
-    //         // }
+            // if (j == 0) {
+            //     qDebug() << "m_freqs[i][j]" << m_freqs[i][j] << "m_freqs[i][j + 1]"
+            //              << m_freqs[i][j + 1];
+            //     qDebug() << "x1: " << x1 << "x2: " << x2;
+            // }
 
-    //         float y1 = m_peaks[i][j];
-    //         float y2 = m_peaks[i][j + 1];
+            float y1 = m_peaks[i][j];
+            float y2 = m_peaks[i][j + 1];
 
-    //         // Draw quad from x1, y1 to x2, y2, extending to the bottom of the screen (y=0)
-    //         glVertex3f(x1, 0.0f, z); // Bottom left
-    //         glVertex3f(x2, 0.0f, z); // Bottom right
-    //         glVertex3f(x2, y2, z);   // Top right
-    //         glVertex3f(x1, y1, z);   // Top left
-    //     }
-    // }
-    // glEnd();
-    // glFlush();
+            // Draw quad from x1, y1 to x2, y2, extending to the bottom of the screen (y=0)
+            glVertex3f(x1, 0.0f, z); // Bottom left
+            glVertex3f(x2, 0.0f, z); // Bottom right
+            glVertex3f(x2, y2, z);   // Top right
+            glVertex3f(x1, y1, z);   // Top left
+        }
+    }
+    glEnd();
+    glFlush();
 
     //Second Pass: Draw the lines themselves
 
@@ -310,7 +310,7 @@ void GL3DSpectrogramScene::updatePeaks()
     //     linePeaks[j] = static_cast<float>(std::rand()) / RAND_MAX * m_maxHeight;
     // }
 
-    QMutexLocker locker(&m_mutex);
+    //QMutexLocker locker(&m_mutex);
 
     // Pomicanje starih peakova i dodavanje novih
     // peaks.insert(peaks.begin(), linePeaks); // Dodavanje novih peakova na početak --> obrnuti smjer

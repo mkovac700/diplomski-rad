@@ -55,5 +55,5 @@ void SettingsDialog::on_comboBox_windowFunction_currentIndexChanged(int index)
 
 void SettingsDialog::on_spinBox_UpdateIntervalMs_valueChanged(int arg1)
 {
-    m_updateIntervalMs = arg1;
+    m_updateIntervalMs = arg1 == 0 ? 1 : arg1;
 }
