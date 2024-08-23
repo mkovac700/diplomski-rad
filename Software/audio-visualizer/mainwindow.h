@@ -77,6 +77,8 @@ private:
 
     void updateMenuMedia();
 
+    void restartEngine();
+
     /**
      * Set new value of format mm:ss for label_Duration
      * @param duration Duration in microseconds

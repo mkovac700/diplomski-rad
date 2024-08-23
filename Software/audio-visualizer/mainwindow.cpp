@@ -231,6 +231,10 @@ void MainWindow::showSettingsDialog()
         Settings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
 
         ui->widget->reinitialize();
+
+        m_engine->setUpdateInterval(Settings::instance().updateIntervalMs());
+
+        restartEngine(); //to update interval ms
     }
 }
 
@@ -267,6 +271,17 @@ void MainWindow::setMode(Mode mode)
 //     break;
 // }
 // }
+
+void MainWindow::restartEngine()
+{
+    if (playing) {
+        m_engine->suspend();
+        if (m_mode == Mode::LoadFileMode)
+            m_engine->startPlayback();
+        else if (m_mode == Mode::StreamMode)
+            m_engine->startStream();
+    }
+}
 
 void MainWindow::on_pushButton_PlayPause_clicked()
 {
