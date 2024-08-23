@@ -20,6 +20,8 @@
 
 #include <settingsdialog.h>
 
+#include <settings.h>
+
 #define LOG_MAINWINDOW
 
 QT_BEGIN_NAMESPACE

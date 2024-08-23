@@ -226,9 +226,9 @@ void MainWindow::showSettingsDialog()
     m_settingsDialog->exec();
     if (m_settingsDialog->result() == QDialog::Accepted) {
         qDebug() << "settings dialog: accepted";
-        // m_engine->setAudioInputDevice(m_settingsDialog->inputDevice());
-        // m_engine->setAudioOutputDevice(m_settingsDialog->outputDevice());
-        // m_engine->setWindowFunction(m_settingsDialog->windowFunction());
+        Settings::instance().setWindowFunction(m_settingsDialog->windowFunction());
+        Settings::instance().setFFTSize(m_settingsDialog->fftSize());
+        Settings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
     }
 }
 

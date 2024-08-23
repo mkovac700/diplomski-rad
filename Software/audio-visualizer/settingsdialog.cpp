@@ -22,7 +22,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                                          QVariant::fromValue(int(WindowFunction::HannWindow)));
     ui->comboBox_windowFunction->addItem("Blackman",
                                          QVariant::fromValue(int(WindowFunction::BlackmanWindow)));
-    ui->comboBox_windowFunction->setCurrentIndex(m_windowFunction);
+    ui->comboBox_windowFunction->setCurrentIndex(Settings::instance().windowFunction());
 }
 
 SettingsDialog::~SettingsDialog()
