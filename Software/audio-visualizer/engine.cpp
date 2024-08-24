@@ -381,10 +381,17 @@ void Engine::audioNotify()
         // qint64 l = m_audioInputIODevice->read(buffer.data(), len);
         // qDebug() << "bytes read: " << l;
 
+        // qint64 len = qMin(m_audioInput->bytesAvailable(), m_spectrumBufferLength);
+        // //QByteArray buffer(m_spectrumBufferLength, 0);
+        // m_buffer.clear();
+        // m_buffer.resize(m_spectrumBufferLength, 0);
+        // qint64 l = m_audioInputIODevice->read(m_buffer.data(), len);
+        // qDebug() << "bytes read: " << l << "buffer size: " << m_buffer.size();
+
         qint64 len = qMin(m_audioInput->bytesAvailable(), m_spectrumBufferLength);
         //QByteArray buffer(m_spectrumBufferLength, 0);
-        m_buffer.clear();
-        m_buffer.resize(m_spectrumBufferLength, 0);
+        //m_buffer.clear();
+        m_buffer.resize(len, 0);
         qint64 l = m_audioInputIODevice->read(m_buffer.data(), len);
         qDebug() << "bytes read: " << l << "buffer size: " << m_buffer.size();
 
@@ -827,7 +834,8 @@ void Engine::calculateSpectrum()
     Q_ASSERT(0 == m_spectrumBufferLength % 2); // constraint of FFT algorithm
 
     if (m_spectrumAnalyser->isReady()) {
-        m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData(), m_spectrumBufferLength);
+        // m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData(), m_spectrumBufferLength);
+        m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData(), m_buffer.size());
         m_spectrumAnalyser->calculate(m_spectrumBuffer, m_format);
     }
 }

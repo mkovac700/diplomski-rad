@@ -56,7 +56,7 @@ signals:
     void bufferReceived(QList<qreal> &buffer);
 
 private:
-    void calculateWindow();
+    void calculateWindow(int numSamples);
 
 private:
 #ifndef DISABLE_FFT
