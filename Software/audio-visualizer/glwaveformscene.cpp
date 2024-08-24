@@ -61,11 +61,13 @@ void GLWaveformScene::spectrumChanged(FrequencySpectrum &spectrum)
 
 void GLWaveformScene::spectrumChanged(qint64 position,
                                       qint64 length,
-                                      const FrequencySpectrum &spectrum)
+                                      const FrequencySpectrum &spectrum,
+                                      int inputFrequency)
 {
     Q_UNUSED(position)
     Q_UNUSED(length)
     Q_UNUSED(spectrum)
+    Q_UNUSED(inputFrequency)
 }
 
 void GLWaveformScene::reinitialize()

@@ -145,8 +145,8 @@ void GL3DSpectrogramScene::paint()
     for (int i = 0; i < m_numLines; ++i) {
         float z = (i - m_numLines / 2) * m_spacingZ;
         for (int j = 0; j < m_numPoints - 1; ++j) {
-            float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
-            float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
+            // float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
 
             // float x1 = (m_freqs[i][j] - 11025.0f);
             // float x2 = (m_freqs[i][j + 1] - 11025.0f);
@@ -162,6 +162,10 @@ void GL3DSpectrogramScene::paint()
             //              << m_freqs[i][j + 1];
             //     qDebug() << "x1: " << x1 << "x2: " << x2;
             // }
+
+            //slučaj kada se koristi logaritmiranje, inače se ne dijeli s 2
+            float x1 = (m_freqs[i][j] - m_nquistFrequency / 2) * 0.01f;
+            float x2 = (m_freqs[i][j + 1] - m_nquistFrequency / 2) * 0.01f;
 
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
@@ -197,14 +201,18 @@ void GL3DSpectrogramScene::paint()
             // float x1 = m_freqs[i][j] * 0.01f;
             // float x2 = m_freqs[i][j + 1] * 0.01f;
 
-            float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
-            float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
+            // float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
+            // float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
 
             // float x1 = (m_freqs[i][j] - 22050.0f) * 0.01f;
             // float x2 = (m_freqs[i][j + 1] - 22050.0f) * 0.01f;
 
             // float x1 = (m_freqs[i][j]) * 0.01f;
             // float x2 = (m_freqs[i][j + 1]) * 0.01f;
+
+            //slučaj kada se koristi logaritmiranje, inače se ne dijeli s 2
+            float x1 = (m_freqs[i][j] - m_nquistFrequency / 2) * 0.01f;
+            float x2 = (m_freqs[i][j + 1] - m_nquistFrequency / 2) * 0.01f;
 
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
@@ -238,13 +246,16 @@ void GL3DSpectrogramScene::spectrumChanged(FrequencySpectrum &spectrum)
 
 void GL3DSpectrogramScene::spectrumChanged(qint64 position,
                                            qint64 length,
-                                           const FrequencySpectrum &spectrum)
+                                           const FrequencySpectrum &spectrum,
+                                           int inputFrequency)
 {
     Q_UNUSED(position)
     Q_UNUSED(length)
     Q_UNUSED(spectrum)
 
     m_spectrum = spectrum;
+    m_inputFrequency = inputFrequency;
+    m_nquistFrequency = inputFrequency / 2;
 
     updatePeaks();
     //glWidget->update();

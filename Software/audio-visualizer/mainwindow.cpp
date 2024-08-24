@@ -36,9 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     //connect(m_engine, &Engine::buffer2Changed, ui->widget, &GLWidget::bufferChanged);
     connect(m_engine, &Engine::buffer2Changed, ui->widget, &GLWidget::handleBufferChanged);
     connect(m_engine,
-            QOverload<qint64, qint64, const FrequencySpectrum &>::of(&Engine::spectrumChanged),
+            QOverload<qint64, qint64, const FrequencySpectrum &, int>::of(&Engine::spectrumChanged),
             ui->widget,
-            QOverload<qint64, qint64, const FrequencySpectrum &>::of(
+            QOverload<qint64, qint64, const FrequencySpectrum &, int>::of(
                 &GLWidget::handleSpectrumChanged));
     // connect(m_engine,
     //         QOverload<qint64, qint64, const FrequencySpectrum &>::of(&Engine::spectrumChanged),

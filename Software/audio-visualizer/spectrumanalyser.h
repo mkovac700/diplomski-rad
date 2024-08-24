@@ -52,7 +52,7 @@ public slots:
     void calculateSpectrum(const QByteArray &buffer, int inputFrequency, int bytesPerSample);
 
 signals:
-    void calculationComplete(const FrequencySpectrum &spectrum);
+    void calculationComplete(const FrequencySpectrum &spectrum, int inputFrequency);
     void bufferReceived(QList<qreal> &buffer);
 
 private:
@@ -143,11 +143,11 @@ public:
     void cancelCalculation();
 
 signals:
-    void spectrumChanged(const FrequencySpectrum &spectrum);
+    void spectrumChanged(const FrequencySpectrum &spectrum, int inputFrequency);
     void bufferChanged(QList<qreal> &buffer);
 
 private slots:
-    void calculationComplete(const FrequencySpectrum &spectrum);
+    void calculationComplete(const FrequencySpectrum &spectrum, int inputFrequency);
     void bufferReceived(QList<qreal> &buffer);
 
 private:

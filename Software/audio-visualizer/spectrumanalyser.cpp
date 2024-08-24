@@ -142,7 +142,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
     SPECTRUMANALYSER_DEBUG << "SpectrumAnalyserThread::calculateSpectrum"
                            << QThread::currentThread() << "spectrum size " << m_spectrum.count();
 
-    emit calculationComplete(m_spectrum); //TODO: dodati inputFrequency
+    emit calculationComplete(m_spectrum, inputFrequency); //TODO: dodati inputFrequency
 }
 
 //=============================================================================
@@ -268,12 +268,14 @@ void SpectrumAnalyser::bufferReceived(QList<qreal> &buffer)
     emit bufferChanged(buffer); //CONNECTAT NA OGL1->BUFFERCHANGED
 }
 
-void SpectrumAnalyser::calculationComplete(const FrequencySpectrum &spectrum)
+void SpectrumAnalyser::calculationComplete(const FrequencySpectrum &spectrum, int inputFrequency)
 {
     Q_ASSERT(Idle != m_state);
     if (Busy == m_state) {
-        emit spectrumChanged(spectrum); //CONNECTANO NATRAG NA ENGINE --> OD TAMO CONNECT NA OGL2
-    }                                   //TODO: dodati inputFrequency
+        emit spectrumChanged(spectrum, inputFrequency);
+        //CONNECTANO NATRAG NA ENGINE --> OD TAMO CONNECT NA OGL2
+        //TODO: dodati inputFrequency
+    }
     m_state = Idle;
 }
 

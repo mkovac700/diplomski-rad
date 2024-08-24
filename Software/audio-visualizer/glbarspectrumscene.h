@@ -22,7 +22,10 @@ public:
 public slots:
     void bufferChanged(QList<qreal> &buffer) override;
     void spectrumChanged(FrequencySpectrum &spectrum) override;
-    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum) override;
+    void spectrumChanged(qint64 position,
+                         qint64 length,
+                         const FrequencySpectrum &spectrum,
+                         int inputFrequency) override;
 
     // GLScene interface
 public:
@@ -30,6 +33,7 @@ public:
 
 private:
     FrequencySpectrum m_spectrum;
+    int m_inputFrequency;
 
     QString name = "Bar Spectrum";
 

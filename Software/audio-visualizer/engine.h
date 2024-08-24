@@ -215,7 +215,10 @@ signals:
      * \param length   Length of window in bytes
      * \param spectrum Resulting frequency spectrum
      */
-    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
+    void spectrumChanged(qint64 position,
+                         qint64 length,
+                         const FrequencySpectrum &spectrum,
+                         int inputFrequency);
 
     /**
      * Buffer containing audio data has changed.
@@ -236,7 +239,7 @@ private slots:
     void audioNotify();
     void audioStateChanged(QAudio::State state);
     void audioDataReady();
-    void spectrumChanged(const FrequencySpectrum &spectrum);
+    void spectrumChanged(const FrequencySpectrum &spectrum, int inputFrequency);
     void bufferChanged(QList<qreal> &buffer);
 
 private:
