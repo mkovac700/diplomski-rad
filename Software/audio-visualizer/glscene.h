@@ -34,7 +34,10 @@ public:
 public slots:
     virtual void bufferChanged(QList<qreal> &buffer) = 0;
     virtual void spectrumChanged(FrequencySpectrum &spectrum) = 0;
-    virtual void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum)
+    virtual void spectrumChanged(qint64 position,
+                                 qint64 length,
+                                 const FrequencySpectrum &spectrum,
+                                 int inputFrequency)
         = 0;
 
 protected:

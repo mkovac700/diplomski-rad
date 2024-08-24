@@ -32,9 +32,11 @@ void GLWidget::setScene(GLScene *scene)
         currentScene->reinitialize();
         connect(this, &GLWidget::bufferChanged, currentScene, &GLScene::bufferChanged);
         connect(this,
-                QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLWidget::spectrumChanged),
+                QOverload<qint64, qint64, const FrequencySpectrum &, int>::of(
+                    &GLWidget::spectrumChanged),
                 currentScene,
-                QOverload<qint64, qint64, const FrequencySpectrum &>::of(&GLScene::spectrumChanged));
+                QOverload<qint64, qint64, const FrequencySpectrum &, int>::of(
+                    &GLScene::spectrumChanged));
     }
 
     busy = false;
@@ -85,10 +87,11 @@ void GLWidget::handleSpectrumChanged(FrequencySpectrum &spectrum)
 
 void GLWidget::handleSpectrumChanged(qint64 position,
                                      qint64 length,
-                                     const FrequencySpectrum &spectrum)
+                                     const FrequencySpectrum &spectrum,
+                                     int inputFrequency)
 {
     if (!busy) {
-        emit spectrumChanged(position, length, spectrum);
+        emit spectrumChanged(position, length, spectrum, inputFrequency);
         update(); // Zove paintGL()
     }
 }

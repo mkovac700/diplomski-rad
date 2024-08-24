@@ -21,12 +21,18 @@ public:
 signals:
     void bufferChanged(QList<qreal> &buffer);
     void spectrumChanged(FrequencySpectrum &spectrum);
-    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
+    void spectrumChanged(qint64 position,
+                         qint64 length,
+                         const FrequencySpectrum &spectrum,
+                         int inputFrequency);
 
 public slots:
     void handleBufferChanged(QList<qreal> &buffer);
     void handleSpectrumChanged(FrequencySpectrum &spectrum);
-    void handleSpectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
+    void handleSpectrumChanged(qint64 position,
+                               qint64 length,
+                               const FrequencySpectrum &spectrum,
+                               int inputFrequency);
 
     // QOpenGLWidget interface
 protected:

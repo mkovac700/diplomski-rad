@@ -67,11 +67,13 @@ void GLBarSpectrumScene::spectrumChanged(FrequencySpectrum &spectrum)
 
 void GLBarSpectrumScene::spectrumChanged(qint64 position,
                                          qint64 length,
-                                         const FrequencySpectrum &spectrum)
+                                         const FrequencySpectrum &spectrum,
+                                         int inputFrequency)
 {
     Q_UNUSED(position)
     Q_UNUSED(length)
     m_spectrum = spectrum;
+    m_inputFrequency = inputFrequency;
 }
 
 void GLBarSpectrumScene::reinitialize()

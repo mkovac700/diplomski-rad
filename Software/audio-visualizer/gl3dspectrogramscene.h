@@ -28,10 +28,15 @@ public:
 public slots:
     void bufferChanged(QList<qreal> &buffer) override;
     void spectrumChanged(FrequencySpectrum &spectrum) override;
-    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum) override;
+    void spectrumChanged(qint64 position,
+                         qint64 length,
+                         const FrequencySpectrum &spectrum,
+                         int inputFrequency) override;
 
 private:
     FrequencySpectrum m_spectrum;
+    int m_inputFrequency;
+    int m_nquistFrequency;
 
     QString name = "3D Spectrogram";
 

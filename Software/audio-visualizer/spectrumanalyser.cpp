@@ -37,7 +37,7 @@ SpectrumAnalyserThread::SpectrumAnalyserThread(QObject *parent)
 
     p = fftw_plan_dft_1d(Settings::instance().fftSize(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
-    calculateWindow();
+    //calculateWindow();
 }
 
 SpectrumAnalyserThread::~SpectrumAnalyserThread()
@@ -51,12 +51,17 @@ SpectrumAnalyserThread::~SpectrumAnalyserThread()
 void SpectrumAnalyserThread::setWindowFunction(WindowFunction type)
 {
     m_windowFunction = type;
-    calculateWindow();
+    //calculateWindow();
 }
 
-void SpectrumAnalyserThread::calculateWindow()
+void SpectrumAnalyserThread::calculateWindow(int numSamples)
 {
-    for (int i = 0; i < m_numSamples; ++i) {
+    m_window.clear();
+    m_window.reserve(numSamples);
+    // for (int i = 0; i < numSamples; i++)
+    //     m_window.append(0.0f);
+
+    for (int i = 0; i < numSamples; ++i) {
         // DataType x = 0.0;
         qreal x = 0.0;
 
@@ -65,17 +70,18 @@ void SpectrumAnalyserThread::calculateWindow()
             x = 1.0;
             break;
         case HannWindow:
-            x = 0.5 * (1 - qCos((2 * M_PI * i) / (m_numSamples - 1)));
+            x = 0.5 * (1 - qCos((2 * M_PI * i) / (numSamples - 1)));
             break;
         case BlackmanWindow:
-            x = 0.42 - 0.5 * qCos(2 * M_PI * i / (m_numSamples - 1))
-                + 0.08 * qCos(4 * M_PI * i / (m_numSamples - 1));
+            x = 0.42 - 0.5 * qCos(2 * M_PI * i / (numSamples - 1))
+                + 0.08 * qCos(4 * M_PI * i / (numSamples - 1));
             break;
         default:
             Q_ASSERT(false);
         }
 
-        m_window[i] = x;
+        // m_window[i] = x;
+        m_window.append(x);
     }
 }
 
@@ -83,11 +89,19 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
                                                int bytesPerFrame)
 {
 #ifndef DISABLE_FFT
-    Q_ASSERT(buffer.size() == m_numSamples * bytesPerFrame);
+    //Q_ASSERT(buffer.size() == m_numSamples * bytesPerFrame);
+
+    int numBufSamples = buffer.size() / bytesPerFrame;
+
+    qDebug() << "numbufsamples: " << numBufSamples << "num samples" << m_numSamples;
+
+    calculateWindow(numBufSamples);
+
+    // first-run: obrada stvarnih podataka
 
     // Initialize data array
     const char *ptr = buffer.constData();
-    for (int i = 0; i < m_numSamples; ++i) {
+    for (int i = 0; i < numBufSamples; ++i) {
         const qint16 pcmSample = *reinterpret_cast<const qint16 *>(ptr);
         // Scale down to range [-1.0, 1.0]
         const qreal realSample = pcmToReal(pcmSample);
@@ -98,6 +112,14 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
         in[i][REAL] = windowedSample;
         in[i][IMAG] = 0.0f;
         ptr += bytesPerFrame;
+    }
+
+    // second-run: zero-padding
+
+    for (int i = numBufSamples; i < m_numSamples; ++i) {
+        m_input[i] = 0.0f;
+        in[i][REAL] = 0.0f;
+        in[i][IMAG] = 0.0f;
     }
 
     emit bufferReceived(m_input); //connectano na spectrumanalyzer::bufferreceived
@@ -142,7 +164,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
     SPECTRUMANALYSER_DEBUG << "SpectrumAnalyserThread::calculateSpectrum"
                            << QThread::currentThread() << "spectrum size " << m_spectrum.count();
 
-    emit calculationComplete(m_spectrum); //TODO: dodati inputFrequency
+    emit calculationComplete(m_spectrum, inputFrequency); //TODO: dodati inputFrequency
 }
 
 //=============================================================================
@@ -268,12 +290,14 @@ void SpectrumAnalyser::bufferReceived(QList<qreal> &buffer)
     emit bufferChanged(buffer); //CONNECTAT NA OGL1->BUFFERCHANGED
 }
 
-void SpectrumAnalyser::calculationComplete(const FrequencySpectrum &spectrum)
+void SpectrumAnalyser::calculationComplete(const FrequencySpectrum &spectrum, int inputFrequency)
 {
     Q_ASSERT(Idle != m_state);
     if (Busy == m_state) {
-        emit spectrumChanged(spectrum); //CONNECTANO NATRAG NA ENGINE --> OD TAMO CONNECT NA OGL2
-    }                                   //TODO: dodati inputFrequency
+        emit spectrumChanged(spectrum, inputFrequency);
+        //CONNECTANO NATRAG NA ENGINE --> OD TAMO CONNECT NA OGL2
+        //TODO: dodati inputFrequency
+    }
     m_state = Idle;
 }
 

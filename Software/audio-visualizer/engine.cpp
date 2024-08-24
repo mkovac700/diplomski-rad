@@ -64,9 +64,9 @@ Engine::Engine(QObject *parent)
     , m_processedUSecs(0)
 {
     connect(m_spectrumAnalyser,
-            QOverload<const FrequencySpectrum &>::of(&SpectrumAnalyser::spectrumChanged),
+            QOverload<const FrequencySpectrum &, int>::of(&SpectrumAnalyser::spectrumChanged),
             this,
-            QOverload<const FrequencySpectrum &>::of(&Engine::spectrumChanged));
+            QOverload<const FrequencySpectrum &, int>::of(&Engine::spectrumChanged));
 
     connect(m_spectrumAnalyser,
             QOverload<QList<qreal> &>::of(&SpectrumAnalyser::bufferChanged),
@@ -269,7 +269,7 @@ void Engine::startPlayback()
             m_audioOutput->resume();
         } else {
             m_spectrumAnalyser->cancelCalculation();
-            emit spectrumChanged(0, 0, FrequencySpectrum());
+            emit spectrumChanged(0, 0, FrequencySpectrum(), 0);
             setPlayPosition(0, true);
             stopRecording();
             m_mode = QAudioDevice::Output;
@@ -381,10 +381,17 @@ void Engine::audioNotify()
         // qint64 l = m_audioInputIODevice->read(buffer.data(), len);
         // qDebug() << "bytes read: " << l;
 
+        // qint64 len = qMin(m_audioInput->bytesAvailable(), m_spectrumBufferLength);
+        // //QByteArray buffer(m_spectrumBufferLength, 0);
+        // m_buffer.clear();
+        // m_buffer.resize(m_spectrumBufferLength, 0);
+        // qint64 l = m_audioInputIODevice->read(m_buffer.data(), len);
+        // qDebug() << "bytes read: " << l << "buffer size: " << m_buffer.size();
+
         qint64 len = qMin(m_audioInput->bytesAvailable(), m_spectrumBufferLength);
         //QByteArray buffer(m_spectrumBufferLength, 0);
-        m_buffer.clear();
-        m_buffer.resize(m_spectrumBufferLength, 0);
+        //m_buffer.clear();
+        m_buffer.resize(len, 0);
         qint64 l = m_audioInputIODevice->read(m_buffer.data(), len);
         qDebug() << "bytes read: " << l << "buffer size: " << m_buffer.size();
 
@@ -529,11 +536,11 @@ void Engine::audioDataReady()
         stopRecording();
 }
 
-void Engine::spectrumChanged(const FrequencySpectrum &spectrum)
+void Engine::spectrumChanged(const FrequencySpectrum &spectrum, int inputFrequency)
 {
     ENGINE_DEBUG << "Engine::spectrumChanged"
                  << "pos" << m_spectrumPosition;
-    emit spectrumChanged(m_spectrumPosition, m_spectrumBufferLength, spectrum);
+    emit spectrumChanged(m_spectrumPosition, m_spectrumBufferLength, spectrum, inputFrequency);
 }
 
 void Engine::bufferChanged(QList<qreal> &buffer)
@@ -642,9 +649,9 @@ bool Engine::initialize()
         m_spectrumAnalyser = new SpectrumAnalyser(this);
 
         connect(m_spectrumAnalyser,
-                QOverload<const FrequencySpectrum &>::of(&SpectrumAnalyser::spectrumChanged),
+                QOverload<const FrequencySpectrum &, int>::of(&SpectrumAnalyser::spectrumChanged),
                 this,
-                QOverload<const FrequencySpectrum &>::of(&Engine::spectrumChanged));
+                QOverload<const FrequencySpectrum &, int>::of(&Engine::spectrumChanged));
 
         connect(m_spectrumAnalyser,
                 QOverload<QList<qreal> &>::of(&SpectrumAnalyser::bufferChanged),
@@ -827,7 +834,8 @@ void Engine::calculateSpectrum()
     Q_ASSERT(0 == m_spectrumBufferLength % 2); // constraint of FFT algorithm
 
     if (m_spectrumAnalyser->isReady()) {
-        m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData(), m_spectrumBufferLength);
+        // m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData(), m_spectrumBufferLength);
+        m_spectrumBuffer = QByteArray::fromRawData(m_buffer.constData(), m_buffer.size());
         m_spectrumAnalyser->calculate(m_spectrumBuffer, m_format);
     }
 }
