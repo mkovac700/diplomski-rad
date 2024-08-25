@@ -59,6 +59,8 @@ void GL3DSpectrogramScene::initialize()
         m_peaks.push_back(linePeaks);
         m_freqs.push_back(lineFreqs);
     }
+
+    //logarithm ? m_centerFrequency = m_nquistFrequency / 2 : m_centerFrequency = m_nquistFrequency;
 }
 
 void GL3DSpectrogramScene::resize(int w, int h)
@@ -164,8 +166,8 @@ void GL3DSpectrogramScene::paint()
             // }
 
             //slučaj kada se koristi logaritmiranje, inače se ne dijeli s 2
-            float x1 = (m_freqs[i][j] - m_nquistFrequency / 2) * 0.01f;
-            float x2 = (m_freqs[i][j + 1] - m_nquistFrequency / 2) * 0.01f;
+            float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f;
+            float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f;
 
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
@@ -211,8 +213,8 @@ void GL3DSpectrogramScene::paint()
             // float x2 = (m_freqs[i][j + 1]) * 0.01f;
 
             //slučaj kada se koristi logaritmiranje, inače se ne dijeli s 2
-            float x1 = (m_freqs[i][j] - m_nquistFrequency / 2) * 0.01f;
-            float x2 = (m_freqs[i][j + 1] - m_nquistFrequency / 2) * 0.01f;
+            float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f;
+            float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f;
 
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
@@ -256,6 +258,12 @@ void GL3DSpectrogramScene::spectrumChanged(qint64 position,
     m_spectrum = spectrum;
     m_inputFrequency = inputFrequency;
     m_nquistFrequency = inputFrequency / 2;
+    m_centerFrequency = m_nquistFrequency / 2;
+
+    // if (logarithm)
+    //     m_centerFrequency = m_nquistFrequency / 2;
+    // else
+    //     m_centerFrequency = m_nquistFrequency;
 
     updatePeaks();
     //glWidget->update();
@@ -326,8 +334,12 @@ void GL3DSpectrogramScene::updatePeaks()
     // Pomicanje starih peakova i dodavanje novih
     // peaks.insert(peaks.begin(), linePeaks); // Dodavanje novih peakova na početak --> obrnuti smjer
     m_peaks.push_back(linePeaks); // Dodavanje novih peakova na kraj
+    if (logarithm)
+        m_freqs.push_back(lineFreqsLogScaled);
+    else
+        m_freqs.push_back(lineFreqs);
     //m_freqs.push_back(lineFreqs);
-    m_freqs.push_back(lineFreqsLogScaled);
+
     if (m_peaks.size() > static_cast<unsigned long long>(m_numLines)) {
         // peaks.pop_back(); // Uklanjanje viška peakova na kraju --> obrnuti smjer
         m_peaks.erase(m_peaks.begin()); // Uklanjanje viška peakova na početku

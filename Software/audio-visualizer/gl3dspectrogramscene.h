@@ -67,6 +67,10 @@ private:
 
     bool initialized = false;
 
+    bool logarithm = true;
+
+    int m_centerFrequency;
+
 private:
     void updatePeaks();
 
