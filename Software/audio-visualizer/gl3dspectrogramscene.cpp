@@ -60,6 +60,9 @@ void GL3DSpectrogramScene::initialize()
         m_freqs.push_back(lineFreqs);
     }
 
+    logarithm = GraphicsSettings::instance().logScale();
+    m_logFactor = GraphicsSettings::instance().logFactor();
+
     //logarithm ? m_centerFrequency = m_nquistFrequency / 2 : m_centerFrequency = m_nquistFrequency;
 }
 
@@ -166,6 +169,9 @@ void GL3DSpectrogramScene::paint()
             // }
 
             //slučaj kada se koristi logaritmiranje, inače se ne dijeli s 2
+            // float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f * 1 / m_logFactor;
+            // float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f * 1 / m_logFactor;
+
             float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f;
             float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f;
 
@@ -213,6 +219,9 @@ void GL3DSpectrogramScene::paint()
             // float x2 = (m_freqs[i][j + 1]) * 0.01f;
 
             //slučaj kada se koristi logaritmiranje, inače se ne dijeli s 2
+            // float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f * 1 / m_logFactor;
+            // float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f * 1 / m_logFactor;
+
             float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f;
             float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f;
 
@@ -316,12 +325,10 @@ void GL3DSpectrogramScene::updatePeaks()
         i++;
     }
 
-    qreal f_min = lineFreqs[0];     //0 ili 44..
+    qreal f_min = lineFreqs.front(); //0 ili 44..
     qreal f_max = lineFreqs.back(); //22050
 
     //qDebug() << "fmin " << f_min;
-
-    std::vector<qreal> lineFreqsLogScaled = linearToLogFreqs(lineFreqs, f_min, f_max, 1);
 
     // Generiranje novih peakova za prvu liniju
     // std::vector<qreal> linePeaks(m_numPoints, 0.0f);
@@ -334,10 +341,15 @@ void GL3DSpectrogramScene::updatePeaks()
     // Pomicanje starih peakova i dodavanje novih
     // peaks.insert(peaks.begin(), linePeaks); // Dodavanje novih peakova na početak --> obrnuti smjer
     m_peaks.push_back(linePeaks); // Dodavanje novih peakova na kraj
-    if (logarithm)
+    if (logarithm) {
+        std::vector<qreal> lineFreqsLogScaled = linearToLogFreqs(lineFreqs,
+                                                                 f_min,
+                                                                 f_max,
+                                                                 m_logFactor);
         m_freqs.push_back(lineFreqsLogScaled);
-    else
+    } else {
         m_freqs.push_back(lineFreqs);
+    }
     //m_freqs.push_back(lineFreqs);
 
     if (m_peaks.size() > static_cast<unsigned long long>(m_numLines)) {

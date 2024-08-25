@@ -24,6 +24,15 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     ui->comboBox_windowFunction->addItem("Blackman",
                                          QVariant::fromValue(int(WindowFunction::BlackmanWindow)));
     ui->comboBox_windowFunction->setCurrentIndex(EngineSettings::instance().windowFunction());
+
+    //3D GRAPHICS
+    for (int i = 0; i <= 8; i++) {
+        int pwr = qPow(2, i);
+        ui->comboBox_scaleFactor->addItem("/" + QString::number(pwr),
+                                          QVariant::fromValue(1 / static_cast<qreal>(pwr)));
+    }
+    ui->comboBox_scaleFactor->setCurrentIndex(ui->comboBox_scaleFactor->findData(
+        QVariant::fromValue(GraphicsSettings::instance().logFactor())));
 }
 
 SettingsDialog::~SettingsDialog()
@@ -56,4 +65,17 @@ void SettingsDialog::on_comboBox_windowFunction_currentIndexChanged(int index)
 void SettingsDialog::on_spinBox_UpdateIntervalMs_valueChanged(int arg1)
 {
     m_updateIntervalMs = arg1 == 0 ? 1 : arg1;
+}
+
+void SettingsDialog::on_checkBox_checkStateChanged(const Qt::CheckState &arg1)
+{
+    if (arg1 == Qt::CheckState::Checked)
+        m_logScale = true;
+    else
+        m_logScale = false;
+}
+
+void SettingsDialog::on_comboBox_scaleFactor_currentIndexChanged(int index)
+{
+    m_logFactor = ui->comboBox_scaleFactor->itemData(index).value<qreal>();
 }

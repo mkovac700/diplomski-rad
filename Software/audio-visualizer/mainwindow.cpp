@@ -230,6 +230,9 @@ void MainWindow::showSettingsDialog()
         EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
         EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
 
+        GraphicsSettings::instance().setLogScale(m_settingsDialog->logScale());
+        GraphicsSettings::instance().setLogFactor(m_settingsDialog->logFactor());
+
         ui->widget->reinitialize();
 
         m_engine->setUpdateInterval(EngineSettings::instance().updateIntervalMs());

@@ -37,6 +37,10 @@ private slots:
 
     void on_spinBox_UpdateIntervalMs_valueChanged(int arg1);
 
+    void on_checkBox_checkStateChanged(const Qt::CheckState &arg1);
+
+    void on_comboBox_scaleFactor_currentIndexChanged(int index);
+
 private:
     Ui::SettingsDialog *ui;
 

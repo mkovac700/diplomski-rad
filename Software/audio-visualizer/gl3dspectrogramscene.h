@@ -9,6 +9,7 @@
 #include "glwidget.h"
 #include <enginesettings.h>
 #include <frequencyspectrum.h>
+#include <graphicssettings.h>
 #include <spectrum.h>
 
 class GL3DSpectrogramScene : public GLScene
@@ -70,6 +71,8 @@ private:
     bool logarithm = true;
 
     int m_centerFrequency;
+
+    qreal m_logFactor;
 
 private:
     void updatePeaks();
