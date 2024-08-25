@@ -13,7 +13,7 @@
 
 #include <fftw3.h>
 
-#include <settings.h>
+#include <enginesettings.h>
 
 #define REAL 0
 #define IMAG 1

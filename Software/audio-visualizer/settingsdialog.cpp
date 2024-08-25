@@ -15,7 +15,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
         ui->comboBox_FFTSize->addItem(QString::number(pwr), QVariant::fromValue(pwr));
     }
     ui->comboBox_FFTSize->setCurrentIndex(
-        ui->comboBox_FFTSize->findData(QVariant::fromValue(Settings::instance().fftSize())));
+        ui->comboBox_FFTSize->findData(QVariant::fromValue(EngineSettings::instance().fftSize())));
 
     ui->comboBox_windowFunction->addItem(tr("None"),
                                          QVariant::fromValue(int(WindowFunction::NoWindow)));
@@ -23,7 +23,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                                          QVariant::fromValue(int(WindowFunction::HannWindow)));
     ui->comboBox_windowFunction->addItem("Blackman",
                                          QVariant::fromValue(int(WindowFunction::BlackmanWindow)));
-    ui->comboBox_windowFunction->setCurrentIndex(Settings::instance().windowFunction());
+    ui->comboBox_windowFunction->setCurrentIndex(EngineSettings::instance().windowFunction());
 }
 
 SettingsDialog::~SettingsDialog()

@@ -7,8 +7,8 @@
 #include <QTimer>
 #include "glscene.h"
 #include "glwidget.h"
+#include <enginesettings.h>
 #include <frequencyspectrum.h>
-#include <settings.h>
 #include <spectrum.h>
 
 class GL3DSpectrogramScene : public GLScene

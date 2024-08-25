@@ -20,7 +20,7 @@
 
 #include <settingsdialog.h>
 
-#include <settings.h>
+#include <enginesettings.h>
 
 #define LOG_MAINWINDOW
 

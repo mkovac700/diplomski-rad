@@ -10,14 +10,15 @@ CONFIG += c++17
 
 SOURCES += \
     audiolistener.cpp \
+    enginesettings.cpp \
     gl3dspectrogramscene.cpp \
     glbarspectrumscene.cpp \
     glwaveformscene.cpp \
     glwidget.cpp \
     main.cpp \
     mainwindow.cpp \
-    settings.cpp \
     settingsdialog.cpp \
+    settingsmanager.cpp \
     signalprocessor.cpp \
     engine.cpp \
     frequencyspectrum.cpp \
@@ -26,14 +27,15 @@ SOURCES += \
 
 HEADERS += \
     audiolistener.h \
+    enginesettings.h \
     gl3dspectrogramscene.h \
     glbarspectrumscene.h \
     glscene.h \
     glwaveformscene.h \
     glwidget.h \
     mainwindow.h \
-    settings.h \
     settingsdialog.h \
+    settingsmanager.h \
     signalprocessor.h \
     engine.h \
     frequencyspectrum.h \

@@ -845,7 +845,7 @@ void Engine::setFormat(const QAudioFormat &format)
     const bool changed = (format != m_format);
     m_format = format;
     m_levelBufferLength = m_format.bytesForDuration(LevelWindowUs);
-    m_spectrumBufferLength = Settings::instance().fftSize() * format.bytesPerFrame();
+    m_spectrumBufferLength = EngineSettings::instance().fftSize() * format.bytesPerFrame();
     if (changed)
         emit formatChanged(m_format);
 }

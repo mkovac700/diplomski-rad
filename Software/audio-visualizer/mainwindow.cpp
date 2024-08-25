@@ -226,13 +226,13 @@ void MainWindow::showSettingsDialog()
     m_settingsDialog->exec();
     if (m_settingsDialog->result() == QDialog::Accepted) {
         qDebug() << "settings dialog: accepted";
-        Settings::instance().setWindowFunction(m_settingsDialog->windowFunction());
-        Settings::instance().setFFTSize(m_settingsDialog->fftSize());
-        Settings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
+        EngineSettings::instance().setWindowFunction(m_settingsDialog->windowFunction());
+        EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
+        EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
 
         ui->widget->reinitialize();
 
-        m_engine->setUpdateInterval(Settings::instance().updateIntervalMs());
+        m_engine->setUpdateInterval(EngineSettings::instance().updateIntervalMs());
 
         restartEngine(); //to update interval ms
     }

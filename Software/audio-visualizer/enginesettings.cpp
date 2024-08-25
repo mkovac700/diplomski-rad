@@ -1,16 +1,16 @@
-#include "settings.h"
+#include "enginesettings.h"
 
-// Static method to return the singleton instance of the Settings class
-Settings &Settings::instance()
+// Static method to return the singleton instance of the EngineSettings class
+EngineSettings &EngineSettings::instance()
 {
-    static Settings instance; // Singleton instance
+    static EngineSettings instance; // Singleton instance
     return instance;
 }
 
 // Constructor (private to enforce singleton)
-Settings::Settings() {}
+EngineSettings::EngineSettings() {}
 
-void Settings::setWindowFunction(WindowFunction windowFunction)
+void EngineSettings::setWindowFunction(WindowFunction windowFunction)
 {
     QMutexLocker locker(&mutex); // Lock the mutex for thread safety
     if (m_windowFunction != windowFunction) {
@@ -19,7 +19,7 @@ void Settings::setWindowFunction(WindowFunction windowFunction)
     }
 }
 
-void Settings::setFFTSize(int fftSize)
+void EngineSettings::setFFTSize(int fftSize)
 {
     QMutexLocker locker(&mutex); // Lock the mutex for thread safety
     if (m_fftSize != fftSize) {
@@ -28,7 +28,7 @@ void Settings::setFFTSize(int fftSize)
     }
 }
 
-void Settings::setUpdateIntervalMs(int intervalMs)
+void EngineSettings::setUpdateIntervalMs(int intervalMs)
 {
     QMutexLocker locker(&mutex); // Lock the mutex for thread safety
     if (m_updateIntervalMs != intervalMs) {
@@ -37,19 +37,19 @@ void Settings::setUpdateIntervalMs(int intervalMs)
     }
 }
 
-WindowFunction Settings::windowFunction() const
+WindowFunction EngineSettings::windowFunction() const
 {
     QMutexLocker locker(&mutex); // Lock the mutex for thread safety
     return m_windowFunction;
 }
 
-int Settings::fftSize() const
+int EngineSettings::fftSize() const
 {
     QMutexLocker locker(&mutex); // Lock the mutex for thread safety
     return m_fftSize;
 }
 
-int Settings::updateIntervalMs() const
+int EngineSettings::updateIntervalMs() const
 {
     QMutexLocker locker(&mutex); // Lock the mutex for thread safety
     return m_updateIntervalMs;

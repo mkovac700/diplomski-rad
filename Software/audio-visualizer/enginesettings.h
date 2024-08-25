@@ -1,21 +1,21 @@
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef ENGINESETTINGS_H
+#define ENGINESETTINGS_H
 
 #include <QMutex>
 #include <QObject>
 #include <spectrum.h>
 
 /**
- * The Settings class
+ * The EngineSettings class
  * @brief Singleton
  * @author Marijan Kovač
  */
-class Settings : public QObject
+class EngineSettings : public QObject
 {
     Q_OBJECT
 public:
-    // Static method to get the singleton instance of the Settings class
-    static Settings &instance();
+    // Static method to get the singleton instance of the EngineSettings class
+    static EngineSettings &instance();
 
     // Thread-safe setters for individual settings
     void setWindowFunction(WindowFunction windowFunction);
@@ -35,11 +35,11 @@ signals:
 
 private:
     // Private constructor to ensure singleton pattern
-    Settings();
+    EngineSettings();
 
     // Disable copy constructor and assignment operator to enforce singleton pattern
-    Settings(const Settings &) = delete;
-    Settings &operator=(const Settings &) = delete;
+    EngineSettings(const EngineSettings &) = delete;
+    EngineSettings &operator=(const EngineSettings &) = delete;
 
     WindowFunction m_windowFunction = DefaultWindowFunction;
     int m_fftSize = 1024;
@@ -49,4 +49,4 @@ private:
     mutable QMutex mutex;
 };
 
-#endif // SETTINGS_H
+#endif // ENGINESETTINGS_H

@@ -2,7 +2,7 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
-#include <settings.h>
+#include <enginesettings.h>
 #include <spectrum.h>
 #include <utils.h>
 

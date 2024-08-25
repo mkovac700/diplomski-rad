@@ -46,7 +46,7 @@ void GL3DSpectrogramScene::initialize()
     //     initialized = true;
     // }
 
-    m_numPoints = Settings::instance().fftSize() / 2;
+    m_numPoints = EngineSettings::instance().fftSize() / 2;
     m_peaks.clear();
     m_freqs.clear();
 
