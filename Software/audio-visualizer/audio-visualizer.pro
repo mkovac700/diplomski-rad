@@ -15,6 +15,7 @@ SOURCES += \
     glbarspectrumscene.cpp \
     glwaveformscene.cpp \
     glwidget.cpp \
+    graphicssettings.cpp \
     main.cpp \
     mainwindow.cpp \
     settingsdialog.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     glscene.h \
     glwaveformscene.h \
     glwidget.h \
+    graphicssettings.h \
     mainwindow.h \
     settingsdialog.h \
     settingsmanager.h \
