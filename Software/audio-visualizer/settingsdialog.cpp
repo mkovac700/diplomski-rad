@@ -4,9 +4,9 @@
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SettingsDialog)
-    , m_windowFunction(DefaultWindowFunction)
-    , m_fftSize(1024)
-    , m_updateIntervalMs(10)
+// , m_windowFunction(DefaultWindowFunction)
+// , m_fftSize(1024)
+// , m_updateIntervalMs(10)
 {
     ui->setupUi(this);
 
