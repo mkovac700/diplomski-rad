@@ -292,9 +292,12 @@ std::vector<qreal> linearToLogFreqs(const std::vector<qreal> &freqs,
     for (qreal f : freqs) {
         // qreal logF = std::log10(f);
         qreal logF = f == 0 ? 0 : std::log10(f);
-        qreal scaledLogF = alpha
-                           * ((logF - logF_min) / (logF_max - logF_min) * (f_max - f_min) + f_min);
-        scaledLogFrequencies.push_back(scaledLogF);
+        qreal logFnorm = (logF - logF_min) / (logF_max - logF_min); //normalize log to [0,1]
+        //scale log freqs to [fmin=43.06, fmax=22050]
+        qreal scaledLogF = 1 + logFnorm * (f_max - f_min);
+        //blend log freqs based on alpha: 1=pure log, 0=near linear
+        qreal blendedScaleLogF = (1 - alpha) * f + alpha * scaledLogF;
+        scaledLogFrequencies.push_back(blendedScaleLogF);
     }
 
     return scaledLogFrequencies;
