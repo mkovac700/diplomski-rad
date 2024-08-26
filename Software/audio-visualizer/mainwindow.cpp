@@ -230,8 +230,11 @@ void MainWindow::showSettingsDialog()
         EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
         EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
 
-        GraphicsSettings::instance().setLogScale(m_settingsDialog->logScale());
+        GraphicsSettings::instance().setIsLogScale(m_settingsDialog->isLogScale());
         GraphicsSettings::instance().setLogFactor(m_settingsDialog->logFactor());
+        GraphicsSettings::instance().setNumLines(m_settingsDialog->numLines());
+        GraphicsSettings::instance().setSpacingX(m_settingsDialog->spacingX());
+        GraphicsSettings::instance().setSpacingZ(m_settingsDialog->spacingZ());
 
         ui->widget->reinitialize();
 

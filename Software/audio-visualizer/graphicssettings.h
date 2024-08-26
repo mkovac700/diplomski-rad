@@ -17,12 +17,22 @@ public:
     static GraphicsSettings &instance();
 
     // Thread-safe setters for individual settings
-    void setLogScale(bool logScale);
+    void setIsLogScale(bool logScale);
     void setLogFactor(qreal logFactor);
 
     // Thread-safe getters for individual settings
-    bool logScale() const;
+    bool isLogScale() const;
     qreal logFactor() const;
+
+    float spacingZ() const;
+    void setSpacingZ(float newSpacingZ);
+
+    int numLines() const;
+    void setNumLines(int newNumLines);
+    float spacingX() const;
+    void setSpacingX(float newSpacingX);
+    float maxHeight() const;
+    void setMaxHeight(float newMaxHeight);
 
 private:
     // Private constructor to ensure singleton pattern
@@ -33,8 +43,13 @@ private:
     GraphicsSettings &operator=(const GraphicsSettings &) = delete;
 
     // 3D scene
-    bool m_logScale = false;
+    bool m_isLogScale = false;
     qreal m_logFactor = 1;
+
+    int m_numLines = 275;
+    float m_spacingX = 0.02f;
+    float m_spacingZ = 2.0f;
+    float m_maxHeight = 0.5f;
 
     // Mutex to protect access to the settings
     mutable QMutex mutex;
