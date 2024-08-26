@@ -7,8 +7,9 @@
 #include <QTimer>
 #include "glscene.h"
 #include "glwidget.h"
+#include <enginesettings.h>
 #include <frequencyspectrum.h>
-#include <settings.h>
+#include <graphicssettings.h>
 #include <spectrum.h>
 
 class GL3DSpectrogramScene : public GLScene
@@ -66,6 +67,12 @@ private:
     QMutex m_mutex;
 
     bool initialized = false;
+
+    bool logarithm = true;
+
+    int m_centerFrequency;
+
+    qreal m_logFactor;
 
 private:
     void updatePeaks();
