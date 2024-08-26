@@ -53,8 +53,8 @@ private:
     const int m_numLines = 275;
     int m_numPoints; //Settings::instance().fftSize() / 2; //SpectrumLengthSamples / 2 + 1
 
-    const float m_spacingX = 0.1f;  //0.02f
-    const float m_spacingZ = 0.3f;  //0.2f
+    const float m_spacingX = 0.02f; //0.02f
+    const float m_spacingZ = 2.0f;  //0.2f
     const float m_maxHeight = 0.5f; //0.5f
 
     std::vector<std::vector<qreal>> m_peaks;
