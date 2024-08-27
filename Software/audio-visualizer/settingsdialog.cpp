@@ -70,12 +70,27 @@ void SettingsDialog::on_spinBox_UpdateIntervalMs_valueChanged(int arg1)
 void SettingsDialog::on_checkBox_checkStateChanged(const Qt::CheckState &arg1)
 {
     if (arg1 == Qt::CheckState::Checked)
-        m_logScale = true;
+        m_isLogScale = true;
     else
-        m_logScale = false;
+        m_isLogScale = false;
 }
 
 void SettingsDialog::on_comboBox_scaleFactor_currentIndexChanged(int index)
 {
     m_logFactor = ui->comboBox_scaleFactor->itemData(index).value<qreal>();
+}
+
+void SettingsDialog::on_spinBox_numLines_valueChanged(int arg1)
+{
+    m_numLines = arg1;
+}
+
+void SettingsDialog::on_doubleSpinBox_spacingX_valueChanged(double arg1)
+{
+    m_spacingX = arg1;
+}
+
+void SettingsDialog::on_doubleSpinBox_spacingZ_valueChanged(double arg1)
+{
+    m_spacingZ = arg1;
 }

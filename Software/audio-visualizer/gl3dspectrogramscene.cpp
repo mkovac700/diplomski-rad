@@ -7,7 +7,7 @@ GL3DSpectrogramScene::GL3DSpectrogramScene(GLWidget *glWidget)
     , m_rotationZ(0)
     , m_positionX(0)
     , m_positionY(0)
-    , m_distance(-200)
+    , m_distance(-550)
 {}
 
 void GL3DSpectrogramScene::initialize()
@@ -22,7 +22,7 @@ void GL3DSpectrogramScene::initialize()
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
     // Enable multisampling for better anti-aliasing (if supported)
-    // glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -41,16 +41,9 @@ void GL3DSpectrogramScene::initialize()
     // glGenBuffers(1, &vao);
     // glGenBuffers(1, &vbo);
 
-    // if (!initialized) {
-
-    //     initialized = true;
-    // }
-
     m_numPoints = EngineSettings::instance().fftSize() / 2;
     m_peaks.clear();
     m_freqs.clear();
-
-    //qDebug() << "num points changed to: " << m_numPoints;
 
     // Inicijalizacija peakova (postavljanje svih na 0)
     for (int i = 0; i < m_numLines; ++i) {
@@ -60,10 +53,11 @@ void GL3DSpectrogramScene::initialize()
         m_freqs.push_back(lineFreqs);
     }
 
-    logarithm = GraphicsSettings::instance().logScale();
+    logarithm = GraphicsSettings::instance().isLogScale();
     m_logFactor = GraphicsSettings::instance().logFactor();
-
-    //logarithm ? m_centerFrequency = m_nquistFrequency / 2 : m_centerFrequency = m_nquistFrequency;
+    m_numLines = GraphicsSettings::instance().numLines();
+    m_spacingX = GraphicsSettings::instance().spacingX();
+    m_spacingZ = GraphicsSettings::instance().spacingZ();
 }
 
 void GL3DSpectrogramScene::resize(int w, int h)
@@ -150,30 +144,8 @@ void GL3DSpectrogramScene::paint()
     for (int i = 0; i < m_numLines; ++i) {
         float z = (i - m_numLines / 2) * m_spacingZ;
         for (int j = 0; j < m_numPoints - 1; ++j) {
-            // float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
-            // float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
-
-            // float x1 = (m_freqs[i][j] - 11025.0f);
-            // float x2 = (m_freqs[i][j + 1] - 11025.0f);
-
-            // float x1 = (m_freqs[i][j] - 22050.0f) * 0.01f;
-            // float x2 = (m_freqs[i][j + 1] - 22050.0f) * 0.01f;
-
-            // float x1 = (m_freqs[i][j]) * 0.01f;
-            // float x2 = (m_freqs[i][j + 1]) * 0.01f;
-
-            // if (j == 0) {
-            //     qDebug() << "m_freqs[i][j]" << m_freqs[i][j] << "m_freqs[i][j + 1]"
-            //              << m_freqs[i][j + 1];
-            //     qDebug() << "x1: " << x1 << "x2: " << x2;
-            // }
-
-            //slučaj kada se koristi logaritmiranje, inače se ne dijeli s 2
-            // float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f * 1 / m_logFactor;
-            // float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f * 1 / m_logFactor;
-
-            float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f;
-            float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f;
+            float x1 = (m_freqs[i][j] - m_centerFrequency) * m_spacingX;
+            float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * m_spacingX;
 
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
@@ -200,35 +172,12 @@ void GL3DSpectrogramScene::paint()
 
         float z = (i - m_numLines / 2) * m_spacingZ;
         for (int j = 0; j < m_numPoints - 1; ++j) {
-            // float x1 = (j - m_numPoints / 2) * m_spacingX;
-            // float x2 = ((j + 1) - m_numPoints / 2) * m_spacingX;
-
-            // float x1 = m_freqs[i][j] * (j - m_numPoints / 2) * m_spacingX;
-            // float x2 = m_freqs[i][j + 1] * ((j + 1) - m_numPoints / 2) * m_spacingX;
-
-            // float x1 = m_freqs[i][j] * 0.01f;
-            // float x2 = m_freqs[i][j + 1] * 0.01f;
-
-            // float x1 = (m_freqs[i][j] - 11025.0f) * 0.01f;
-            // float x2 = (m_freqs[i][j + 1] - 11025.0f) * 0.01f;
-
-            // float x1 = (m_freqs[i][j] - 22050.0f) * 0.01f;
-            // float x2 = (m_freqs[i][j + 1] - 22050.0f) * 0.01f;
-
-            // float x1 = (m_freqs[i][j]) * 0.01f;
-            // float x2 = (m_freqs[i][j + 1]) * 0.01f;
-
-            //slučaj kada se koristi logaritmiranje, inače se ne dijeli s 2
-            // float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f * 1 / m_logFactor;
-            // float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f * 1 / m_logFactor;
-
-            float x1 = (m_freqs[i][j] - m_centerFrequency) * 0.01f;
-            float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * 0.01f;
+            float x1 = (m_freqs[i][j] - m_centerFrequency) * m_spacingX;
+            float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * m_spacingX;
 
             float y1 = m_peaks[i][j];
             float y2 = m_peaks[i][j + 1];
 
-            // Crtanje linija s nasumičnim peakovima
             glVertex3f(x1, y1, z);
             glVertex3f(x2, y2, z);
         }
@@ -262,7 +211,6 @@ void GL3DSpectrogramScene::spectrumChanged(qint64 position,
 {
     Q_UNUSED(position)
     Q_UNUSED(length)
-    Q_UNUSED(spectrum)
 
     m_spectrum = spectrum;
     m_inputFrequency = inputFrequency;
@@ -311,12 +259,6 @@ void GL3DSpectrogramScene::updatePeaks()
 
     FrequencySpectrum::iterator i = m_spectrum.begin();
     const FrequencySpectrum::iterator end = m_spectrum.end();
-    // int j = 0;
-    // for (; i != end; ++i) {
-    //     const FrequencySpectrum::Element e = *i;
-
-    //     linePeaks[j++] = e.amplitude;
-    // }
 
     for (int j = 0; j < m_numPoints && i != end; ++j) {
         const FrequencySpectrum::Element e = *i;
@@ -329,15 +271,7 @@ void GL3DSpectrogramScene::updatePeaks()
     }
 
     qreal f_min = lineFreqs.front(); //0 ili 44..
-    qreal f_max = lineFreqs.back(); //22050
-
-    //qDebug() << "fmin " << f_min;
-
-    // Generiranje novih peakova za prvu liniju
-    // std::vector<qreal> linePeaks(m_numPoints, 0.0f);
-    // for (int j = 0; j < m_numPoints; ++j) {
-    //     linePeaks[j] = static_cast<float>(std::rand()) / RAND_MAX * m_maxHeight;
-    // }
+    qreal f_max = lineFreqs.back();  //22050
 
     //QMutexLocker locker(&m_mutex);
 
