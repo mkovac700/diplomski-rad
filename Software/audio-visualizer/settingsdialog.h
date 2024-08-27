@@ -25,8 +25,12 @@ public:
     int updateIntervalMs() const { return m_updateIntervalMs; }
 
     //GRAPHICS
-    bool logScale() const { return m_logScale; }
+    bool isLogScale() const { return m_isLogScale; }
     qreal logFactor() const { return m_logFactor; }
+
+    int numLines() const { return m_numLines; }
+    float spacingX() const { return m_spacingX; }
+    float spacingZ() const { return m_spacingZ; }
 
 private slots:
     void on_spinBox_UpdateIntervalMs_editingFinished();
@@ -41,6 +45,12 @@ private slots:
 
     void on_comboBox_scaleFactor_currentIndexChanged(int index);
 
+    void on_spinBox_numLines_valueChanged(int arg1);
+
+    void on_doubleSpinBox_spacingX_valueChanged(double arg1);
+
+    void on_doubleSpinBox_spacingZ_valueChanged(double arg1);
+
 private:
     Ui::SettingsDialog *ui;
 
@@ -50,8 +60,12 @@ private:
     int m_updateIntervalMs = EngineSettings::instance().updateIntervalMs();
 
     //GRAPHICS
-    bool m_logScale = GraphicsSettings::instance().logScale();
+    bool m_isLogScale = GraphicsSettings::instance().isLogScale();
     qreal m_logFactor = GraphicsSettings::instance().logFactor();
+
+    int m_numLines = GraphicsSettings::instance().numLines();
+    float m_spacingX = GraphicsSettings::instance().spacingX();
+    float m_spacingZ = GraphicsSettings::instance().spacingZ();
 };
 
 #endif // SETTINGSDIALOG_H

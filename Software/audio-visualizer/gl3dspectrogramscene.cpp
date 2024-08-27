@@ -53,8 +53,11 @@ void GL3DSpectrogramScene::initialize()
         m_freqs.push_back(lineFreqs);
     }
 
-    logarithm = GraphicsSettings::instance().logScale();
+    logarithm = GraphicsSettings::instance().isLogScale();
     m_logFactor = GraphicsSettings::instance().logFactor();
+    m_numLines = GraphicsSettings::instance().numLines();
+    m_spacingX = GraphicsSettings::instance().spacingX();
+    m_spacingZ = GraphicsSettings::instance().spacingZ();
 }
 
 void GL3DSpectrogramScene::resize(int w, int h)
