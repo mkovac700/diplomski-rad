@@ -289,6 +289,22 @@ void MainWindow::restartEngine()
     }
 }
 
+void MainWindow::stopEngine()
+{
+    if (playing) {
+        ui->pushButton_PlayPause->setToolTip(tr("Play"));
+
+        ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-play-96-2.png"));
+
+        if (m_mode == Mode::LoadFileMode)
+            m_engine->stopPlayback();
+        else if (m_mode == Mode::StreamMode)
+            m_engine->stopStream();
+
+        playing = false;
+    }
+}
+
 void MainWindow::on_pushButton_PlayPause_clicked()
 {
     if (playing) {
@@ -309,20 +325,13 @@ void MainWindow::on_pushButton_PlayPause_clicked()
 
 void MainWindow::on_pushButton_stop_clicked()
 {
-    ui->pushButton_PlayPause->setToolTip(tr("Play"));
-
-    ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-play-96-2.png"));
-
-    if (m_mode == Mode::LoadFileMode)
-        m_engine->stopPlayback();
-    else if (m_mode == Mode::StreamMode)
-        m_engine->stopStream();
-
-    playing = false;
+    stopEngine();
 }
 
 void MainWindow::openFile()
 {
+    stopEngine();
+
     setMode(Mode::LoadFileMode);
 
     updateLabelDuration(0);
@@ -352,6 +361,8 @@ void MainWindow::openFile()
 
 void MainWindow::openStream()
 {
+    stopEngine();
+
     setMode(Mode::StreamMode);
     updateLabelDuration(0);
 
