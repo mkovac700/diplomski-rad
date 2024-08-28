@@ -77,7 +77,15 @@ private:
 
     void updateMenuMedia();
 
+    /**
+     * Updates settings and restarts update timer
+     */
     void restartEngine();
+
+    /**
+     * Stop all ongoing activity and reset engine to defaults
+     */
+    void stopEngine();
 
     /**
      * Set new value of format mm:ss for label_Duration
