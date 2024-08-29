@@ -32,6 +32,13 @@ public:
     float spacingX() const { return m_spacingX; }
     float spacingZ() const { return m_spacingZ; }
 
+    bool applyWindow() const { return m_applyWindow; }
+    bool drawGrid() const { return m_drawGrid; }
+    int minFreq() const { return m_minFreq; }
+    int maxFreq() const { return m_maxFreq; }
+    int bandWidth() const { return m_bandWidth; }
+    int gridStepHz() const { return m_gridStepHz; }
+
 private slots:
     void on_spinBox_UpdateIntervalMs_editingFinished();
 
@@ -51,6 +58,18 @@ private slots:
 
     void on_doubleSpinBox_spacingZ_valueChanged(double arg1);
 
+    void on_checkBox_applyWindow_checkStateChanged(const Qt::CheckState &arg1);
+
+    void on_checkBox_drawGrid_checkStateChanged(const Qt::CheckState &arg1);
+
+    void on_spinBox_minFreq_valueChanged(int arg1);
+
+    void on_spinBox_maxFreq_valueChanged(int arg1);
+
+    void on_spinBox_bandWidth_valueChanged(int arg1);
+
+    void on_spinBox_gridStepHz_valueChanged(int arg1);
+
 private:
     Ui::SettingsDialog *ui;
 
@@ -60,12 +79,24 @@ private:
     int m_updateIntervalMs = EngineSettings::instance().updateIntervalMs();
 
     //GRAPHICS
+
+    //3d spectrum
     bool m_isLogScale = GraphicsSettings::instance().isLogScale();
     qreal m_logFactor = GraphicsSettings::instance().logFactor();
 
     int m_numLines = GraphicsSettings::instance().numLines();
     float m_spacingX = GraphicsSettings::instance().spacingX();
     float m_spacingZ = GraphicsSettings::instance().spacingZ();
+
+    //waveform
+    bool m_applyWindow = GraphicsSettings::instance().applyWindow();
+
+    //bar spectrum
+    bool m_drawGrid = GraphicsSettings::instance().drawGrid();
+    int m_minFreq = GraphicsSettings::instance().minFreq();
+    int m_maxFreq = GraphicsSettings::instance().maxFreq();
+    int m_bandWidth = GraphicsSettings::instance().bandWidth();
+    int m_gridStepHz = GraphicsSettings::instance().gridStepHz();
 };
 
 #endif // SETTINGSDIALOG_H

@@ -94,3 +94,39 @@ void SettingsDialog::on_doubleSpinBox_spacingZ_valueChanged(double arg1)
 {
     m_spacingZ = arg1;
 }
+
+void SettingsDialog::on_checkBox_applyWindow_checkStateChanged(const Qt::CheckState &arg1)
+{
+    if (arg1 == Qt::CheckState::Checked)
+        m_applyWindow = true;
+    else
+        m_applyWindow = false;
+}
+
+void SettingsDialog::on_checkBox_drawGrid_checkStateChanged(const Qt::CheckState &arg1)
+{
+    if (arg1 == Qt::CheckState::Checked)
+        m_drawGrid = true;
+    else
+        m_drawGrid = false;
+}
+
+void SettingsDialog::on_spinBox_minFreq_valueChanged(int arg1)
+{
+    m_minFreq = arg1;
+}
+
+void SettingsDialog::on_spinBox_maxFreq_valueChanged(int arg1)
+{
+    m_maxFreq = arg1;
+}
+
+void SettingsDialog::on_spinBox_bandWidth_valueChanged(int arg1)
+{
+    m_bandWidth = arg1;
+}
+
+void SettingsDialog::on_spinBox_gridStepHz_valueChanged(int arg1)
+{
+    m_gridStepHz = arg1;
+}

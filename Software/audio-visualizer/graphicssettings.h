@@ -34,6 +34,21 @@ public:
     float maxHeight() const;
     void setMaxHeight(float newMaxHeight);
 
+    bool applyWindow() const;
+    void setApplyWindow(bool newApplyWindow);
+    bool drawGrid() const;
+    void setDrawGrid(bool newDrawGrid);
+    int minFreq() const;
+    void setMinFreq(int newMinFreq);
+    int maxFreq() const;
+    void setMaxFreq(int newMaxFreq);
+
+    int bandWidth() const;
+    void setBandWidth(int newBandWidth);
+
+    int gridStepHz() const;
+    void setGridStepHz(int newGridStepHz);
+
 private:
     // Private constructor to ensure singleton pattern
     GraphicsSettings();
@@ -50,6 +65,16 @@ private:
     float m_spacingX = 0.02f;
     float m_spacingZ = 2.0f;
     float m_maxHeight = 0.5f;
+
+    //waveform
+    bool m_applyWindow = false;
+
+    //bar spectrum
+    bool m_drawGrid = false;
+    int m_minFreq = 0;
+    int m_maxFreq = 24000;
+    int m_bandWidth = 1;
+    int m_gridStepHz = 100;
 
     // Mutex to protect access to the settings
     mutable QMutex mutex;

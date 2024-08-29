@@ -14,6 +14,13 @@ void GLBarSpectrumScene::initialize()
     glLoadIdentity();
 
     m_fftSize = EngineSettings::instance().fftSize();
+    m_drawGrid = GraphicsSettings::instance().drawGrid();
+
+    m_lowFreq = GraphicsSettings::instance().minFreq();
+    m_highFreq = GraphicsSettings::instance().maxFreq();
+
+    m_bandWidth = GraphicsSettings::instance().bandWidth();
+    m_gridStepHz = GraphicsSettings::instance().gridStepHz();
 }
 
 void GLBarSpectrumScene::resize(int w, int h)
@@ -39,7 +46,6 @@ void GLBarSpectrumScene::paint()
 
     m_numBands = k_upper - k_lower + 1;
     // m_bandWidth = m_highFreq - m_lowFreq / m_numBands;
-    m_bandWidth = 10;
 
     /*float xScale = glWidget->width() / (float) 20000;*/ //(float) width() / 10000;
     float xScale = glWidget->width() / (float) m_highFreq;
@@ -65,13 +71,15 @@ void GLBarSpectrumScene::paint()
         }
     }
 
-    glLineWidth(1.0);
-    glColor3f(0, 1, 0);
-    for (int i = 0; i < static_cast<int>(m_highFreq); i += 100) {
-        glBegin(GL_LINE_STRIP);
-        glVertex2f(i * xScale, 0.0f * yScale);
-        glVertex2f(i * xScale, glWidget->height());
-        glEnd();
+    if (m_drawGrid) {
+        glLineWidth(1.0);
+        glColor3f(0, 1, 0);
+        for (int i = 0; i < static_cast<int>(m_highFreq); i += m_gridStepHz) {
+            glBegin(GL_LINE_STRIP);
+            glVertex2f(i * xScale, 0.0f * yScale);
+            glVertex2f(i * xScale, glWidget->height());
+            glEnd();
+        }
     }
 
     glFlush();
