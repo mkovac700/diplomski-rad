@@ -12,6 +12,8 @@ void GLBarSpectrumScene::initialize()
     glOrtho(0, glWidget->width(), 0, glWidget->height(), -1, 1); // Adjusted to start from bottom-left
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    m_fftSize = EngineSettings::instance().fftSize();
 }
 
 void GLBarSpectrumScene::resize(int w, int h)
@@ -30,22 +32,45 @@ void GLBarSpectrumScene::paint()
 
     glColor3f(1, 1, 1);
 
-    float xScale = glWidget->width() / (float) 20000; //(float) width() / 10000;
+    qreal deltaF = m_inputFrequency / m_fftSize;
+
+    qreal k_lower = m_lowFreq / deltaF;
+    qreal k_upper = m_highFreq / deltaF;
+
+    m_numBands = k_upper - k_lower + 1;
+    // m_bandWidth = m_highFreq - m_lowFreq / m_numBands;
+    m_bandWidth = 10;
+
+    /*float xScale = glWidget->width() / (float) 20000;*/ //(float) width() / 10000;
+    float xScale = glWidget->width() / (float) m_highFreq;
     float yScale = glWidget->height() / (float) 1.5f;
 
+    glLineWidth(m_bandWidth);
+    glColor3f(1, 1, 1);
     FrequencySpectrum::iterator i = m_spectrum.begin();
     const FrequencySpectrum::iterator end = m_spectrum.end();
     for (; i != end; ++i) {
         const FrequencySpectrum::Element e = *i;
 
+        if (e.frequency >= m_lowFreq && e.frequency <= m_highFreq) {
+            glBegin(GL_LINE_STRIP);
+
+            // glVertex2f(e.frequency * xScale, 0.0f);              // Start point (x, 0)
+            // glVertex2f(e.frequency * xScale, e.amplitude * 100); // End point (x, y) //* 100 //*10
+
+            glVertex2f(e.frequency * xScale, 0.0f * yScale);        // Start point (x, 0)
+            glVertex2f(e.frequency * xScale, e.amplitude * yScale); // End point (x, y) //* 100 //*10
+
+            glEnd();
+        }
+    }
+
+    glLineWidth(1.0);
+    glColor3f(0, 1, 0);
+    for (int i = 0; i < static_cast<int>(m_highFreq); i += 100) {
         glBegin(GL_LINE_STRIP);
-
-        // glVertex2f(e.frequency * xScale, 0.0f);              // Start point (x, 0)
-        // glVertex2f(e.frequency * xScale, e.amplitude * 100); // End point (x, y) //* 100 //*10
-
-        glVertex2f(e.frequency * xScale, 0.0f * yScale);        // Start point (x, 0)
-        glVertex2f(e.frequency * xScale, e.amplitude * yScale); // End point (x, y) //* 100 //*10
-
+        glVertex2f(i * xScale, 0.0f * yScale);
+        glVertex2f(i * xScale, glWidget->height());
         glEnd();
     }
 

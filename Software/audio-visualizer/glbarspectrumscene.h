@@ -2,8 +2,10 @@
 #define GLBARSPECTRUMSCENE_H
 
 #include "glwidget.h"
+#include <enginesettings.h>
 #include <frequencyspectrum.h>
 #include <glscene.h>
+#include <graphicssettings.h>
 
 class GLBarSpectrumScene : public GLScene
 {
@@ -34,6 +36,13 @@ public:
 private:
     FrequencySpectrum m_spectrum;
     int m_inputFrequency;
+
+    qreal m_highFreq = 3000;
+    qreal m_lowFreq = 0;
+    qint64 m_numBands; //needs to be calculated based on sample rate and fft size and bounds
+    qreal m_bandWidth; //calculated by (high freq - low freq) / num bands
+
+    qint64 m_fftSize;
 
     QString name = "Bar Spectrum";
 

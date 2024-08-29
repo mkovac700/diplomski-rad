@@ -59,6 +59,7 @@ void GLWidget::resetState()
     glDisable(GL_CULL_FACE);
     glDisable(GL_TEXTURE_2D);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glLineWidth(1.0);
 
     // Resetiranje viewporta
     glViewport(0, 0, width(), height());
