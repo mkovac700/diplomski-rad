@@ -10,6 +10,90 @@ GraphicsSettings &GraphicsSettings::instance()
 // Constructor (private to enforce singleton)
 GraphicsSettings::GraphicsSettings() {}
 
+int GraphicsSettings::gridStepHz() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_gridStepHz;
+}
+
+void GraphicsSettings::setGridStepHz(int newGridStepHz)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_gridStepHz != newGridStepHz) {
+        m_gridStepHz = newGridStepHz;
+    }
+}
+
+int GraphicsSettings::bandWidth() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_bandWidth;
+}
+
+void GraphicsSettings::setBandWidth(int newBandWidth)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_bandWidth != newBandWidth) {
+        m_bandWidth = newBandWidth;
+    }
+}
+
+bool GraphicsSettings::applyWindow() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_applyWindow;
+}
+
+void GraphicsSettings::setApplyWindow(bool newApplyWindow)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_applyWindow != newApplyWindow) {
+        m_applyWindow = newApplyWindow;
+    }
+}
+
+bool GraphicsSettings::drawGrid() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_drawGrid;
+}
+
+void GraphicsSettings::setDrawGrid(bool newDrawGrid)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_drawGrid != newDrawGrid) {
+        m_drawGrid = newDrawGrid;
+    }
+}
+
+int GraphicsSettings::minFreq() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_minFreq;
+}
+
+void GraphicsSettings::setMinFreq(int newMinFreq)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_minFreq != newMinFreq) {
+        m_minFreq = newMinFreq;
+    }
+}
+
+int GraphicsSettings::maxFreq() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_maxFreq;
+}
+
+void GraphicsSettings::setMaxFreq(int newMaxFreq)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_maxFreq != newMaxFreq) {
+        m_maxFreq = newMaxFreq;
+    }
+}
+
 int GraphicsSettings::numLines() const
 {
     QMutexLocker locker(&mutex); // Lock the mutex for thread safety

@@ -38,6 +38,8 @@ SpectrumAnalyserThread::SpectrumAnalyserThread(QObject *parent)
     p = fftw_plan_dft_1d(EngineSettings::instance().fftSize(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
     //calculateWindow();
+
+    m_applyWindow = GraphicsSettings::instance().applyWindow();
 }
 
 SpectrumAnalyserThread::~SpectrumAnalyserThread()
@@ -108,7 +110,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
         // const DataType windowedSample = realSample * m_window[i];
         // m_input[i] = windowedSample;
         const qreal windowedSample = realSample * m_window[i];
-        m_input[i] = windowedSample;
+        m_input[i] = m_applyWindow ? windowedSample : realSample;
         in[i][REAL] = windowedSample;
         in[i][IMAG] = 0.0f;
         ptr += bytesPerFrame;

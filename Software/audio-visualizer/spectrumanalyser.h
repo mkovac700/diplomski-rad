@@ -14,6 +14,7 @@
 #include <fftw3.h>
 
 #include <enginesettings.h>
+#include <graphicssettings.h>
 
 #define REAL 0
 #define IMAG 1
@@ -88,6 +89,8 @@ private:
     QList<qreal> m_output;
 
     FrequencySpectrum m_spectrum;
+
+    bool m_applyWindow = false;
 
 #ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
     QThread *m_thread;
