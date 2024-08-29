@@ -236,6 +236,14 @@ void MainWindow::showSettingsDialog()
         GraphicsSettings::instance().setSpacingX(m_settingsDialog->spacingX());
         GraphicsSettings::instance().setSpacingZ(m_settingsDialog->spacingZ());
 
+        GraphicsSettings::instance().setApplyWindow(m_settingsDialog->applyWindow());
+        GraphicsSettings::instance().setDrawGrid(m_settingsDialog->drawGrid());
+
+        GraphicsSettings::instance().setMinFreq(m_settingsDialog->minFreq());
+        GraphicsSettings::instance().setMaxFreq(m_settingsDialog->maxFreq());
+        GraphicsSettings::instance().setBandWidth(m_settingsDialog->bandWidth());
+        GraphicsSettings::instance().setGridStepHz(m_settingsDialog->gridStepHz());
+
         ui->widget->reinitialize();
 
         m_engine->setUpdateInterval(EngineSettings::instance().updateIntervalMs());

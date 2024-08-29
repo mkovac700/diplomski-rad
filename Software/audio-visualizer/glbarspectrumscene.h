@@ -39,8 +39,11 @@ private:
 
     qreal m_highFreq = 3000;
     qreal m_lowFreq = 0;
-    qint64 m_numBands; //needs to be calculated based on sample rate and fft size and bounds
-    qreal m_bandWidth; //calculated by (high freq - low freq) / num bands
+    qint64 m_numBands; //sample rate and fft size and bounds
+    qreal m_bandWidth = 1;
+
+    bool m_drawGrid = false;
+    int m_gridStepHz = 100;
 
     qint64 m_fftSize;
 
