@@ -39,7 +39,7 @@ private:
     int m_inputFrequency;
     int m_nquistFrequency;
 
-    QString name = "3D Spectrogram";
+    QString name = tr("3D Spektrogram");
 
 private:
     float m_rotationX;

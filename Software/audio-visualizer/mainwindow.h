@@ -2,9 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "glbarspectrumscene.h"
 #include "glscene.h"
-#include "glwaveformscene.h"
 
 #include <QMediaDevices>
 
@@ -21,6 +19,8 @@
 #include <settingsdialog.h>
 
 #include <enginesettings.h>
+
+#include <QLabel>
 
 #define LOG_MAINWINDOW
 
@@ -96,6 +96,8 @@ private:
     void updateHorizontalSliderPosition(qint64 processedUSecs);
     void updateLabelSeek(qint64 uSecs);
 
+    void updateStatusBar();
+
 private:
     Ui::MainWindow *ui;
 
@@ -115,6 +117,8 @@ private:
     Mode m_mode;
 
     SettingsDialog *m_settingsDialog;
+
+    QLabel *m_statusLabel;
 
     //------------------------------------------------
     // SCENES

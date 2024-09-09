@@ -47,7 +47,7 @@ private:
 
     qint64 m_fftSize;
 
-    QString name = "Bar Spectrum";
+    QString name = tr("Stupčasti spektar");
 
     // GLScene interface
 public:

@@ -33,7 +33,7 @@ public:
     QString getName() const override { return name; };
 
 private:
-    QString name = "Waveform";
+    QString name = tr("Oblik vala");
 
     // GLScene interface
 public:

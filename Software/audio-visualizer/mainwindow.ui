@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>VisualFREQ</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -66,7 +66,7 @@
       <item>
        <widget class="QLabel" name="label_CurrentScene">
         <property name="text">
-         <string>Waveform</string>
+         <string>Oblik vala</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -217,7 +217,11 @@
    </widget>
    <addaction name="menuMedia"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
+   </property>
+  </widget>
   <action name="actionFile">
    <property name="checkable">
     <bool>true</bool>

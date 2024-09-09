@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_engine(new Engine(this))
     , m_mode(Mode::NoMode)
     , m_settingsDialog(new SettingsDialog(this))
+    , m_statusLabel(new QLabel(this))
 {
     ui->setupUi(this);
 
@@ -58,6 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_engine, &Engine::processingComplete, this, &MainWindow::processingComplete);
 
     initializeScenes();
+
+    ui->statusbar->addPermanentWidget(m_statusLabel, 100);
 }
 
 MainWindow::~MainWindow()
@@ -110,6 +113,31 @@ void MainWindow::updateLabelSeek(qint64 uSecs)
     QString formattedTime = time.toString("m:ss");
 
     ui->label_Seek->setText(formattedTime);
+}
+
+void MainWindow::updateStatusBar()
+{
+    QString message;
+
+    if (m_mode == Mode::StreamMode)
+        message.append(tr("Strujanje"));
+    else if (m_mode == Mode::LoadFileMode)
+        message.append(QString(tr("Datoteka: ")).append(m_currentFile.split("/").last()));
+
+    int sampleRate = m_engine->format().sampleRate();
+    int fftSize = EngineSettings::instance().fftSize();
+
+    message.append(" | ");
+
+    message.append(QString(tr("Brzina uzorkovanja: "))).append(QString::number(sampleRate));
+
+    message.append(" | ");
+
+    message.append(QString(tr("FFT veličina: "))).append(QString::number(fftSize));
+
+    m_statusLabel->setText(message);
+
+    //ui->statusbar->showMessage(message);
 }
 
 void MainWindow::initializeScenes()
@@ -249,6 +277,8 @@ void MainWindow::showSettingsDialog()
         m_engine->setUpdateInterval(EngineSettings::instance().updateIntervalMs());
 
         restartEngine(); //to update interval ms
+
+        updateStatusBar();
     }
 }
 
@@ -352,7 +382,7 @@ void MainWindow::openFile()
 
     qDebug() << m_currentFile;
 
-    ui->statusbar->showMessage(QString("Datoteka: ").append(m_currentFile.split("/").last()));
+    // ui->statusbar->showMessage(QString("Datoteka: ").append(m_currentFile.split("/").last()));
 
     if (m_currentFile.isEmpty())
         return;
@@ -365,6 +395,8 @@ void MainWindow::openFile()
 
     updateLabelDuration(m_engine->bufferDuration());
     updateHorizontalSlider(m_engine->bufferDuration());
+
+    updateStatusBar();
 }
 
 void MainWindow::openStream()
@@ -376,6 +408,8 @@ void MainWindow::openStream()
 
     m_engine->reset();
     m_engine->openStream();
+
+    updateStatusBar();
 }
 
 void MainWindow::processedUSecsChanged(qint64 processedUSecs)
