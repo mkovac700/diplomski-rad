@@ -23,6 +23,8 @@ void GL3DSpectrogramScene::initialize()
 
     // Enable multisampling for better anti-aliasing (if supported)
     glEnable(GL_MULTISAMPLE);
+    //glSampleCoverage(1.0, GL_FALSE); // 1.0 means full coverage, GL_FALSE means invert the mask
+    glEnable(GL_SAMPLE_ALPHA_TO_ONE);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
