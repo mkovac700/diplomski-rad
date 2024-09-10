@@ -16,15 +16,24 @@ void GL3DSpectrogramScene::initialize()
 
     initializeOpenGLFunctions();
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     // Enable line smoothing
     glEnable(GL_LINE_SMOOTH);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_POLYGON_SMOOTH);
+    glEnable(GL_POINT_SMOOTH);
 
     // Enable multisampling for better anti-aliasing (if supported)
     glEnable(GL_MULTISAMPLE);
     //glSampleCoverage(1.0, GL_FALSE); // 1.0 means full coverage, GL_FALSE means invert the mask
     glEnable(GL_SAMPLE_ALPHA_TO_ONE);
+
+    glCullFace(GL_BACK);
+    glDepthRange(0.1f, 100.0f);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnable(GL_STENCIL_TEST);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -117,7 +126,10 @@ void GL3DSpectrogramScene::HSVtoRGB(float H, float S, float V, float &r, float &
 
 void GL3DSpectrogramScene::paint()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     QMatrix4x4 modelViewMatrix;
     modelViewMatrix.translate(m_positionX, m_positionY, m_distance);
@@ -142,6 +154,10 @@ void GL3DSpectrogramScene::paint()
 
     glColor3f(0.0f, 0.0f, 0.0f);
 
+    glCullFace(GL_BACK);
+
+    glStencilMask(0x00);
+
     glBegin(GL_QUADS);
     for (int i = 0; i < m_numLines; ++i) {
         float z = (i - m_numLines / 2) * m_spacingZ;
@@ -163,6 +179,12 @@ void GL3DSpectrogramScene::paint()
     glFlush();
 
     //Second Pass: Draw the lines themselves
+
+    glCullFace(GL_FRONT);
+
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00);
+    glEnable(GL_DEPTH_TEST);
 
     glBegin(GL_LINES);
     for (int i = 0; i < m_numLines; ++i) {
@@ -186,6 +208,10 @@ void GL3DSpectrogramScene::paint()
     }
     glEnd();
     glFlush();
+
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glDisable(GL_DEPTH_TEST);
 }
 
 void GL3DSpectrogramScene::reinitialize()
