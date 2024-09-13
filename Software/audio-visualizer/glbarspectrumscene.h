@@ -58,6 +58,9 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+
+private:
+    void HSVtoRGB(float H, float S, float V, float &r, float &g, float &b);
 };
 
 #endif // GLBARSPECTRUMSCENE_H

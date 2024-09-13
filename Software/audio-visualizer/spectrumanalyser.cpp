@@ -92,6 +92,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
 {
 #ifndef DISABLE_FFT
     //Q_ASSERT(buffer.size() == m_numSamples * bytesPerFrame);
+    m_applyWindow = GraphicsSettings::instance().applyWindow();
 
     int numBufSamples = buffer.size() / bytesPerFrame;
 
