@@ -37,13 +37,15 @@ void GL3DSpectrogramScene::initialize()
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    glLineWidth(2.0f);
+
     int w = glWidget->width(), h = glWidget->height();
 
     glViewport(0, 0, w, h);
 
     // Postavljanje perspektivne projekcije
     m_projectionMatrix.setToIdentity();
-    m_projectionMatrix.perspective(45.0f, GLfloat(w) / h, 0.1f, 1000.0f);
+    m_projectionMatrix.perspective(45.0f, GLfloat(w) / h, 0.1f, 2000.0f);
 
     // initShaders();
 
@@ -80,7 +82,7 @@ void GL3DSpectrogramScene::resize(int w, int h)
     m_projectionMatrix.perspective(45.0f,
                                    GLfloat(w) / h,
                                    0.1f,
-                                   1000.0f); //static_cast<float>(m_numPoints) //1000.0f
+                                   2000.0f); //static_cast<float>(m_numPoints) //1000.0f
 }
 
 void GL3DSpectrogramScene::HSVtoRGB(float H, float S, float V, float &r, float &g, float &b)
@@ -126,7 +128,6 @@ void GL3DSpectrogramScene::HSVtoRGB(float H, float S, float V, float &r, float &
 
 void GL3DSpectrogramScene::paint()
 {
-    glDisable(GL_DEPTH_TEST);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -154,8 +155,6 @@ void GL3DSpectrogramScene::paint()
 
     glColor3f(0.0f, 0.0f, 0.0f);
 
-    glCullFace(GL_BACK);
-
     glStencilMask(0x00);
 
     glBegin(GL_QUADS);
@@ -180,11 +179,10 @@ void GL3DSpectrogramScene::paint()
 
     //Second Pass: Draw the lines themselves
 
-    glCullFace(GL_FRONT);
-
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
-    glEnable(GL_DEPTH_TEST);
+
+    //glColor3f(1.0f, 1.0f, 1.0f);
 
     glBegin(GL_LINES);
     for (int i = 0; i < m_numLines; ++i) {
@@ -196,6 +194,12 @@ void GL3DSpectrogramScene::paint()
 
         float z = (i - m_numLines / 2) * m_spacingZ;
         for (int j = 0; j < m_numPoints - 1; ++j) {
+            // float hue = (i * 360.0f) / m_numPoints - 1;
+            // float r, g, b;
+            // HSVtoRGB(hue, 1.0f, 1.0f, r, g, b);
+
+            // glColor3f(r, g, b);
+
             float x1 = (m_freqs[i][j] - m_centerFrequency) * m_spacingX;
             float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * m_spacingX;
 
@@ -211,7 +215,6 @@ void GL3DSpectrogramScene::paint()
 
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glDisable(GL_DEPTH_TEST);
 }
 
 void GL3DSpectrogramScene::reinitialize()
@@ -291,7 +294,7 @@ void GL3DSpectrogramScene::updatePeaks()
     for (int j = 0; j < m_numPoints && i != end; ++j) {
         const FrequencySpectrum::Element e = *i;
         lineFreqs[j] = e.frequency;
-        linePeaks[j] = e.db;
+        linePeaks[j] = e.db; //* 1 / 2.71828f;
         //linePeaks[j] = e.magnitude * 0.5f;
         //linePeaks[j] = e.amplitude * 10;
         //linePeaks[j] = e.amplitude; //e.magnitude; //e.amplitude * 10;

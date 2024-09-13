@@ -49,14 +49,22 @@ void GLBarSpectrumScene::paint()
 
     /*float xScale = glWidget->width() / (float) 20000;*/ //(float) width() / 10000;
     float xScale = glWidget->width() / (float) m_highFreq;
-    float yScale = glWidget->height() / (float) 1.5f;
+    float yScale = glWidget->height() / (float) 5.0f;
 
     glLineWidth(m_bandWidth);
     glColor3f(1, 1, 1);
+
+    int j = 0;
+
     FrequencySpectrum::iterator i = m_spectrum.begin();
     const FrequencySpectrum::iterator end = m_spectrum.end();
     for (; i != end; ++i) {
         const FrequencySpectrum::Element e = *i;
+
+        float hue = (j * 360.0f) / m_numBands; //m_spectrum.count() * 2
+        float r, g, b;
+        HSVtoRGB(hue, 1.0f, 1.0f, r, g, b);
+        glColor3f(r, g, b);
 
         if (e.frequency >= m_lowFreq && e.frequency <= m_highFreq) {
             glBegin(GL_LINE_STRIP);
@@ -65,10 +73,13 @@ void GLBarSpectrumScene::paint()
             // glVertex2f(e.frequency * xScale, e.amplitude * 100); // End point (x, y) //* 100 //*10
 
             glVertex2f(e.frequency * xScale, 0.0f * yScale);        // Start point (x, 0)
-            glVertex2f(e.frequency * xScale, e.amplitude * yScale); // End point (x, y) //* 100 //*10
+            glVertex2f(e.frequency * xScale,
+                       std::log(1 + e.magnitude) * yScale); // End point (x, y) //* 100 //*10
 
             glEnd();
         }
+
+        j++;
     }
 
     if (m_drawGrid) {
@@ -83,6 +94,47 @@ void GLBarSpectrumScene::paint()
     }
 
     glFlush();
+}
+
+void GLBarSpectrumScene::HSVtoRGB(float H, float S, float V, float &r, float &g, float &b)
+{
+    float C = V * S;
+    float X = C * (1 - fabs(fmod(H / 60.0, 2) - 1));
+    float m = V - C;
+
+    if (0 <= H && H < 60) {
+        r = C;
+        g = X;
+        b = 0;
+    } else if (60 <= H && H < 120) {
+        r = X;
+        g = C;
+        b = 0;
+    } else if (120 <= H && H < 180) {
+        r = 0;
+        g = C;
+        b = X;
+    } else if (180 <= H && H < 240) {
+        r = 0;
+        g = X;
+        b = C;
+    } else if (240 <= H && H < 300) {
+        r = X;
+        g = 0;
+        b = C;
+    } else if (300 <= H && H < 360) {
+        r = C;
+        g = 0;
+        b = X;
+    } else {
+        r = 0;
+        g = 0;
+        b = 0;
+    }
+
+    r += m;
+    g += m;
+    b += m;
 }
 
 //---------------------

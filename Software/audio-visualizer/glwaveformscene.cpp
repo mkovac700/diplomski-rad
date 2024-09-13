@@ -6,6 +6,15 @@ void GLWaveformScene::initialize()
 
     initializeOpenGLFunctions();
 
+    // Enable line smoothing
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_POLYGON_SMOOTH);
+    glEnable(GL_POINT_SMOOTH);
+
+    // Enable multisampling for better anti-aliasing (if supported)
+    glEnable(GL_MULTISAMPLE);
+
     glClearColor(0, 0, 0, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -37,6 +46,11 @@ void GLWaveformScene::paint()
         xScale = glWidget->width() / static_cast<float>(m_buffer.size());
 
     for (int i = 0; i < m_buffer.size(); i++) {
+        float hue = (i * 360.0f) / m_buffer.size();
+        float r, g, b;
+        HSVtoRGB(hue, 1.0f, 1.0f, r, g, b);
+        glColor3f(r, g, b);
+
         auto x = i * xScale;
         auto y = m_buffer[i];
         glVertex2f(x, y);
@@ -44,6 +58,47 @@ void GLWaveformScene::paint()
 
     glEnd();
     glFlush();
+}
+
+void GLWaveformScene::HSVtoRGB(float H, float S, float V, float &r, float &g, float &b)
+{
+    float C = V * S;
+    float X = C * (1 - fabs(fmod(H / 60.0, 2) - 1));
+    float m = V - C;
+
+    if (0 <= H && H < 60) {
+        r = C;
+        g = X;
+        b = 0;
+    } else if (60 <= H && H < 120) {
+        r = X;
+        g = C;
+        b = 0;
+    } else if (120 <= H && H < 180) {
+        r = 0;
+        g = C;
+        b = X;
+    } else if (180 <= H && H < 240) {
+        r = 0;
+        g = X;
+        b = C;
+    } else if (240 <= H && H < 300) {
+        r = X;
+        g = 0;
+        b = C;
+    } else if (300 <= H && H < 360) {
+        r = C;
+        g = 0;
+        b = X;
+    } else {
+        r = 0;
+        g = 0;
+        b = 0;
+    }
+
+    r += m;
+    g += m;
+    b += m;
 }
 
 //---------------------
