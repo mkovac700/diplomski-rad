@@ -94,6 +94,7 @@ Engine::Engine(QObject *parent)
 #endif
 
     m_notifyTimer = new QTimer(this);
+    m_notifyTimer->setTimerType(Qt::TimerType::CoarseTimer);
     //m_notifyTimer->setInterval(10); //1000
     connect(m_notifyTimer, &QTimer::timeout, this, &Engine::audioNotify);
 }
@@ -128,10 +129,10 @@ bool Engine::loadFile(const QString &fileName)
     }
     if (result) {
         QIODevice *file2 = new QFile(fileName);
-        // file->close();
-        // file->open(QIODevice::ReadOnly);
+        //file->close();
+        //file->open(QIODevice::ReadOnly);
         file2->open(QIODevice::ReadOnly);
-        // m_analysisFile = new QWaveDecoder(file, this);
+        //m_analysisFile = new QWaveDecoder(file, this);
         m_analysisFile = new QWaveDecoder(file2, this);
         m_analysisFile->open(QIODevice::ReadOnly);
     }
@@ -282,8 +283,10 @@ void Engine::startPlayback()
                 m_bufferPosition = 0;
                 m_dataLength = 0;
                 m_audioOutput->start(m_file->getDevice());
-                m_processedUSecs = m_audioOutput->processedUSecs();
-                qDebug() << "processedUSecs on start:" << m_processedUSecs;
+                m_processedUSecs = m_audioOutput->processedUSecs() - WaveformWindowDuration;
+                //m_processedUSecs = 0;
+                m_originalProcessedUSecs = m_audioOutput->processedUSecs();
+                ENGINE_DEBUG << "processedUSecs on start:" << m_processedUSecs;
             } else {
                 // m_audioOutputIODevice.close();
                 // m_audioOutputIODevice.setBuffer(&m_buffer);
@@ -360,7 +363,7 @@ void Engine::initAudioDevices()
 
 void Engine::audioNotify()
 {
-    qDebug() << "audioNotify: " << QTime::currentTime();
+    ENGINE_DEBUG << "audioNotify: " << QTime::currentTime();
 
     switch (m_mode) {
     case QAudioDevice::Input: {
@@ -379,21 +382,21 @@ void Engine::audioNotify()
         // qint64 len = m_audioInput->bytesAvailable();
         // QByteArray buffer(len, 0);
         // qint64 l = m_audioInputIODevice->read(buffer.data(), len);
-        // qDebug() << "bytes read: " << l;
+        // ENGINE_DEBUG << "bytes read: " << l;
 
         // qint64 len = qMin(m_audioInput->bytesAvailable(), m_spectrumBufferLength);
         // //QByteArray buffer(m_spectrumBufferLength, 0);
         // m_buffer.clear();
         // m_buffer.resize(m_spectrumBufferLength, 0);
         // qint64 l = m_audioInputIODevice->read(m_buffer.data(), len);
-        // qDebug() << "bytes read: " << l << "buffer size: " << m_buffer.size();
+        // ENGINE_DEBUG << "bytes read: " << l << "buffer size: " << m_buffer.size();
 
         qint64 len = qMin(m_audioInput->bytesAvailable(), m_spectrumBufferLength);
         //QByteArray buffer(m_spectrumBufferLength, 0);
         //m_buffer.clear();
         m_buffer.resize(len, 0);
         qint64 l = m_audioInputIODevice->read(m_buffer.data(), len);
-        qDebug() << "bytes read: " << l << "buffer size: " << m_buffer.size();
+        ENGINE_DEBUG << "bytes read: " << l << "buffer size: " << m_buffer.size();
 
         if (l > 0) {
             // const qreal level = m_audioInfo->calculateLevel(buffer.constData(), l);
@@ -407,16 +410,18 @@ void Engine::audioNotify()
 
         m_processedUSecs += m_updateInterval * 1000;
 
-        qDebug() << "Engine::audioNotify[3]" << "m_processedUSec:" << m_processedUSecs
-                 << "processedUSecs" << m_audioOutput->processedUSecs();
+        ENGINE_DEBUG << "Engine::audioNotify[3]" << "m_processedUSec:" << m_processedUSecs
+                     << "processedUSecs" << m_audioOutput->processedUSecs();
 
         //sync audio processedUSecs with custom timer processedUSecs
         if (m_originalProcessedUSecs != m_audioOutput->processedUSecs()) {
             m_originalProcessedUSecs = m_audioOutput->processedUSecs();
-            emit processedUSecsChanged(m_processedUSecs); //->za slider
-            if (m_processedUSecs != m_originalProcessedUSecs) {
-                qDebug() << "synced";
-                m_processedUSecs = m_originalProcessedUSecs - WaveformWindowDuration;
+            emit processedUSecsChanged(m_originalProcessedUSecs); //->za slider
+            if (m_processedUSecs != m_originalProcessedUSecs - WaveformWindowDuration) {
+                ENGINE_DEBUG << "synced";
+                m_processedUSecs = m_originalProcessedUSecs - (m_updateInterval * 1000)
+                                   - WaveformWindowDuration;
+                //m_processedUSecs = m_originalProcessedUSecs - WaveformWindowDuration;
             }
         }
 
@@ -444,24 +449,24 @@ void Engine::audioNotify()
                     = readEnd - readPos
                       + m_spectrumBufferLength; //m_format.bytesForDuration(WaveformWindowDuration); //500000
                 // const qint64 readLen = readEnd - readPos;
-                qDebug() << "Engine::audioNotify [1]"
-                         << "analysisFileSize" << m_analysisFile->getDevice()->size() << "readPos"
-                         << readPos << "readLen" << readLen;
+                ENGINE_DEBUG << "Engine::audioNotify [1]"
+                             << "analysisFileSize" << m_analysisFile->getDevice()->size()
+                             << "readPos" << readPos << "readLen" << readLen;
                 if (m_analysisFile->seek(readPos + m_analysisFile->headerLength())) {
                     m_buffer.resize(readLen);
                     m_bufferPosition = readPos;
 
                     m_dataLength = m_analysisFile->read(m_buffer.data(), readLen);
 
-                    qDebug() << "bytes read: " << m_dataLength
-                             << "buffer size: " << m_buffer.size();
+                    ENGINE_DEBUG << "bytes read: " << m_dataLength
+                                 << "buffer size: " << m_buffer.size();
 
-                    qDebug() << "Engine::audioNotify [2]"
-                             << "playPosition" << playPosition << "bufferPosition"
-                             << m_bufferPosition << "dataLength" << m_dataLength;
+                    ENGINE_DEBUG << "Engine::audioNotify [2]"
+                                 << "playPosition" << playPosition << "bufferPosition"
+                                 << m_bufferPosition << "dataLength" << m_dataLength;
                 } else {
-                    qDebug() << "Engine::audioNotify [2]"
-                             << "file seek error";
+                    ENGINE_DEBUG << "Engine::audioNotify [2]"
+                                 << "file seek error";
                 }
                 //emit bufferChanged(m_bufferPosition, m_dataLength, m_buffer);
             }
@@ -477,9 +482,9 @@ void Engine::audioNotify()
         if (spectrumPosition >= 0
             && spectrumPosition + m_spectrumBufferLength < m_bufferPosition + m_dataLength) {
             calculateSpectrum(spectrumPosition);
-            qDebug() << "calculateSpectrum: " << QTime::currentTime()
-                     << "play position: " << playPosition
-                     << "spectrum position: " << spectrumPosition;
+            ENGINE_DEBUG << "calculateSpectrum: " << QTime::currentTime()
+                         << "play position: " << playPosition
+                         << "spectrum position: " << spectrumPosition;
         }
     } break;
     default:
@@ -545,7 +550,7 @@ void Engine::spectrumChanged(const FrequencySpectrum &spectrum, int inputFrequen
 
 void Engine::bufferChanged(QList<qreal> &buffer)
 {
-    qDebug() << "emitted: " << QTime::currentTime();
+    ENGINE_DEBUG << "emitted: " << QTime::currentTime();
 
     emit buffer2Changed(buffer);
 }

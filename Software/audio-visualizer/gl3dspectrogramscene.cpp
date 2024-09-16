@@ -186,19 +186,19 @@ void GL3DSpectrogramScene::paint()
 
     glBegin(GL_LINES);
     for (int i = 0; i < m_numLines; ++i) {
-        float hue = (i * 360.0f) / m_numLines;
-        float r, g, b;
-        HSVtoRGB(hue, 1.0f, 1.0f, r, g, b);
+        // float hue = (i * 360.0f) / m_numLines;
+        // float r, g, b;
+        // HSVtoRGB(hue, 1.0f, 1.0f, r, g, b);
 
-        glColor3f(r, g, b);
+        // glColor3f(r, g, b);
 
         float z = (i - m_numLines / 2) * m_spacingZ;
         for (int j = 0; j < m_numPoints - 1; ++j) {
-            // float hue = (i * 360.0f) / m_numPoints - 1;
-            // float r, g, b;
-            // HSVtoRGB(hue, 1.0f, 1.0f, r, g, b);
+            float hue = (j * 330.0f) / (m_numPoints - 1);
+            float r, g, b;
+            HSVtoRGB(hue, 1.0f, 1.0f, r, g, b);
 
-            // glColor3f(r, g, b);
+            glColor3f(r, g, b);
 
             float x1 = (m_freqs[i][j] - m_centerFrequency) * m_spacingX;
             float x2 = (m_freqs[i][j + 1] - m_centerFrequency) * m_spacingX;
@@ -294,7 +294,7 @@ void GL3DSpectrogramScene::updatePeaks()
     for (int j = 0; j < m_numPoints && i != end; ++j) {
         const FrequencySpectrum::Element e = *i;
         lineFreqs[j] = e.frequency;
-        linePeaks[j] = e.db; //* 1 / 2.71828f;
+        linePeaks[j] = e.magnitude; //* 1 / 2.71828f;
         //linePeaks[j] = e.magnitude * 0.5f;
         //linePeaks[j] = e.amplitude * 10;
         //linePeaks[j] = e.amplitude; //e.magnitude; //e.amplitude * 10;
