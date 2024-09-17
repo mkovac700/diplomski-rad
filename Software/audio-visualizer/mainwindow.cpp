@@ -254,9 +254,37 @@ void MainWindow::showSettingsDialog()
     m_settingsDialog->exec();
     if (m_settingsDialog->result() == QDialog::Accepted) {
         qDebug() << "settings dialog: accepted";
-        EngineSettings::instance().setWindowFunction(m_settingsDialog->windowFunction());
-        EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
-        EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
+
+        WindowFunction wf = EngineSettings::instance().windowFunction();
+        int fftSize = EngineSettings::instance().fftSize();
+        int intervalMs = EngineSettings::instance().updateIntervalMs();
+
+        if (wf != m_settingsDialog->windowFunction()) {
+            EngineSettings::instance().setWindowFunction(m_settingsDialog->windowFunction());
+            QMessageBox::warning(this,
+                                 tr("Upozorenje"),
+                                 tr("Unijeli ste postavke koje zahtijevaju restart pogona. To može "
+                                    "uzrokovati kratkotrajni prekid rada."));
+            //reset engine
+        }
+
+        if (fftSize != m_settingsDialog->fftSize()) {
+            EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
+            QMessageBox::warning(this,
+                                 tr("Upozorenje"),
+                                 tr("Unijeli ste postavke koje zahtijevaju restart pogona. To može "
+                                    "uzrokovati kratkotrajni prekid rada."));
+            //reset engine
+        }
+
+        if (intervalMs != m_settingsDialog->updateIntervalMs()) {
+            EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
+            restartEngineTimer(); //to update interval ms
+        }
+
+        // EngineSettings::instance().setWindowFunction(m_settingsDialog->windowFunction());
+        // EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
+        // EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
 
         GraphicsSettings::instance().setIsLogScale(m_settingsDialog->isLogScale());
         GraphicsSettings::instance().setLogFactor(m_settingsDialog->logFactor());
@@ -273,10 +301,6 @@ void MainWindow::showSettingsDialog()
         GraphicsSettings::instance().setGridStepHz(m_settingsDialog->gridStepHz());
 
         ui->widget->reinitialize();
-
-        m_engine->setUpdateInterval(EngineSettings::instance().updateIntervalMs());
-
-        restartEngine(); //to update interval ms
 
         updateStatusBar();
     }
@@ -316,8 +340,10 @@ void MainWindow::setMode(Mode mode)
 // }
 // }
 
-void MainWindow::restartEngine()
+void MainWindow::restartEngineTimer()
 {
+    m_engine->setUpdateInterval(EngineSettings::instance().updateIntervalMs());
+
     if (playing) {
         m_engine->suspend();
         if (m_mode == Mode::LoadFileMode)
@@ -354,6 +380,8 @@ void MainWindow::on_pushButton_PlayPause_clicked()
             m_engine->startPlayback();
         else if (m_mode == Mode::StreamMode)
             m_engine->startStream();
+        else
+            return;
         ui->pushButton_PlayPause->setToolTip(tr("Pause"));
         ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-pause-96-2.png"));
     }
@@ -374,18 +402,20 @@ void MainWindow::openFile()
 
     updateLabelDuration(0);
 
-    m_currentFile = QFileDialog::getOpenFileName(this,
-                                                 tr("Open File"),
-                                                 QStandardPaths::writableLocation(
-                                                     QStandardPaths::MusicLocation),
-                                                 tr("Audio Files (*.wav)"));
+    QString file = QFileDialog::getOpenFileName(this,
+                                                tr("Open File"),
+                                                QStandardPaths::writableLocation(
+                                                    QStandardPaths::MusicLocation),
+                                                tr("Audio Files (*.wav)"));
 
-    qDebug() << m_currentFile;
+    qDebug() << file;
 
     // ui->statusbar->showMessage(QString("Datoteka: ").append(m_currentFile.split("/").last()));
 
-    if (m_currentFile.isEmpty())
+    if (file.isEmpty())
         return;
+
+    m_currentFile = file;
 
     m_engine->reset();
 

@@ -230,6 +230,9 @@ void Engine::startRecording()
 
 void Engine::startStream()
 {
+    if (!m_audioInput)
+        initialize();
+
     if (m_audioInput) {
         if (QAudioDevice::Input == m_mode && QAudio::SuspendedState == m_state) {
             m_audioInput->resume();
@@ -576,6 +579,7 @@ void Engine::reset()
 {
     stopRecording();
     stopPlayback();
+    stopStream();
     setState(QAudioDevice::Input, QAudio::StoppedState);
     m_generateTone = false;
     setFormat(QAudioFormat());

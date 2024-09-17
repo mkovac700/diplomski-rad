@@ -427,6 +427,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="label_WarningMessage">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>

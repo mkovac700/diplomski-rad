@@ -80,7 +80,7 @@ private:
     /**
      * Updates settings and restarts update timer
      */
-    void restartEngine();
+    void restartEngineTimer();
 
     /**
      * Stop all ongoing activity and reset engine to defaults
