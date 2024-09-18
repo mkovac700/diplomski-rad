@@ -292,6 +292,7 @@ void Engine::startPlayback()
                                    - WaveformWindowDuration;
                 //m_processedUSecs = 0;
                 m_originalProcessedUSecs = m_audioOutput->processedUSecs() + m_startUSecs;
+                m_previousOriginalProcessedUSecs = m_originalProcessedUSecs;
                 ENGINE_DEBUG << "processedUSecs on start:" << m_processedUSecs + m_startUSecs;
             } else {
                 // m_audioOutputIODevice.close();
@@ -421,6 +422,7 @@ void Engine::audioNotify()
 
         //sync audio processedUSecs with custom timer processedUSecs
         if (m_originalProcessedUSecs != m_audioOutput->processedUSecs() + m_startUSecs) {
+            m_previousOriginalProcessedUSecs = m_originalProcessedUSecs;
             m_originalProcessedUSecs = m_audioOutput->processedUSecs() + m_startUSecs;
             emit processedUSecsChanged(m_originalProcessedUSecs); //->za slider
             if (m_processedUSecs != m_originalProcessedUSecs - WaveformWindowDuration) {
@@ -608,7 +610,8 @@ void Engine::resetSoft()
 {
     auto last_state = m_state;
     //OBAVEZNO PRIJE ZAUSTAVLJANJA OUTPUTA
-    m_startUSecs = m_originalProcessedUSecs;
+    // m_startUSecs = m_originalProcessedUSecs;
+    m_startUSecs = m_previousOriginalProcessedUSecs - WaveformWindowDuration;
     m_startPos = m_format.bytesForDuration(m_startUSecs);
 
     ENGINE_DEBUG << "M_STARTUSECS" << m_startUSecs << "M_STARTPOS" << m_startPos;
@@ -616,7 +619,7 @@ void Engine::resetSoft()
     if (m_audioOutput) {
         //ovo je zapravo stopPlayback ali bez resetiranja varijabli na 0
         m_audioOutput->stop();
-        QCoreApplication::instance()->processEvents();
+        //QCoreApplication::instance()->processEvents();
         m_audioOutput->disconnect();
         m_notifyTimer->stop();
     }
@@ -845,7 +848,7 @@ void Engine::stopRecording()
 {
     if (m_audioInput) {
         m_audioInput->stop();
-        QCoreApplication::instance()->processEvents();
+        //QCoreApplication::instance()->processEvents();
         m_audioInput->disconnect();
         m_audioInputIODevice = nullptr;
         m_notifyTimer->stop();

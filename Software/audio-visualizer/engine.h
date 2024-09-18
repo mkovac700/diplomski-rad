@@ -330,6 +330,7 @@ private:
     qint64 m_originalProcessedUSecs;
     qint64 m_startUSecs;
     qint64 m_startPos;
+    qint64 m_previousOriginalProcessedUSecs;
 
 #ifdef DUMP_DATA
     QDir m_outputDir;
