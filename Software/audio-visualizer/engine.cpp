@@ -62,6 +62,8 @@ Engine::Engine(QObject *parent)
     , m_count(0)
     , m_updateInterval(10)
     , m_processedUSecs(0)
+    , m_startUSecs(0)
+    , m_startPos(0)
 {
     connect(m_spectrumAnalyser,
             QOverload<const FrequencySpectrum &, int>::of(&SpectrumAnalyser::spectrumChanged),
@@ -237,7 +239,7 @@ void Engine::startStream()
         if (QAudioDevice::Input == m_mode && QAudio::SuspendedState == m_state) {
             m_audioInput->resume();
         } else {
-            stopPlayback();
+            //stopPlayback();
             m_mode = QAudioDevice::Input;
             connect(m_audioInput, &QAudioSource::stateChanged, this, &Engine::audioStateChanged);
             m_audioInputIODevice = m_audioInput->start();
@@ -281,15 +283,16 @@ void Engine::startPlayback()
 
             m_count = 0;
             if (m_file) {
-                m_file->seek(0);
+                m_file->seek(m_startPos);
                 //m_analysisFile->seek(0);
                 m_bufferPosition = 0;
                 m_dataLength = 0;
                 m_audioOutput->start(m_file->getDevice());
-                m_processedUSecs = m_audioOutput->processedUSecs() - WaveformWindowDuration;
+                m_processedUSecs = m_audioOutput->processedUSecs() + m_startUSecs
+                                   - WaveformWindowDuration;
                 //m_processedUSecs = 0;
-                m_originalProcessedUSecs = m_audioOutput->processedUSecs();
-                ENGINE_DEBUG << "processedUSecs on start:" << m_processedUSecs;
+                m_originalProcessedUSecs = m_audioOutput->processedUSecs() + m_startUSecs;
+                ENGINE_DEBUG << "processedUSecs on start:" << m_processedUSecs + m_startUSecs;
             } else {
                 // m_audioOutputIODevice.close();
                 // m_audioOutputIODevice.setBuffer(&m_buffer);
@@ -417,8 +420,8 @@ void Engine::audioNotify()
                      << "processedUSecs" << m_audioOutput->processedUSecs();
 
         //sync audio processedUSecs with custom timer processedUSecs
-        if (m_originalProcessedUSecs != m_audioOutput->processedUSecs()) {
-            m_originalProcessedUSecs = m_audioOutput->processedUSecs();
+        if (m_originalProcessedUSecs != m_audioOutput->processedUSecs() + m_startUSecs) {
+            m_originalProcessedUSecs = m_audioOutput->processedUSecs() + m_startUSecs;
             emit processedUSecsChanged(m_originalProcessedUSecs); //->za slider
             if (m_processedUSecs != m_originalProcessedUSecs - WaveformWindowDuration) {
                 ENGINE_DEBUG << "synced";
@@ -577,7 +580,7 @@ void Engine::resetAudioDevices()
 
 void Engine::reset()
 {
-    stopRecording();
+    //stopRecording();
     stopPlayback();
     stopStream();
     setState(QAudioDevice::Input, QAudio::StoppedState);
@@ -592,10 +595,70 @@ void Engine::reset()
     m_bufferLength = 0;
     m_dataLength = 0;
     m_processedUSecs = 0;
+    m_originalProcessedUSecs = 0;
+    m_startUSecs = 0;
+    m_startPos = 0;
     emit dataLengthChanged(0);
     resetAudioDevices();
     delete m_spectrumAnalyser;
     m_spectrumAnalyser = nullptr;
+}
+
+void Engine::resetSoft()
+{
+    auto last_state = m_state;
+    //OBAVEZNO PRIJE ZAUSTAVLJANJA OUTPUTA
+    m_startUSecs = m_originalProcessedUSecs;
+    m_startPos = m_format.bytesForDuration(m_startUSecs);
+
+    ENGINE_DEBUG << "M_STARTUSECS" << m_startUSecs << "M_STARTPOS" << m_startPos;
+
+    if (m_audioOutput) {
+        //ovo je zapravo stopPlayback ali bez resetiranja varijabli na 0
+        m_audioOutput->stop();
+        QCoreApplication::instance()->processEvents();
+        m_audioOutput->disconnect();
+        m_notifyTimer->stop();
+    }
+    if (m_audioInput) {
+        //stopStream();
+
+        m_audioInput->stop();
+        m_audioInput->disconnect();
+        m_notifyTimer->stop();
+    }
+
+    setFormat(QAudioFormat());
+
+    m_buffer.clear();
+    m_bufferPosition = 0;
+    m_bufferLength = 0;
+    m_dataLength = 0;
+
+    delete m_spectrumAnalyser;
+    m_spectrumAnalyser = nullptr;
+
+    //reinitialize();
+    initialize();
+
+    // m_spectrumAnalyser = new SpectrumAnalyser(this);
+
+    // connect(m_spectrumAnalyser,
+    //         QOverload<const FrequencySpectrum &, int>::of(&SpectrumAnalyser::spectrumChanged),
+    //         this,
+    //         QOverload<const FrequencySpectrum &, int>::of(&Engine::spectrumChanged));
+
+    // connect(m_spectrumAnalyser,
+    //         QOverload<QList<qreal> &>::of(&SpectrumAnalyser::bufferChanged),
+    //         this,
+    //         QOverload<QList<qreal> &>::of(&Engine::bufferChanged));
+
+    if (last_state == QAudio::ActiveState) {
+        if (m_mode == QAudioDevice::Output)
+            startPlayback();
+        else if (m_mode == QAudioDevice::Input)
+            startStream();
+    }
 }
 
 bool Engine::initialize()
@@ -653,6 +716,72 @@ bool Engine::initialize()
                  << "m_dataLength" << m_dataLength;
     ENGINE_DEBUG << "Engine::initialize"
                  << "format" << m_format;
+    ENGINE_DEBUG << "Engine::initialize"
+                 << "result" << result;
+
+    if (result && m_spectrumAnalyser == nullptr) {
+        m_spectrumAnalyser = new SpectrumAnalyser(this);
+
+        connect(m_spectrumAnalyser,
+                QOverload<const FrequencySpectrum &, int>::of(&SpectrumAnalyser::spectrumChanged),
+                this,
+                QOverload<const FrequencySpectrum &, int>::of(&Engine::spectrumChanged));
+
+        connect(m_spectrumAnalyser,
+                QOverload<QList<qreal> &>::of(&SpectrumAnalyser::bufferChanged),
+                this,
+                QOverload<QList<qreal> &>::of(&Engine::bufferChanged));
+    }
+
+    return result;
+}
+
+bool Engine::reinitialize()
+{
+    bool result = false;
+
+    selectFormat(); //kljucna stvar -> postavlja spectrum buf len
+
+    resetAudioDevices();
+    if (m_file) {
+        emit bufferLengthChanged(bufferLength());
+        emit dataLengthChanged(dataLength());
+        emit bufferChanged(0, 0, m_buffer);
+        setRecordPosition(bufferLength());
+        result = true;
+    } else {
+        m_bufferLength = m_format.bytesForDuration(BufferDurationUs);
+        m_buffer.resize(m_bufferLength);
+        m_buffer.fill(0);
+        emit bufferLengthChanged(bufferLength());
+        if (m_generateTone) {
+            // if (0 == m_tone.endFreq) {
+            //     const qreal nyquist = nyquistFrequency(m_format);
+            //     m_tone.endFreq = qMin(qreal(SpectrumHighFreq), nyquist);
+            // }
+            // // Call function defined in utils.h, at global scope
+            // ::generateTone(m_tone, m_format, m_buffer);
+            // m_dataLength = m_bufferLength;
+            // emit dataLengthChanged(dataLength());
+            // emit bufferChanged(0, m_dataLength, m_buffer);
+            // setRecordPosition(m_bufferLength);
+            // result = true;
+        } else {
+            emit bufferChanged(0, 0, m_buffer);
+            m_audioInput = new QAudioSource(m_audioInputDevice, m_format, this);
+            result = true;
+        }
+    }
+    m_audioOutput = new QAudioSink(m_audioOutputDevice, m_format, this);
+
+    ENGINE_DEBUG << "Engine::initialize"
+                 << "m_bufferLength" << m_bufferLength;
+    ENGINE_DEBUG << "Engine::initialize"
+                 << "m_dataLength" << m_dataLength;
+    ENGINE_DEBUG << "Engine::initialize"
+                 << "format" << m_format;
+    ENGINE_DEBUG << "Engine::initialize"
+                 << "result" << result;
 
     if (result && m_spectrumAnalyser == nullptr) {
         m_spectrumAnalyser = new SpectrumAnalyser(this);
@@ -718,9 +847,9 @@ void Engine::stopRecording()
         m_audioInput->stop();
         QCoreApplication::instance()->processEvents();
         m_audioInput->disconnect();
+        m_audioInputIODevice = nullptr;
+        m_notifyTimer->stop();
     }
-    m_audioInputIODevice = nullptr;
-    m_notifyTimer->stop();
 
 #ifdef DUMP_AUDIO
     dumpData();
@@ -731,10 +860,13 @@ void Engine::stopPlayback()
 {
     if (m_audioOutput) {
         m_audioOutput->stop();
-        QCoreApplication::instance()->processEvents();
+        //QCoreApplication::instance()->processEvents();
         m_audioOutput->disconnect();
         setPlayPosition(0);
         m_processedUSecs = 0;
+        m_originalProcessedUSecs = 0;
+        m_startUSecs = 0;
+        m_startPos = 0;
     }
     m_notifyTimer->stop();
     emit processingComplete();

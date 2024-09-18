@@ -69,6 +69,15 @@ public:
      * Stop any ongoing recording or playback, and reset to ground state.
      */
     void reset();
+
+    /**
+     *    
+     * Stop any ongoing recording or playback, and reset only the essential 
+     * settings, but keep last play position and state.
+     * @author Marijan K.
+     */
+    void resetSoft();
+
     /**
      * Load data from WAV file
      */
@@ -245,6 +254,7 @@ private slots:
 private:
     void resetAudioDevices();
     bool initialize();
+    bool reinitialize();
     bool selectFormat();
     void stopRecording();
     // void stopPlayback();
@@ -318,6 +328,8 @@ private:
 
     qint64 m_processedUSecs;
     qint64 m_originalProcessedUSecs;
+    qint64 m_startUSecs;
+    qint64 m_startPos;
 
 #ifdef DUMP_DATA
     QDir m_outputDir;

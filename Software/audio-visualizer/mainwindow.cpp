@@ -259,23 +259,26 @@ void MainWindow::showSettingsDialog()
         int fftSize = EngineSettings::instance().fftSize();
         int intervalMs = EngineSettings::instance().updateIntervalMs();
 
-        if (wf != m_settingsDialog->windowFunction()) {
+        if (wf != m_settingsDialog->windowFunction() || fftSize != m_settingsDialog->fftSize()) {
             EngineSettings::instance().setWindowFunction(m_settingsDialog->windowFunction());
-            QMessageBox::warning(this,
-                                 tr("Upozorenje"),
-                                 tr("Unijeli ste postavke koje zahtijevaju restart pogona. To može "
-                                    "uzrokovati kratkotrajni prekid rada."));
-            //reset engine
-        }
-
-        if (fftSize != m_settingsDialog->fftSize()) {
             EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
             QMessageBox::warning(this,
                                  tr("Upozorenje"),
                                  tr("Unijeli ste postavke koje zahtijevaju restart pogona. To može "
                                     "uzrokovati kratkotrajni prekid rada."));
             //reset engine
+            m_engine->resetSoft();
         }
+
+        // if (fftSize != m_settingsDialog->fftSize()) {
+        //     EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
+        //     QMessageBox::warning(this,
+        //                          tr("Upozorenje"),
+        //                          tr("Unijeli ste postavke koje zahtijevaju restart pogona. To može "
+        //                             "uzrokovati kratkotrajni prekid rada."));
+        //     //reset engine
+        //     m_engine->resetSoft();
+        // }
 
         if (intervalMs != m_settingsDialog->updateIntervalMs()) {
             EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
@@ -396,12 +399,6 @@ void MainWindow::on_pushButton_stop_clicked()
 
 void MainWindow::openFile()
 {
-    stopEngine();
-
-    setMode(Mode::LoadFileMode);
-
-    updateLabelDuration(0);
-
     QString file = QFileDialog::getOpenFileName(this,
                                                 tr("Open File"),
                                                 QStandardPaths::writableLocation(
@@ -410,10 +407,16 @@ void MainWindow::openFile()
 
     qDebug() << file;
 
-    // ui->statusbar->showMessage(QString("Datoteka: ").append(m_currentFile.split("/").last()));
-
-    if (file.isEmpty())
+    if (file.isEmpty()) {
+        setMode(m_mode); //if canceled, set back to current mode
+        qDebug() << "test";
         return;
+    }
+
+    //updateLabelDuration(0);
+    setMode(Mode::LoadFileMode);
+
+    stopEngine();
 
     m_currentFile = file;
 
