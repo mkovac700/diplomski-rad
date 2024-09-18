@@ -671,6 +671,14 @@ void Engine::resetSoft()
 
 void Engine::resetSoft(qint64 startUSecs)
 {
+    //inicijalno je mod postavljen na input sve do prvog poziva startplayback
+    //kako startna pozicija ne bi bila ignorirana prije prvog pokretanja
+    //provjerimo je li mod input i postavimo zeljenu poziciju
+    if (m_audioOutput && m_mode == QAudioDevice::Input) {
+        m_startUSecs = startUSecs;
+        m_startPos = m_format.bytesForDuration(m_startUSecs);
+    }
+
     if (m_audioOutput && m_mode == QAudioDevice::Output) {
         if (startUSecs == bufferDuration()) {
             ENGINE_DEBUG << "START POS == BUFF LENGTH";
@@ -690,6 +698,8 @@ void Engine::resetSoft(qint64 startUSecs)
 
         m_startUSecs = startUSecs;
         m_startPos = m_format.bytesForDuration(m_startUSecs);
+
+        //ENGINE_DEBUG << "ENGINE::RESETSOFT M_STARTUSECS = " << m_startUSecs;
 
         if (lastState == QAudio::ActiveState)
             startPlayback();

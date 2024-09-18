@@ -395,6 +395,8 @@ void MainWindow::openFile()
     qDebug() << "buffer duration (us): " << m_engine->bufferDuration();
 
     updateLabelDuration(m_engine->bufferDuration());
+    updateLabelSeek(0);
+    ui->horizontalSlider_Position->setEnabled(true);
     updateHorizontalSlider(m_engine->bufferDuration());
 
     updateStatusBar();
@@ -406,6 +408,8 @@ void MainWindow::openStream()
 
     setMode(Mode::StreamMode);
     updateLabelDuration(0);
+    updateLabelSeek(0);
+    ui->horizontalSlider_Position->setDisabled(true);
 
     m_engine->reset();
     m_engine->openStream();
