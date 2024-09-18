@@ -79,6 +79,15 @@ public:
     void resetSoft();
 
     /**
+     * @author Marijan K.
+     * Reset playback with desired start position.
+     * @note Reset is mandatory because QAudioSink calculates processed
+     * time since start called, so we need to stop it first.
+     * @param startUSecs desired start position in microseconds
+     */
+    void resetSoft(qint64 startUSecs);
+
+    /**
      * Load data from WAV file
      */
     bool loadFile(const QString &fileName);

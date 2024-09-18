@@ -120,6 +120,8 @@ private:
 
     QLabel *m_statusLabel;
 
+    qint64 m_startPosition = 0;
+
     //------------------------------------------------
     // SCENES
     //------------------------------------------------
@@ -133,5 +135,8 @@ private:
 private slots:
     void on_pushButton_PreviousScene_clicked();
     void on_pushButton_NextScene_clicked();
+    void on_horizontalSlider_Position_sliderPressed();
+    void on_horizontalSlider_Position_sliderReleased();
+    void on_horizontalSlider_Position_sliderMoved(int position);
 };
 #endif // MAINWINDOW_H

@@ -83,38 +83,6 @@ void MainWindow::updateMenuMedia()
     MAINWINDOW_DEBUG << (m_mode == Mode::LoadFileMode) << (m_mode == Mode::StreamMode);
 }
 
-void MainWindow::updateLabelDuration(qint64 duration)
-{
-    qint64 durationMs = duration / 1000;
-
-    QTime time(0, 0);
-    time = time.addMSecs(durationMs);
-    QString formattedTime = time.toString("m:ss");
-
-    ui->label_Duration->setText(formattedTime);
-}
-
-void MainWindow::updateHorizontalSlider(qint64 maxValue)
-{
-    ui->horizontalSlider_Position->setMaximum(maxValue);
-}
-
-void MainWindow::updateHorizontalSliderPosition(qint64 processedUSecs)
-{
-    ui->horizontalSlider_Position->setSliderPosition(processedUSecs);
-}
-
-void MainWindow::updateLabelSeek(qint64 uSecs)
-{
-    qint64 mSecs = uSecs / 1000;
-
-    QTime time(0, 0);
-    time = time.addMSecs(mSecs);
-    QString formattedTime = time.toString("m:ss");
-
-    ui->label_Seek->setText(formattedTime);
-}
-
 void MainWindow::updateStatusBar()
 {
     QString message;
@@ -445,10 +413,66 @@ void MainWindow::openStream()
     updateStatusBar();
 }
 
+void MainWindow::updateLabelDuration(qint64 duration)
+{
+    qint64 durationMs = duration / 1000;
+
+    QTime time(0, 0);
+    time = time.addMSecs(durationMs);
+    QString formattedTime = time.toString("m:ss");
+
+    ui->label_Duration->setText(formattedTime);
+}
+
+void MainWindow::updateHorizontalSlider(qint64 maxValue)
+{
+    ui->horizontalSlider_Position->setMaximum(maxValue);
+}
+
+void MainWindow::updateHorizontalSliderPosition(qint64 processedUSecs)
+{
+    ui->horizontalSlider_Position->setSliderPosition(processedUSecs);
+}
+
+void MainWindow::updateLabelSeek(qint64 uSecs)
+{
+    qint64 mSecs = uSecs / 1000;
+
+    QTime time(0, 0);
+    time = time.addMSecs(mSecs);
+    QString formattedTime = time.toString("m:ss");
+
+    ui->label_Seek->setText(formattedTime);
+}
+
 void MainWindow::processedUSecsChanged(qint64 processedUSecs)
 {
     updateHorizontalSliderPosition(processedUSecs);
     updateLabelSeek(processedUSecs);
+}
+
+void MainWindow::on_horizontalSlider_Position_sliderPressed()
+{
+    //connect(m_engine, &Engine::processedUSecsChanged, this, &MainWindow::processedUSecsChanged);
+    //privremeno iskljuci azuriranja slidera
+    disconnect(m_engine, &Engine::processedUSecsChanged, 0, 0);
+}
+
+void MainWindow::on_horizontalSlider_Position_sliderMoved(int position)
+{
+    m_startPosition = position;
+    updateLabelSeek(m_startPosition);
+}
+
+void MainWindow::on_horizontalSlider_Position_sliderReleased()
+{
+    //qint64 newPosition = ui->horizontalSlider_Position->sliderPosition(); //isto sto i value()
+
+    //reset engine
+    m_engine->resetSoft(m_startPosition);
+
+    //natrag ukljuci azuriranje slidera
+    connect(m_engine, &Engine::processedUSecsChanged, this, &MainWindow::processedUSecsChanged);
 }
 
 void MainWindow::processingComplete()

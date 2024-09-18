@@ -611,8 +611,10 @@ void Engine::resetSoft()
     auto last_state = m_state;
     //OBAVEZNO PRIJE ZAUSTAVLJANJA OUTPUTA
     // m_startUSecs = m_originalProcessedUSecs;
-    m_startUSecs = m_previousOriginalProcessedUSecs - WaveformWindowDuration;
-    m_startPos = m_format.bytesForDuration(m_startUSecs);
+
+    qint64 previousUSecs = m_previousOriginalProcessedUSecs - WaveformWindowDuration;
+    // m_startUSecs = m_previousOriginalProcessedUSecs - WaveformWindowDuration;
+    // m_startPos = m_format.bytesForDuration(m_startUSecs);
 
     ENGINE_DEBUG << "M_STARTUSECS" << m_startUSecs << "M_STARTPOS" << m_startPos;
 
@@ -630,6 +632,9 @@ void Engine::resetSoft()
         m_audioInput->disconnect();
         m_notifyTimer->stop();
     }
+
+    m_startUSecs = previousUSecs;
+    m_startPos = m_format.bytesForDuration(m_startUSecs);
 
     setFormat(QAudioFormat());
 
@@ -661,6 +666,33 @@ void Engine::resetSoft()
             startPlayback();
         else if (m_mode == QAudioDevice::Input)
             startStream();
+    }
+}
+
+void Engine::resetSoft(qint64 startUSecs)
+{
+    if (m_audioOutput && m_mode == QAudioDevice::Output) {
+        if (startUSecs == bufferDuration()) {
+            ENGINE_DEBUG << "START POS == BUFF LENGTH";
+            stopPlayback();
+            return;
+        }
+
+        auto lastState = m_state;
+
+        if (lastState != QAudio::StoppedState) {
+            //ovo sve je zapravo stopPlayback ali bez resetiranja varijabli na 0
+            m_audioOutput->stop();
+            //QCoreApplication::instance()->processEvents();
+            //m_audioOutput->disconnect();
+            m_notifyTimer->stop();
+        }
+
+        m_startUSecs = startUSecs;
+        m_startPos = m_format.bytesForDuration(m_startUSecs);
+
+        if (lastState == QAudio::ActiveState)
+            startPlayback();
     }
 }
 
@@ -818,7 +850,6 @@ bool Engine::selectFormat()
             foundSupportedFormat = true;
         }
     } else {
-
         int minSampleRate = qMin(m_audioInputDevice.minimumSampleRate(),
                                  m_audioOutputDevice.minimumSampleRate());
         int maxSampleRate = qMin(m_audioInputDevice.maximumSampleRate(),
