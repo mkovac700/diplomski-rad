@@ -58,6 +58,12 @@ private slots:
 
     void showSettingsDialog();
 
+    void handleErrorMessage(const QString &heading, const QString &detail);
+
+    void updateInputDevices();
+
+    void updateOutputDevices();
+
 private:
     void loadInputDevices();
 

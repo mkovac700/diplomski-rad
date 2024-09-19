@@ -23,12 +23,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     if (m_devices->audioInputs().isEmpty())
-        QMessageBox::critical(this, "Greška", "Nema dostupnih ulaznih uređaja!");
+        QMessageBox::warning(this, tr("Upozorenje"), tr("Nema dostupnih ulaznih uređaja!"));
     else
         loadInputDevices();
 
     if (m_devices->audioOutputs().isEmpty())
-        QMessageBox::critical(this, "Greška", "Nema dostupnih izlaznih uređaja!");
+        QMessageBox::warning(this, tr("Upozorenje"), tr("Nema dostupnih izlaznih uređaja!"));
     else
         loadOutputDevices();
 
@@ -58,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_engine, &Engine::processingComplete, this, &MainWindow::processingComplete);
 
+    connect(m_engine, &Engine::errorMessage, this, &MainWindow::handleErrorMessage);
+
     initializeScenes();
 
     ui->statusbar->addPermanentWidget(m_statusLabel, 100);
@@ -73,6 +75,9 @@ void MainWindow::initializeMenuMedia()
     connect(ui->actionFile, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionStream, &QAction::triggered, this, &MainWindow::openStream);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::showSettingsDialog);
+
+    connect(ui->menuAudioIn, &QMenu::aboutToShow, this, &MainWindow::updateInputDevices);
+    connect(ui->menuAudioOut, &QMenu::aboutToShow, this, &MainWindow::updateOutputDevices);
 }
 
 void MainWindow::updateMenuMedia()
@@ -122,6 +127,8 @@ void MainWindow::initializeScenes()
 
 void MainWindow::loadInputDevices()
 {
+    ui->menuAudioIn->clear();
+
     const QAudioDevice &defaultInputDevice = QMediaDevices::defaultAudioInput();
 
     QAction *action = new QAction(tr("Default"), ui->menuAudioIn);
@@ -165,6 +172,8 @@ void MainWindow::initializeInputAudio(const QAudioDevice &inputDeviceInfo)
 
 void MainWindow::loadOutputDevices()
 {
+    ui->menuAudioOut->clear();
+
     const QAudioDevice &defaultOutputDevice = QMediaDevices::defaultAudioOutput();
 
     QAction *action = new QAction(tr("Default"), ui->menuAudioOut);
@@ -275,6 +284,21 @@ void MainWindow::showSettingsDialog()
 
         updateStatusBar();
     }
+}
+
+void MainWindow::handleErrorMessage(const QString &heading, const QString &detail)
+{
+    QMessageBox::critical(this, heading, detail);
+}
+
+void MainWindow::updateInputDevices()
+{
+    loadInputDevices();
+}
+
+void MainWindow::updateOutputDevices()
+{
+    loadOutputDevices();
 }
 
 void MainWindow::initializeOutputAudio(const QAudioDevice &outputDevice)
