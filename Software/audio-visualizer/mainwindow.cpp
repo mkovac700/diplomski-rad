@@ -208,6 +208,8 @@ void MainWindow::changeAudioIn()
         action->setChecked(true);
         m_engine->setAudioInputDevice(action->data().value<QAudioDevice>());
     }
+
+    m_engine->resetSoft();
 }
 
 void MainWindow::changeAudioOut()
@@ -224,6 +226,8 @@ void MainWindow::changeAudioOut()
         action->setChecked(true);
         m_engine->setAudioOutputDevice(action->data().value<QAudioDevice>());
     }
+
+    m_engine->resetSoft();
 }
 
 void MainWindow::showSettingsDialog()
