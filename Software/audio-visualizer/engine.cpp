@@ -242,6 +242,11 @@ void Engine::startStream()
             //stopPlayback();
             m_mode = QAudioDevice::Input;
             connect(m_audioInput, &QAudioSource::stateChanged, this, &Engine::audioStateChanged);
+            auto error = m_audioInput->error();
+            if (error != QAudio::NoError) {
+                emitError(error);
+                return;
+            }
             m_audioInputIODevice = m_audioInput->start();
         }
         m_notifyTimer->start(m_updateInterval);
@@ -287,6 +292,11 @@ void Engine::startPlayback()
                 //m_analysisFile->seek(0);
                 m_bufferPosition = 0;
                 m_dataLength = 0;
+                auto error = m_audioOutput->error();
+                if (error != QAudio::NoError) {
+                    emitError(error);
+                    return;
+                }
                 m_audioOutput->start(m_file->getDevice());
                 m_processedUSecs = m_audioOutput->processedUSecs() + m_startUSecs
                                    - WaveformWindowDuration;
