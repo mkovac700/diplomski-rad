@@ -109,6 +109,9 @@ private:
 
     QMediaDevices *m_devices = new QMediaDevices(this);
 
+    QAudioDevice m_currentInputDevice;
+    QAudioDevice m_currentOutputDevice;
+
     QScopedPointer<AudioListener> m_audioListener;
     QScopedPointer<QAudioSource> m_audioInput;
 

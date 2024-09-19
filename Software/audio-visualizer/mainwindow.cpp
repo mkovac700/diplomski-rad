@@ -133,7 +133,10 @@ void MainWindow::loadInputDevices()
 
     QAction *action = new QAction(tr("Default"), ui->menuAudioIn);
     action->setCheckable(true);
-    action->setChecked(true);
+    if (m_currentInputDevice.isNull())
+        m_currentInputDevice = defaultInputDevice;
+    if (m_currentInputDevice.isDefault())
+        action->setChecked(true);
     action->setData(QVariant::fromValue(defaultInputDevice));
     ui->menuAudioIn->addAction(action);
 
@@ -142,6 +145,8 @@ void MainWindow::loadInputDevices()
     for (auto &inputDevice : m_devices->audioInputs()) {
         QAction *action = new QAction(inputDevice.description(), ui->menuAudioIn);
         action->setCheckable(true);
+        if (!m_currentInputDevice.isDefault() && m_currentInputDevice.id() == inputDevice.id())
+            action->setChecked(true);
         action->setData(QVariant::fromValue(inputDevice));
         ui->menuAudioIn->addAction(action);
 
@@ -178,7 +183,10 @@ void MainWindow::loadOutputDevices()
 
     QAction *action = new QAction(tr("Default"), ui->menuAudioOut);
     action->setCheckable(true);
-    action->setChecked(true);
+    if (m_currentOutputDevice.isNull())
+        m_currentOutputDevice = defaultOutputDevice;
+    if (m_currentOutputDevice.isDefault())
+        action->setChecked(true);
     action->setData(QVariant::fromValue(defaultOutputDevice));
     ui->menuAudioOut->addAction(action);
 
@@ -187,6 +195,8 @@ void MainWindow::loadOutputDevices()
     for (auto &outputDevice : m_devices->audioOutputs()) {
         QAction *action = new QAction(outputDevice.description(), ui->menuAudioOut);
         action->setCheckable(true);
+        if (!m_currentOutputDevice.isDefault() && m_currentOutputDevice.id() == outputDevice.id())
+            action->setChecked(true);
         action->setData(QVariant::fromValue(outputDevice));
         ui->menuAudioOut->addAction(action);
 
@@ -206,7 +216,8 @@ void MainWindow::changeAudioIn()
             }
         }
         action->setChecked(true);
-        m_engine->setAudioInputDevice(action->data().value<QAudioDevice>());
+        m_currentInputDevice = action->data().value<QAudioDevice>();
+        m_engine->setAudioInputDevice(m_currentInputDevice);
     }
 
     m_engine->resetSoft();
@@ -224,7 +235,8 @@ void MainWindow::changeAudioOut()
             }
         }
         action->setChecked(true);
-        m_engine->setAudioOutputDevice(action->data().value<QAudioDevice>());
+        m_currentOutputDevice = action->data().value<QAudioDevice>();
+        m_engine->setAudioOutputDevice(m_currentOutputDevice);
     }
 
     m_engine->resetSoft();
