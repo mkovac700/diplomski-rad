@@ -23,12 +23,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     if (m_devices->audioInputs().isEmpty())
-        QMessageBox::critical(this, "Greška", "Nema dostupnih ulaznih uređaja!");
+        QMessageBox::warning(this, tr("Upozorenje"), tr("Nema dostupnih ulaznih uređaja!"));
     else
         loadInputDevices();
 
     if (m_devices->audioOutputs().isEmpty())
-        QMessageBox::critical(this, "Greška", "Nema dostupnih izlaznih uređaja!");
+        QMessageBox::warning(this, tr("Upozorenje"), tr("Nema dostupnih izlaznih uređaja!"));
     else
         loadOutputDevices();
 
@@ -58,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_engine, &Engine::processingComplete, this, &MainWindow::processingComplete);
 
+    connect(m_engine, &Engine::errorMessage, this, &MainWindow::handleErrorMessage);
+
     initializeScenes();
 
     ui->statusbar->addPermanentWidget(m_statusLabel, 100);
@@ -73,6 +75,9 @@ void MainWindow::initializeMenuMedia()
     connect(ui->actionFile, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionStream, &QAction::triggered, this, &MainWindow::openStream);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::showSettingsDialog);
+
+    connect(ui->menuAudioIn, &QMenu::aboutToShow, this, &MainWindow::updateInputDevices);
+    connect(ui->menuAudioOut, &QMenu::aboutToShow, this, &MainWindow::updateOutputDevices);
 }
 
 void MainWindow::updateMenuMedia()
@@ -122,11 +127,16 @@ void MainWindow::initializeScenes()
 
 void MainWindow::loadInputDevices()
 {
+    ui->menuAudioIn->clear();
+
     const QAudioDevice &defaultInputDevice = QMediaDevices::defaultAudioInput();
 
     QAction *action = new QAction(tr("Default"), ui->menuAudioIn);
     action->setCheckable(true);
-    action->setChecked(true);
+    if (m_currentInputDevice.isNull())
+        m_currentInputDevice = defaultInputDevice;
+    if (m_currentInputDevice.isDefault())
+        action->setChecked(true);
     action->setData(QVariant::fromValue(defaultInputDevice));
     ui->menuAudioIn->addAction(action);
 
@@ -135,6 +145,8 @@ void MainWindow::loadInputDevices()
     for (auto &inputDevice : m_devices->audioInputs()) {
         QAction *action = new QAction(inputDevice.description(), ui->menuAudioIn);
         action->setCheckable(true);
+        if (!m_currentInputDevice.isDefault() && m_currentInputDevice.id() == inputDevice.id())
+            action->setChecked(true);
         action->setData(QVariant::fromValue(inputDevice));
         ui->menuAudioIn->addAction(action);
 
@@ -165,11 +177,16 @@ void MainWindow::initializeInputAudio(const QAudioDevice &inputDeviceInfo)
 
 void MainWindow::loadOutputDevices()
 {
+    ui->menuAudioOut->clear();
+
     const QAudioDevice &defaultOutputDevice = QMediaDevices::defaultAudioOutput();
 
     QAction *action = new QAction(tr("Default"), ui->menuAudioOut);
     action->setCheckable(true);
-    action->setChecked(true);
+    if (m_currentOutputDevice.isNull())
+        m_currentOutputDevice = defaultOutputDevice;
+    if (m_currentOutputDevice.isDefault())
+        action->setChecked(true);
     action->setData(QVariant::fromValue(defaultOutputDevice));
     ui->menuAudioOut->addAction(action);
 
@@ -178,6 +195,8 @@ void MainWindow::loadOutputDevices()
     for (auto &outputDevice : m_devices->audioOutputs()) {
         QAction *action = new QAction(outputDevice.description(), ui->menuAudioOut);
         action->setCheckable(true);
+        if (!m_currentOutputDevice.isDefault() && m_currentOutputDevice.id() == outputDevice.id())
+            action->setChecked(true);
         action->setData(QVariant::fromValue(outputDevice));
         ui->menuAudioOut->addAction(action);
 
@@ -197,8 +216,11 @@ void MainWindow::changeAudioIn()
             }
         }
         action->setChecked(true);
-        m_engine->setAudioInputDevice(action->data().value<QAudioDevice>());
+        m_currentInputDevice = action->data().value<QAudioDevice>();
+        m_engine->setAudioInputDevice(m_currentInputDevice);
     }
+
+    m_engine->resetSoft();
 }
 
 void MainWindow::changeAudioOut()
@@ -213,8 +235,11 @@ void MainWindow::changeAudioOut()
             }
         }
         action->setChecked(true);
-        m_engine->setAudioOutputDevice(action->data().value<QAudioDevice>());
+        m_currentOutputDevice = action->data().value<QAudioDevice>();
+        m_engine->setAudioOutputDevice(m_currentOutputDevice);
     }
+
+    m_engine->resetSoft();
 }
 
 void MainWindow::showSettingsDialog()
@@ -275,6 +300,21 @@ void MainWindow::showSettingsDialog()
 
         updateStatusBar();
     }
+}
+
+void MainWindow::handleErrorMessage(const QString &heading, const QString &detail)
+{
+    QMessageBox::critical(this, heading, detail);
+}
+
+void MainWindow::updateInputDevices()
+{
+    loadInputDevices();
+}
+
+void MainWindow::updateOutputDevices()
+{
+    loadOutputDevices();
 }
 
 void MainWindow::initializeOutputAudio(const QAudioDevice &outputDevice)

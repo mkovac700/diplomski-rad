@@ -58,6 +58,12 @@ private slots:
 
     void showSettingsDialog();
 
+    void handleErrorMessage(const QString &heading, const QString &detail);
+
+    void updateInputDevices();
+
+    void updateOutputDevices();
+
 private:
     void loadInputDevices();
 
@@ -102,6 +108,9 @@ private:
     Ui::MainWindow *ui;
 
     QMediaDevices *m_devices = new QMediaDevices(this);
+
+    QAudioDevice m_currentInputDevice;
+    QAudioDevice m_currentOutputDevice;
 
     QScopedPointer<AudioListener> m_audioListener;
     QScopedPointer<QAudioSource> m_audioInput;
