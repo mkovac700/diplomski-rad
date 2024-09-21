@@ -296,6 +296,13 @@ void MainWindow::showSettingsDialog()
         GraphicsSettings::instance().setBandWidth(m_settingsDialog->bandWidth());
         GraphicsSettings::instance().setGridStepHz(m_settingsDialog->gridStepHz());
 
+        GraphicsSettings::instance().setBarPowerUnitMeasure(m_settingsDialog->barPowerUnitMeasure());
+        GraphicsSettings::instance().setBarYScaleFactor(m_settingsDialog->barYScaleFactor());
+        GraphicsSettings::instance().setSpectrogramPowerUnitMeasure(
+            m_settingsDialog->spectrogramPowerUnitMeasure());
+        GraphicsSettings::instance().setSpectrogramYScaleFactor(
+            m_settingsDialog->spectrogramYScaleFactor());
+
         ui->widget->reinitialize();
 
         updateStatusBar();

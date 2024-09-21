@@ -10,6 +10,62 @@ GraphicsSettings &GraphicsSettings::instance()
 // Constructor (private to enforce singleton)
 GraphicsSettings::GraphicsSettings() {}
 
+UnitMeasurement GraphicsSettings::spectrogramPowerUnitMeasure() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_spectrogramPowerUnitMeasure;
+}
+
+void GraphicsSettings::setSpectrogramPowerUnitMeasure(UnitMeasurement newSpectrogramPowerUnitMeasure)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_spectrogramPowerUnitMeasure != newSpectrogramPowerUnitMeasure) {
+        m_spectrogramPowerUnitMeasure = newSpectrogramPowerUnitMeasure;
+    }
+}
+
+qreal GraphicsSettings::spectrogramYScaleFactor() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_spectrogramYScaleFactor;
+}
+
+void GraphicsSettings::setSpectrogramYScaleFactor(qreal newSpectrogramYScaleFactor)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_spectrogramYScaleFactor != newSpectrogramYScaleFactor) {
+        m_spectrogramYScaleFactor = newSpectrogramYScaleFactor;
+    }
+}
+
+UnitMeasurement GraphicsSettings::barPowerUnitMeasure() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_barPowerUnitMeasure;
+}
+
+void GraphicsSettings::setBarPowerUnitMeasure(UnitMeasurement newBarPowerUnitMeasure)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_barPowerUnitMeasure != newBarPowerUnitMeasure) {
+        m_barPowerUnitMeasure = newBarPowerUnitMeasure;
+    }
+}
+
+qreal GraphicsSettings::barYScaleFactor() const
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    return m_barYScaleFactor;
+}
+
+void GraphicsSettings::setBarYScaleFactor(qreal newBarYScaleFactor)
+{
+    QMutexLocker locker(&mutex); // Lock the mutex for thread safety
+    if (m_barYScaleFactor != newBarYScaleFactor) {
+        m_barYScaleFactor = newBarYScaleFactor;
+    }
+}
+
 int GraphicsSettings::gridStepHz() const
 {
     QMutexLocker locker(&mutex); // Lock the mutex for thread safety

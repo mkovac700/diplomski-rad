@@ -3,6 +3,7 @@
 
 #include <QMutex>
 #include <QObject>
+#include <spectrum.h>
 
 /**
  * The GraphicsSettings class
@@ -49,6 +50,15 @@ public:
     int gridStepHz() const;
     void setGridStepHz(int newGridStepHz);
 
+    UnitMeasurement spectrogramPowerUnitMeasure() const;
+    void setSpectrogramPowerUnitMeasure(UnitMeasurement newSpectrogramPowerUnitMeasure);
+    qreal spectrogramYScaleFactor() const;
+    void setSpectrogramYScaleFactor(qreal newSpectrogramYScaleFactor);
+    UnitMeasurement barPowerUnitMeasure() const;
+    void setBarPowerUnitMeasure(UnitMeasurement newBarPowerUnitMeasure);
+    qreal barYScaleFactor() const;
+    void setBarYScaleFactor(qreal newBarYScaleFactor);
+
 private:
     // Private constructor to ensure singleton pattern
     GraphicsSettings();
@@ -66,6 +76,9 @@ private:
     float m_spacingZ = 2.0f;
     float m_maxHeight = 0.5f;
 
+    UnitMeasurement m_spectrogramPowerUnitMeasure = UnitMeasurement::Magnitude;
+    qreal m_spectrogramYScaleFactor = 100.0f;
+
     //waveform
     bool m_applyWindow = false;
 
@@ -75,6 +88,9 @@ private:
     int m_maxFreq = 24000;
     int m_bandWidth = 1;
     int m_gridStepHz = 100;
+
+    UnitMeasurement m_barPowerUnitMeasure = UnitMeasurement::Magnitude;
+    qreal m_barYScaleFactor = 100.0f;
 
     // Mutex to protect access to the settings
     mutable QMutex mutex;

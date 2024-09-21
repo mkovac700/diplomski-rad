@@ -21,9 +21,22 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                                          QVariant::fromValue(int(WindowFunction::NoWindow)));
     ui->comboBox_windowFunction->addItem("Hann",
                                          QVariant::fromValue(int(WindowFunction::HannWindow)));
+    ui->comboBox_windowFunction->addItem("Hamming",
+                                         QVariant::fromValue(int(WindowFunction::HammingWindow)));
     ui->comboBox_windowFunction->addItem("Blackman",
                                          QVariant::fromValue(int(WindowFunction::BlackmanWindow)));
     ui->comboBox_windowFunction->setCurrentIndex(EngineSettings::instance().windowFunction());
+
+    //BAR SPECTRUM
+    ui->comboBox_BarPowerUnitMeasure->addItem(tr("Amplituda"),
+                                              QVariant::fromValue(int(UnitMeasurement::Amplitude)));
+    ui->comboBox_BarPowerUnitMeasure->addItem(tr("Magnituda"),
+                                              QVariant::fromValue(int(UnitMeasurement::Magnitude)));
+    ui->comboBox_BarPowerUnitMeasure->addItem(tr("Decibel (dB)"),
+                                              QVariant::fromValue(int(UnitMeasurement::DB)));
+
+    ui->comboBox_BarPowerUnitMeasure->setCurrentIndex(ui->comboBox_BarPowerUnitMeasure->findData(
+        QVariant::fromValue(GraphicsSettings::instance().barPowerUnitMeasure())));
 
     //3D GRAPHICS
     for (int i = 0; i <= 8; i++) {
@@ -33,6 +46,19 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     }
     ui->comboBox_scaleFactor->setCurrentIndex(ui->comboBox_scaleFactor->findData(
         QVariant::fromValue(GraphicsSettings::instance().logFactor())));
+
+    ui->comboBox_SpectrogramPowerUnitMeasure->addItem(tr("Amplituda"),
+                                                      QVariant::fromValue(
+                                                          int(UnitMeasurement::Amplitude)));
+    ui->comboBox_SpectrogramPowerUnitMeasure->addItem(tr("Magnituda"),
+                                                      QVariant::fromValue(
+                                                          int(UnitMeasurement::Magnitude)));
+    ui->comboBox_SpectrogramPowerUnitMeasure->addItem(tr("Decibel (dB)"),
+                                                      QVariant::fromValue(int(UnitMeasurement::DB)));
+
+    ui->comboBox_SpectrogramPowerUnitMeasure->setCurrentIndex(
+        ui->comboBox_SpectrogramPowerUnitMeasure->findData(
+            QVariant::fromValue(GraphicsSettings::instance().spectrogramPowerUnitMeasure())));
 }
 
 SettingsDialog::~SettingsDialog()
@@ -129,4 +155,26 @@ void SettingsDialog::on_spinBox_bandWidth_valueChanged(int arg1)
 void SettingsDialog::on_spinBox_gridStepHz_valueChanged(int arg1)
 {
     m_gridStepHz = arg1;
+}
+
+void SettingsDialog::on_comboBox_SpectrogramPowerUnitMeasure_currentIndexChanged(int index)
+{
+    m_spectrogramPowerUnitMeasure = ui->comboBox_SpectrogramPowerUnitMeasure->itemData(index)
+                                        .value<UnitMeasurement>();
+}
+
+void SettingsDialog::on_comboBox_BarPowerUnitMeasure_currentIndexChanged(int index)
+{
+    m_barPowerUnitMeasure = ui->comboBox_BarPowerUnitMeasure->itemData(index)
+                                .value<UnitMeasurement>();
+}
+
+void SettingsDialog::on_doubleSpinBox_BarYScaleFactor_valueChanged(double arg1)
+{
+    m_barYScaleFactor = arg1;
+}
+
+void SettingsDialog::on_doubleSpinBox_SpectrogramYScaleFactor_valueChanged(double arg1)
+{
+    m_spectrogramYScaleFactor = arg1;
 }

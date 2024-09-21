@@ -47,6 +47,9 @@ private:
 
     qint64 m_fftSize;
 
+    UnitMeasurement m_barPowerUnitMeasure = UnitMeasurement::Magnitude;
+    qreal m_barYScaleFactor = 100.0f;
+
     QString name = tr("Stupčasti spektar");
 
     // GLScene interface

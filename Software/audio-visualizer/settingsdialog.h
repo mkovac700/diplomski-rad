@@ -39,6 +39,11 @@ public:
     int bandWidth() const { return m_bandWidth; }
     int gridStepHz() const { return m_gridStepHz; }
 
+    UnitMeasurement spectrogramPowerUnitMeasure() const { return m_spectrogramPowerUnitMeasure; }
+    qreal spectrogramYScaleFactor() const { return m_spectrogramYScaleFactor; }
+    UnitMeasurement barPowerUnitMeasure() const { return m_barPowerUnitMeasure; }
+    qreal barYScaleFactor() const { return m_barYScaleFactor; }
+
 private slots:
     void on_spinBox_UpdateIntervalMs_editingFinished();
 
@@ -70,6 +75,14 @@ private slots:
 
     void on_spinBox_gridStepHz_valueChanged(int arg1);
 
+    void on_comboBox_SpectrogramPowerUnitMeasure_currentIndexChanged(int index);
+
+    void on_comboBox_BarPowerUnitMeasure_currentIndexChanged(int index);
+
+    void on_doubleSpinBox_BarYScaleFactor_valueChanged(double arg1);
+
+    void on_doubleSpinBox_SpectrogramYScaleFactor_valueChanged(double arg1);
+
 private:
     Ui::SettingsDialog *ui;
 
@@ -87,6 +100,9 @@ private:
     int m_numLines = GraphicsSettings::instance().numLines();
     float m_spacingX = GraphicsSettings::instance().spacingX();
     float m_spacingZ = GraphicsSettings::instance().spacingZ();
+    UnitMeasurement m_spectrogramPowerUnitMeasure = GraphicsSettings::instance()
+                                                        .spectrogramPowerUnitMeasure();
+    qreal m_spectrogramYScaleFactor = GraphicsSettings::instance().spectrogramYScaleFactor();
 
     //waveform
     bool m_applyWindow = GraphicsSettings::instance().applyWindow();
@@ -97,6 +113,8 @@ private:
     int m_maxFreq = GraphicsSettings::instance().maxFreq();
     int m_bandWidth = GraphicsSettings::instance().bandWidth();
     int m_gridStepHz = GraphicsSettings::instance().gridStepHz();
+    UnitMeasurement m_barPowerUnitMeasure = GraphicsSettings::instance().barPowerUnitMeasure();
+    qreal m_barYScaleFactor = GraphicsSettings::instance().barYScaleFactor();
 };
 
 #endif // SETTINGSDIALOG_H

@@ -21,6 +21,8 @@ void GLWaveformScene::initialize()
     glOrtho(0, glWidget->width(), -1, 1, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    glLineWidth(1.1f);
 }
 
 void GLWaveformScene::resize(int w, int h)

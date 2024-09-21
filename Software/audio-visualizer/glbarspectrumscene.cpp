@@ -21,6 +21,9 @@ void GLBarSpectrumScene::initialize()
 
     m_bandWidth = GraphicsSettings::instance().bandWidth();
     m_gridStepHz = GraphicsSettings::instance().gridStepHz();
+
+    m_barPowerUnitMeasure = GraphicsSettings::instance().barPowerUnitMeasure();
+    m_barYScaleFactor = GraphicsSettings::instance().barYScaleFactor();
 }
 
 void GLBarSpectrumScene::resize(int w, int h)
@@ -49,7 +52,7 @@ void GLBarSpectrumScene::paint()
 
     /*float xScale = glWidget->width() / (float) 20000;*/ //(float) width() / 10000;
     float xScale = glWidget->width() / (float) m_highFreq;
-    float yScale = glWidget->height() / (float) 5.0f;
+    float yScale = glWidget->height() / (float) m_barYScaleFactor; //5.0f
 
     glLineWidth(m_bandWidth);
     glColor3f(1, 1, 1);
@@ -72,9 +75,15 @@ void GLBarSpectrumScene::paint()
             // glVertex2f(e.frequency * xScale, 0.0f);              // Start point (x, 0)
             // glVertex2f(e.frequency * xScale, e.amplitude * 100); // End point (x, y) //* 100 //*10
 
-            glVertex2f(e.frequency * xScale, 0.0f * yScale);        // Start point (x, 0)
-            glVertex2f(e.frequency * xScale,
-                       std::log(1 + e.magnitude) * yScale); // End point (x, y) //* 100 //*10
+            glVertex2f(e.frequency * xScale, 0.0f); // Start point (x, 0)
+
+            // End point (x, y) //* 100 //*10
+            if (m_barPowerUnitMeasure == UnitMeasurement::Magnitude)
+                glVertex2f(e.frequency * xScale, e.magnitude * yScale);
+            else if (m_barPowerUnitMeasure == UnitMeasurement::DB)
+                glVertex2f(e.frequency * xScale, e.db * yScale);
+            else if (m_barPowerUnitMeasure == UnitMeasurement::Amplitude)
+                glVertex2f(e.frequency * xScale, e.amplitude * yScale);
 
             glEnd();
         }

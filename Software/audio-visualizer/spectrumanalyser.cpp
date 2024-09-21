@@ -74,6 +74,9 @@ void SpectrumAnalyserThread::calculateWindow(int numSamples)
         case HannWindow:
             x = 0.5 * (1 - qCos((2 * M_PI * i) / (numSamples - 1)));
             break;
+        case HammingWindow:
+            x = 0.54 - 0.46 * qCos((2 * M_PI * i) / (numSamples - 1));
+            break;
         case BlackmanWindow:
             x = 0.42 - 0.5 * qCos(2 * M_PI * i / (numSamples - 1))
                 + 0.08 * qCos(4 * M_PI * i / (numSamples - 1));
@@ -160,7 +163,7 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
         // Bound amplitude to [0.0, 1.0]
         m_spectrum[i].clipped = (amplitude > 1.0);
         amplitude = qMax(qreal(0.0), amplitude);
-        //amplitude = qMin(qreal(1.0), amplitude);
+        amplitude = qMin(qreal(1.0), amplitude);
         m_spectrum[i].amplitude = amplitude;
     }
 #endif
