@@ -54,6 +54,15 @@ void GL3DSpectrogramScene::initialize()
     // glGenBuffers(1, &vao);
     // glGenBuffers(1, &vbo);
 
+    logarithm = GraphicsSettings::instance().isLogScale();
+    m_logFactor = GraphicsSettings::instance().logFactor();
+    m_numLines = GraphicsSettings::instance().numLines();
+    m_spacingX = GraphicsSettings::instance().spacingX();
+    m_spacingZ = GraphicsSettings::instance().spacingZ();
+
+    m_spectrogramPowerUnitMeasure = GraphicsSettings::instance().spectrogramPowerUnitMeasure();
+    m_spectrogramYScaleFactor = GraphicsSettings::instance().spectrogramYScaleFactor();
+
     m_numPoints = EngineSettings::instance().fftSize() / 2;
     m_peaks.clear();
     m_freqs.clear();
@@ -65,12 +74,6 @@ void GL3DSpectrogramScene::initialize()
         m_peaks.push_back(linePeaks);
         m_freqs.push_back(lineFreqs);
     }
-
-    logarithm = GraphicsSettings::instance().isLogScale();
-    m_logFactor = GraphicsSettings::instance().logFactor();
-    m_numLines = GraphicsSettings::instance().numLines();
-    m_spacingX = GraphicsSettings::instance().spacingX();
-    m_spacingZ = GraphicsSettings::instance().spacingZ();
 }
 
 void GL3DSpectrogramScene::resize(int w, int h)
@@ -294,7 +297,13 @@ void GL3DSpectrogramScene::updatePeaks()
     for (int j = 0; j < m_numPoints && i != end; ++j) {
         const FrequencySpectrum::Element e = *i;
         lineFreqs[j] = e.frequency;
-        linePeaks[j] = e.magnitude; //* 1 / 2.71828f;
+        if (m_spectrogramPowerUnitMeasure == UnitMeasurement::Magnitude)
+            linePeaks[j] = e.magnitude * m_spectrogramYScaleFactor; //* 1 / 2.71828f;
+        else if (m_spectrogramPowerUnitMeasure == UnitMeasurement::DB)
+            linePeaks[j] = e.db * m_spectrogramYScaleFactor;
+        else if (m_spectrogramPowerUnitMeasure == UnitMeasurement::Amplitude)
+            linePeaks[j] = e.amplitude * m_spectrogramYScaleFactor;
+
         //linePeaks[j] = e.magnitude * 0.5f;
         //linePeaks[j] = e.amplitude * 10;
         //linePeaks[j] = e.amplitude; //e.magnitude; //e.amplitude * 10;

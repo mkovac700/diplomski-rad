@@ -74,6 +74,9 @@ private:
 
     qreal m_logFactor;
 
+    UnitMeasurement m_spectrogramPowerUnitMeasure = UnitMeasurement::Magnitude;
+    qreal m_spectrogramYScaleFactor = 1.0f;
+
 private:
     void updatePeaks();
 

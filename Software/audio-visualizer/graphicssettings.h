@@ -77,7 +77,7 @@ private:
     float m_maxHeight = 0.5f;
 
     UnitMeasurement m_spectrogramPowerUnitMeasure = UnitMeasurement::Magnitude;
-    qreal m_spectrogramYScaleFactor = 100.0f;
+    qreal m_spectrogramYScaleFactor = 1.0f;
 
     //waveform
     bool m_applyWindow = false;
