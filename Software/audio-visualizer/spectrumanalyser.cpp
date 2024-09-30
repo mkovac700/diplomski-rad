@@ -74,6 +74,9 @@ void SpectrumAnalyserThread::calculateWindow(int numSamples)
         case HannWindow:
             x = 0.5 * (1 - qCos((2 * M_PI * i) / (numSamples - 1)));
             break;
+        case HammingWindow:
+            x = 0.54 - 0.46 * qCos((2 * M_PI * i) / (numSamples - 1));
+            break;
         case BlackmanWindow:
             x = 0.42 - 0.5 * qCos(2 * M_PI * i / (numSamples - 1))
                 + 0.08 * qCos(4 * M_PI * i / (numSamples - 1));
@@ -92,10 +95,11 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
 {
 #ifndef DISABLE_FFT
     //Q_ASSERT(buffer.size() == m_numSamples * bytesPerFrame);
+    m_applyWindow = GraphicsSettings::instance().applyWindow();
 
     int numBufSamples = buffer.size() / bytesPerFrame;
 
-    qDebug() << "numbufsamples: " << numBufSamples << "num samples" << m_numSamples;
+    //SPECTRUMANALYSER_DEBUG << "numbufsamples: " << numBufSamples << "num samples" << m_numSamples;
 
     calculateWindow(numBufSamples);
 
@@ -159,12 +163,12 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer, int inp
         // Bound amplitude to [0.0, 1.0]
         m_spectrum[i].clipped = (amplitude > 1.0);
         amplitude = qMax(qreal(0.0), amplitude);
-        //amplitude = qMin(qreal(1.0), amplitude);
+        amplitude = qMin(qreal(1.0), amplitude);
         m_spectrum[i].amplitude = amplitude;
     }
 #endif
-    SPECTRUMANALYSER_DEBUG << "SpectrumAnalyserThread::calculateSpectrum"
-                           << QThread::currentThread() << "spectrum size " << m_spectrum.count();
+    //SPECTRUMANALYSER_DEBUG << "SpectrumAnalyserThread::calculateSpectrum"
+    //<< QThread::currentThread() << "spectrum size " << m_spectrum.count();
 
     emit calculationComplete(m_spectrum, inputFrequency); //TODO: dodati inputFrequency
 }
@@ -221,8 +225,8 @@ void SpectrumAnalyser::calculate(const QByteArray &buffer, const QAudioFormat &f
 {
     // QThread::currentThread is marked 'for internal use only', but
     // we're only using it for debug output here, so it's probably OK :)
-    SPECTRUMANALYSER_DEBUG << "SpectrumAnalyser::calculate" << QThread::currentThread() << "state"
-                           << m_state;
+    //SPECTRUMANALYSER_DEBUG << "SpectrumAnalyser::calculate" << QThread::currentThread() << "state"
+    //<< m_state;
 
     // SPECTRUMANALYSER_DEBUG << "SpectrumAnalyser::calculate" << QThread::currentThread()
     //                        << "buffer size " << buffer.size();

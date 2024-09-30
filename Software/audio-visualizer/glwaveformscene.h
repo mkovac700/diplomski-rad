@@ -33,7 +33,7 @@ public:
     QString getName() const override { return name; };
 
 private:
-    QString name = "Waveform";
+    QString name = tr("Oblik vala");
 
     // GLScene interface
 public:
@@ -44,6 +44,9 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+
+private:
+    void HSVtoRGB(float H, float S, float V, float &r, float &g, float &b);
 };
 
 #endif // GLWAVEFORMSCENE_H

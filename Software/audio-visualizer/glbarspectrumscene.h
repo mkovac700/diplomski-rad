@@ -47,7 +47,10 @@ private:
 
     qint64 m_fftSize;
 
-    QString name = "Bar Spectrum";
+    UnitMeasurement m_barPowerUnitMeasure = UnitMeasurement::Magnitude;
+    qreal m_barYScaleFactor = 100.0f;
+
+    QString name = tr("Stupčasti spektar");
 
     // GLScene interface
 public:
@@ -58,6 +61,9 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+
+private:
+    void HSVtoRGB(float H, float S, float V, float &r, float &g, float &b);
 };
 
 #endif // GLBARSPECTRUMSCENE_H

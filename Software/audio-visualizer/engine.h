@@ -69,6 +69,24 @@ public:
      * Stop any ongoing recording or playback, and reset to ground state.
      */
     void reset();
+
+    /**
+     *    
+     * Stop any ongoing recording or playback, and reset only the essential 
+     * settings, but keep last play position and state.
+     * @author Marijan K.
+     */
+    void resetSoft();
+
+    /**
+     * @author Marijan K.
+     * Reset playback with desired start position.
+     * @note Reset is mandatory because QAudioSink calculates processed
+     * time since start called, so we need to stop it first.
+     * @param startUSecs desired start position in microseconds
+     */
+    void resetSoft(qint64 startUSecs);
+
     /**
      * Load data from WAV file
      */
@@ -245,6 +263,7 @@ private slots:
 private:
     void resetAudioDevices();
     bool initialize();
+    bool reinitialize();
     bool selectFormat();
     void stopRecording();
     // void stopPlayback();
@@ -318,6 +337,9 @@ private:
 
     qint64 m_processedUSecs;
     qint64 m_originalProcessedUSecs;
+    qint64 m_startUSecs;
+    qint64 m_startPos;
+    qint64 m_previousOriginalProcessedUSecs;
 
 #ifdef DUMP_DATA
     QDir m_outputDir;

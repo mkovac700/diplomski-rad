@@ -45,8 +45,10 @@ const int NullMessageTimeout = -1;
 // Types and data structures
 //-----------------------------------------------------------------------------
 
-enum WindowFunction { NoWindow, HannWindow, BlackmanWindow };
+enum WindowFunction { NoWindow, HannWindow, HammingWindow, BlackmanWindow };
 Q_DECLARE_METATYPE(WindowFunction)
+
+enum UnitMeasurement { Amplitude, Magnitude, DB };
 
 const WindowFunction DefaultWindowFunction = BlackmanWindow;
 

@@ -18,16 +18,17 @@ MainWindow::MainWindow(QWidget *parent)
     , m_engine(new Engine(this))
     , m_mode(Mode::NoMode)
     , m_settingsDialog(new SettingsDialog(this))
+    , m_statusLabel(new QLabel(this))
 {
     ui->setupUi(this);
 
     if (m_devices->audioInputs().isEmpty())
-        QMessageBox::critical(this, "Greška", "Nema dostupnih ulaznih uređaja!");
+        QMessageBox::warning(this, tr("Upozorenje"), tr("Nema dostupnih ulaznih uređaja!"));
     else
         loadInputDevices();
 
     if (m_devices->audioOutputs().isEmpty())
-        QMessageBox::critical(this, "Greška", "Nema dostupnih izlaznih uređaja!");
+        QMessageBox::warning(this, tr("Upozorenje"), tr("Nema dostupnih izlaznih uređaja!"));
     else
         loadOutputDevices();
 
@@ -57,7 +58,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_engine, &Engine::processingComplete, this, &MainWindow::processingComplete);
 
+    connect(m_engine, &Engine::errorMessage, this, &MainWindow::handleErrorMessage);
+
     initializeScenes();
+
+    ui->statusbar->addPermanentWidget(m_statusLabel, 100);
 }
 
 MainWindow::~MainWindow()
@@ -70,6 +75,9 @@ void MainWindow::initializeMenuMedia()
     connect(ui->actionFile, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionStream, &QAction::triggered, this, &MainWindow::openStream);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::showSettingsDialog);
+
+    connect(ui->menuAudioIn, &QMenu::aboutToShow, this, &MainWindow::updateInputDevices);
+    connect(ui->menuAudioOut, &QMenu::aboutToShow, this, &MainWindow::updateOutputDevices);
 }
 
 void MainWindow::updateMenuMedia()
@@ -80,36 +88,29 @@ void MainWindow::updateMenuMedia()
     MAINWINDOW_DEBUG << (m_mode == Mode::LoadFileMode) << (m_mode == Mode::StreamMode);
 }
 
-void MainWindow::updateLabelDuration(qint64 duration)
+void MainWindow::updateStatusBar()
 {
-    qint64 durationMs = duration / 1000;
+    QString message;
 
-    QTime time(0, 0);
-    time = time.addMSecs(durationMs);
-    QString formattedTime = time.toString("m:ss");
+    if (m_mode == Mode::StreamMode)
+        message.append(tr("Strujanje"));
+    else if (m_mode == Mode::LoadFileMode)
+        message.append(QString(tr("Datoteka: ")).append(m_currentFile.split("/").last()));
 
-    ui->label_Duration->setText(formattedTime);
-}
+    int sampleRate = m_engine->format().sampleRate();
+    int fftSize = EngineSettings::instance().fftSize();
 
-void MainWindow::updateHorizontalSlider(qint64 maxValue)
-{
-    ui->horizontalSlider_Position->setMaximum(maxValue);
-}
+    message.append(" | ");
 
-void MainWindow::updateHorizontalSliderPosition(qint64 processedUSecs)
-{
-    ui->horizontalSlider_Position->setSliderPosition(processedUSecs);
-}
+    message.append(QString(tr("Brzina uzorkovanja: "))).append(QString::number(sampleRate));
 
-void MainWindow::updateLabelSeek(qint64 uSecs)
-{
-    qint64 mSecs = uSecs / 1000;
+    message.append(" | ");
 
-    QTime time(0, 0);
-    time = time.addMSecs(mSecs);
-    QString formattedTime = time.toString("m:ss");
+    message.append(QString(tr("FFT veličina: "))).append(QString::number(fftSize));
 
-    ui->label_Seek->setText(formattedTime);
+    m_statusLabel->setText(message);
+
+    //ui->statusbar->showMessage(message);
 }
 
 void MainWindow::initializeScenes()
@@ -126,11 +127,16 @@ void MainWindow::initializeScenes()
 
 void MainWindow::loadInputDevices()
 {
+    ui->menuAudioIn->clear();
+
     const QAudioDevice &defaultInputDevice = QMediaDevices::defaultAudioInput();
 
     QAction *action = new QAction(tr("Default"), ui->menuAudioIn);
     action->setCheckable(true);
-    action->setChecked(true);
+    if (m_currentInputDevice.isNull())
+        m_currentInputDevice = defaultInputDevice;
+    if (m_currentInputDevice.isDefault())
+        action->setChecked(true);
     action->setData(QVariant::fromValue(defaultInputDevice));
     ui->menuAudioIn->addAction(action);
 
@@ -139,6 +145,8 @@ void MainWindow::loadInputDevices()
     for (auto &inputDevice : m_devices->audioInputs()) {
         QAction *action = new QAction(inputDevice.description(), ui->menuAudioIn);
         action->setCheckable(true);
+        if (!m_currentInputDevice.isDefault() && m_currentInputDevice.id() == inputDevice.id())
+            action->setChecked(true);
         action->setData(QVariant::fromValue(inputDevice));
         ui->menuAudioIn->addAction(action);
 
@@ -169,11 +177,16 @@ void MainWindow::initializeInputAudio(const QAudioDevice &inputDeviceInfo)
 
 void MainWindow::loadOutputDevices()
 {
+    ui->menuAudioOut->clear();
+
     const QAudioDevice &defaultOutputDevice = QMediaDevices::defaultAudioOutput();
 
     QAction *action = new QAction(tr("Default"), ui->menuAudioOut);
     action->setCheckable(true);
-    action->setChecked(true);
+    if (m_currentOutputDevice.isNull())
+        m_currentOutputDevice = defaultOutputDevice;
+    if (m_currentOutputDevice.isDefault())
+        action->setChecked(true);
     action->setData(QVariant::fromValue(defaultOutputDevice));
     ui->menuAudioOut->addAction(action);
 
@@ -182,6 +195,8 @@ void MainWindow::loadOutputDevices()
     for (auto &outputDevice : m_devices->audioOutputs()) {
         QAction *action = new QAction(outputDevice.description(), ui->menuAudioOut);
         action->setCheckable(true);
+        if (!m_currentOutputDevice.isDefault() && m_currentOutputDevice.id() == outputDevice.id())
+            action->setChecked(true);
         action->setData(QVariant::fromValue(outputDevice));
         ui->menuAudioOut->addAction(action);
 
@@ -201,8 +216,11 @@ void MainWindow::changeAudioIn()
             }
         }
         action->setChecked(true);
-        m_engine->setAudioInputDevice(action->data().value<QAudioDevice>());
+        m_currentInputDevice = action->data().value<QAudioDevice>();
+        m_engine->setAudioInputDevice(m_currentInputDevice);
     }
+
+    m_engine->resetSoft();
 }
 
 void MainWindow::changeAudioOut()
@@ -217,8 +235,11 @@ void MainWindow::changeAudioOut()
             }
         }
         action->setChecked(true);
-        m_engine->setAudioOutputDevice(action->data().value<QAudioDevice>());
+        m_currentOutputDevice = action->data().value<QAudioDevice>();
+        m_engine->setAudioOutputDevice(m_currentOutputDevice);
     }
+
+    m_engine->resetSoft();
 }
 
 void MainWindow::showSettingsDialog()
@@ -226,9 +247,40 @@ void MainWindow::showSettingsDialog()
     m_settingsDialog->exec();
     if (m_settingsDialog->result() == QDialog::Accepted) {
         qDebug() << "settings dialog: accepted";
-        EngineSettings::instance().setWindowFunction(m_settingsDialog->windowFunction());
-        EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
-        EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
+
+        WindowFunction wf = EngineSettings::instance().windowFunction();
+        int fftSize = EngineSettings::instance().fftSize();
+        int intervalMs = EngineSettings::instance().updateIntervalMs();
+
+        if (wf != m_settingsDialog->windowFunction() || fftSize != m_settingsDialog->fftSize()) {
+            EngineSettings::instance().setWindowFunction(m_settingsDialog->windowFunction());
+            EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
+            QMessageBox::warning(this,
+                                 tr("Upozorenje"),
+                                 tr("Unijeli ste postavke koje zahtijevaju restart pogona. To može "
+                                    "uzrokovati kratkotrajni prekid rada."));
+            //reset engine
+            m_engine->resetSoft();
+        }
+
+        // if (fftSize != m_settingsDialog->fftSize()) {
+        //     EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
+        //     QMessageBox::warning(this,
+        //                          tr("Upozorenje"),
+        //                          tr("Unijeli ste postavke koje zahtijevaju restart pogona. To može "
+        //                             "uzrokovati kratkotrajni prekid rada."));
+        //     //reset engine
+        //     m_engine->resetSoft();
+        // }
+
+        if (intervalMs != m_settingsDialog->updateIntervalMs()) {
+            EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
+            restartEngineTimer(); //to update interval ms
+        }
+
+        // EngineSettings::instance().setWindowFunction(m_settingsDialog->windowFunction());
+        // EngineSettings::instance().setFFTSize(m_settingsDialog->fftSize());
+        // EngineSettings::instance().setUpdateIntervalMs(m_settingsDialog->updateIntervalMs());
 
         GraphicsSettings::instance().setIsLogScale(m_settingsDialog->isLogScale());
         GraphicsSettings::instance().setLogFactor(m_settingsDialog->logFactor());
@@ -244,12 +296,32 @@ void MainWindow::showSettingsDialog()
         GraphicsSettings::instance().setBandWidth(m_settingsDialog->bandWidth());
         GraphicsSettings::instance().setGridStepHz(m_settingsDialog->gridStepHz());
 
+        GraphicsSettings::instance().setBarPowerUnitMeasure(m_settingsDialog->barPowerUnitMeasure());
+        GraphicsSettings::instance().setBarYScaleFactor(m_settingsDialog->barYScaleFactor());
+        GraphicsSettings::instance().setSpectrogramPowerUnitMeasure(
+            m_settingsDialog->spectrogramPowerUnitMeasure());
+        GraphicsSettings::instance().setSpectrogramYScaleFactor(
+            m_settingsDialog->spectrogramYScaleFactor());
+
         ui->widget->reinitialize();
 
-        m_engine->setUpdateInterval(EngineSettings::instance().updateIntervalMs());
-
-        restartEngine(); //to update interval ms
+        updateStatusBar();
     }
+}
+
+void MainWindow::handleErrorMessage(const QString &heading, const QString &detail)
+{
+    QMessageBox::critical(this, heading, detail);
+}
+
+void MainWindow::updateInputDevices()
+{
+    loadInputDevices();
+}
+
+void MainWindow::updateOutputDevices()
+{
+    loadOutputDevices();
 }
 
 void MainWindow::initializeOutputAudio(const QAudioDevice &outputDevice)
@@ -286,8 +358,10 @@ void MainWindow::setMode(Mode mode)
 // }
 // }
 
-void MainWindow::restartEngine()
+void MainWindow::restartEngineTimer()
 {
+    m_engine->setUpdateInterval(EngineSettings::instance().updateIntervalMs());
+
     if (playing) {
         m_engine->suspend();
         if (m_mode == Mode::LoadFileMode)
@@ -324,6 +398,8 @@ void MainWindow::on_pushButton_PlayPause_clicked()
             m_engine->startPlayback();
         else if (m_mode == Mode::StreamMode)
             m_engine->startStream();
+        else
+            return;
         ui->pushButton_PlayPause->setToolTip(tr("Pause"));
         ui->pushButton_PlayPause->setIcon(QIcon(":/icons/icons8-pause-96-2.png"));
     }
@@ -338,24 +414,26 @@ void MainWindow::on_pushButton_stop_clicked()
 
 void MainWindow::openFile()
 {
-    stopEngine();
+    QString file = QFileDialog::getOpenFileName(this,
+                                                tr("Open File"),
+                                                QStandardPaths::writableLocation(
+                                                    QStandardPaths::MusicLocation),
+                                                tr("Audio Files (*.wav)"));
 
+    qDebug() << file;
+
+    if (file.isEmpty()) {
+        setMode(m_mode); //if canceled, set back to current mode
+        qDebug() << "test";
+        return;
+    }
+
+    //updateLabelDuration(0);
     setMode(Mode::LoadFileMode);
 
-    updateLabelDuration(0);
+    stopEngine();
 
-    m_currentFile = QFileDialog::getOpenFileName(this,
-                                                 tr("Open File"),
-                                                 QStandardPaths::writableLocation(
-                                                     QStandardPaths::MusicLocation),
-                                                 tr("Audio Files (*.wav)"));
-
-    qDebug() << m_currentFile;
-
-    ui->statusbar->showMessage(QString("Datoteka: ").append(m_currentFile.split("/").last()));
-
-    if (m_currentFile.isEmpty())
-        return;
+    m_currentFile = file;
 
     m_engine->reset();
 
@@ -364,7 +442,11 @@ void MainWindow::openFile()
     qDebug() << "buffer duration (us): " << m_engine->bufferDuration();
 
     updateLabelDuration(m_engine->bufferDuration());
+    updateLabelSeek(0);
+    ui->horizontalSlider_Position->setEnabled(true);
     updateHorizontalSlider(m_engine->bufferDuration());
+
+    updateStatusBar();
 }
 
 void MainWindow::openStream()
@@ -373,15 +455,75 @@ void MainWindow::openStream()
 
     setMode(Mode::StreamMode);
     updateLabelDuration(0);
+    updateLabelSeek(0);
+    ui->horizontalSlider_Position->setDisabled(true);
 
     m_engine->reset();
     m_engine->openStream();
+
+    updateStatusBar();
+}
+
+void MainWindow::updateLabelDuration(qint64 duration)
+{
+    qint64 durationMs = duration / 1000;
+
+    QTime time(0, 0);
+    time = time.addMSecs(durationMs);
+    QString formattedTime = time.toString("m:ss");
+
+    ui->label_Duration->setText(formattedTime);
+}
+
+void MainWindow::updateHorizontalSlider(qint64 maxValue)
+{
+    ui->horizontalSlider_Position->setMaximum(maxValue);
+}
+
+void MainWindow::updateHorizontalSliderPosition(qint64 processedUSecs)
+{
+    ui->horizontalSlider_Position->setSliderPosition(processedUSecs);
+}
+
+void MainWindow::updateLabelSeek(qint64 uSecs)
+{
+    qint64 mSecs = uSecs / 1000;
+
+    QTime time(0, 0);
+    time = time.addMSecs(mSecs);
+    QString formattedTime = time.toString("m:ss");
+
+    ui->label_Seek->setText(formattedTime);
 }
 
 void MainWindow::processedUSecsChanged(qint64 processedUSecs)
 {
     updateHorizontalSliderPosition(processedUSecs);
     updateLabelSeek(processedUSecs);
+}
+
+void MainWindow::on_horizontalSlider_Position_sliderPressed()
+{
+    //connect(m_engine, &Engine::processedUSecsChanged, this, &MainWindow::processedUSecsChanged);
+    //privremeno iskljuci azuriranja slidera
+    disconnect(m_engine, &Engine::processedUSecsChanged, 0, 0);
+}
+
+void MainWindow::on_horizontalSlider_Position_sliderMoved(int position)
+{
+    m_startPosition = position;
+    updateLabelSeek(m_startPosition);
+}
+
+void MainWindow::on_horizontalSlider_Position_sliderReleased()
+{
+    //qint64 newPosition = ui->horizontalSlider_Position->sliderPosition(); //isto sto i value()
+
+    //reset engine
+    m_engine->resetSoft(m_startPosition);
+
+    //natrag ukljuci azuriranje slidera
+    connect(m_engine, &Engine::processedUSecsChanged, this, &MainWindow::processedUSecsChanged);
 }
 
 void MainWindow::processingComplete()

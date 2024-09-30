@@ -39,7 +39,7 @@ private:
     int m_inputFrequency;
     int m_nquistFrequency;
 
-    QString name = "3D Spectrogram";
+    QString name = tr("3D Spektrogram");
 
 private:
     float m_rotationX;
@@ -73,6 +73,9 @@ private:
     int m_centerFrequency;
 
     qreal m_logFactor;
+
+    UnitMeasurement m_spectrogramPowerUnitMeasure = UnitMeasurement::Magnitude;
+    qreal m_spectrogramYScaleFactor = 1.0f;
 
 private:
     void updatePeaks();

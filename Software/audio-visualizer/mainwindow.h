@@ -2,9 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "glbarspectrumscene.h"
 #include "glscene.h"
-#include "glwaveformscene.h"
 
 #include <QMediaDevices>
 
@@ -21,6 +19,8 @@
 #include <settingsdialog.h>
 
 #include <enginesettings.h>
+
+#include <QLabel>
 
 #define LOG_MAINWINDOW
 
@@ -58,6 +58,12 @@ private slots:
 
     void showSettingsDialog();
 
+    void handleErrorMessage(const QString &heading, const QString &detail);
+
+    void updateInputDevices();
+
+    void updateOutputDevices();
+
 private:
     void loadInputDevices();
 
@@ -80,7 +86,7 @@ private:
     /**
      * Updates settings and restarts update timer
      */
-    void restartEngine();
+    void restartEngineTimer();
 
     /**
      * Stop all ongoing activity and reset engine to defaults
@@ -96,10 +102,15 @@ private:
     void updateHorizontalSliderPosition(qint64 processedUSecs);
     void updateLabelSeek(qint64 uSecs);
 
+    void updateStatusBar();
+
 private:
     Ui::MainWindow *ui;
 
     QMediaDevices *m_devices = new QMediaDevices(this);
+
+    QAudioDevice m_currentInputDevice;
+    QAudioDevice m_currentOutputDevice;
 
     QScopedPointer<AudioListener> m_audioListener;
     QScopedPointer<QAudioSource> m_audioInput;
@@ -116,6 +127,10 @@ private:
 
     SettingsDialog *m_settingsDialog;
 
+    QLabel *m_statusLabel;
+
+    qint64 m_startPosition = 0;
+
     //------------------------------------------------
     // SCENES
     //------------------------------------------------
@@ -129,5 +144,8 @@ private:
 private slots:
     void on_pushButton_PreviousScene_clicked();
     void on_pushButton_NextScene_clicked();
+    void on_horizontalSlider_Position_sliderPressed();
+    void on_horizontalSlider_Position_sliderReleased();
+    void on_horizontalSlider_Position_sliderMoved(int position);
 };
 #endif // MAINWINDOW_H
