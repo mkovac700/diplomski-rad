@@ -5,5 +5,7 @@
         <file>icons/icons8-pause-96-2.png</file>
         <file>icons/icons8-play-96-2.png</file>
         <file>icons/icons8-stop-96-2.png</file>
+        <file>icons/foi_logo.png</file>
+        <file>icons/wave-sound.png</file>
     </qresource>
 </RCC>

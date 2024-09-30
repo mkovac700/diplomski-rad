@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_engine(new Engine(this))
     , m_mode(Mode::NoMode)
     , m_settingsDialog(new SettingsDialog(this))
+    , m_aboutDialog(new AboutDialog(this))
     , m_statusLabel(new QLabel(this))
 {
     ui->setupUi(this);
@@ -75,6 +76,7 @@ void MainWindow::initializeMenuMedia()
     connect(ui->actionFile, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionStream, &QAction::triggered, this, &MainWindow::openStream);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::showSettingsDialog);
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::showAboutDialog);
 
     connect(ui->menuAudioIn, &QMenu::aboutToShow, this, &MainWindow::updateInputDevices);
     connect(ui->menuAudioOut, &QMenu::aboutToShow, this, &MainWindow::updateOutputDevices);
@@ -307,6 +309,11 @@ void MainWindow::showSettingsDialog()
 
         updateStatusBar();
     }
+}
+
+void MainWindow::showAboutDialog()
+{
+    m_aboutDialog->exec();
 }
 
 void MainWindow::handleErrorMessage(const QString &heading, const QString &detail)

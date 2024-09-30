@@ -9,6 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    aboutdialog.cpp \
     audiolistener.cpp \
     enginesettings.cpp \
     gl3dspectrogramscene.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
     spectrumanalyser.cpp
 
 HEADERS += \
+    aboutdialog.h \
     audiolistener.h \
     enginesettings.h \
     gl3dspectrogramscene.h \
@@ -46,6 +48,7 @@ HEADERS += \
     spectrumanalyser.h
 
 FORMS += \
+    aboutdialog.ui \
     mainwindow.ui \
     settingsdialog.ui
 

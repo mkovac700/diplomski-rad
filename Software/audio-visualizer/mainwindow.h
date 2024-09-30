@@ -18,6 +18,8 @@
 
 #include <settingsdialog.h>
 
+#include <aboutdialog.h>
+
 #include <enginesettings.h>
 
 #include <QLabel>
@@ -57,6 +59,8 @@ private slots:
     void changeAudioOut();
 
     void showSettingsDialog();
+
+    void showAboutDialog();
 
     void handleErrorMessage(const QString &heading, const QString &detail);
 
@@ -126,6 +130,7 @@ private:
     Mode m_mode;
 
     SettingsDialog *m_settingsDialog;
+    AboutDialog *m_aboutDialog;
 
     QLabel *m_statusLabel;
 
