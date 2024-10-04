@@ -366,6 +366,6 @@ void GL3DSpectrogramScene::mouseMoveEvent(QMouseEvent *event)
 void GL3DSpectrogramScene::wheelEvent(QWheelEvent *event)
 {
     m_distance += event->angleDelta().y() / 120.0f; // 120 je korak kotačića miša
-    qDebug() << "distance" << m_distance;
+    GLSCENE_DEBUG << "distance" << m_distance;
     //update();
 }

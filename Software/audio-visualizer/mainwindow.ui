@@ -214,6 +214,8 @@
     <addaction name="menuAudioOut"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuMedia"/>
   </widget>
@@ -241,6 +243,11 @@
   <action name="actionSettings">
    <property name="text">
     <string>Postavke</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>O programu</string>
    </property>
   </action>
  </widget>

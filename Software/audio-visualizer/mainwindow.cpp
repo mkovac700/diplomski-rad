@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_engine(new Engine(this))
     , m_mode(Mode::NoMode)
     , m_settingsDialog(new SettingsDialog(this))
+    , m_aboutDialog(new AboutDialog(this))
     , m_statusLabel(new QLabel(this))
 {
     ui->setupUi(this);
@@ -75,6 +76,7 @@ void MainWindow::initializeMenuMedia()
     connect(ui->actionFile, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionStream, &QAction::triggered, this, &MainWindow::openStream);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::showSettingsDialog);
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::showAboutDialog);
 
     connect(ui->menuAudioIn, &QMenu::aboutToShow, this, &MainWindow::updateInputDevices);
     connect(ui->menuAudioOut, &QMenu::aboutToShow, this, &MainWindow::updateOutputDevices);
@@ -154,27 +156,6 @@ void MainWindow::loadInputDevices()
     }
 }
 
-void MainWindow::initializeInputAudio(const QAudioDevice &inputDeviceInfo)
-{
-    QAudioFormat format;
-    format.setSampleRate(inputDeviceInfo.preferredFormat().sampleRate()); //8000 //m_sample_rate
-    format.setChannelCount(2);
-    format.setSampleFormat(QAudioFormat::Int16);
-
-    m_audioListener.reset(new AudioListener(format));
-
-    //connect(m_audioListener.data(), &AudioListener::bufferChanged, ui->widget, &GLWidget::setBuffer);
-    // connect(m_audioListener.data(),
-    //         &AudioListener::bufferChanged,
-    //         ui->widget_2,
-    //         &GLWidget2::setBuffer);
-
-    m_audioInput.reset(new QAudioSource(inputDeviceInfo, format));
-
-    m_audioListener->start();
-    m_audioInput->start(m_audioListener.data()); //-> default, pull mode (moguce je implementirati i push mode -> bolja varijanta za real-time)
-}
-
 void MainWindow::loadOutputDevices()
 {
     ui->menuAudioOut->clear();
@@ -246,7 +227,7 @@ void MainWindow::showSettingsDialog()
 {
     m_settingsDialog->exec();
     if (m_settingsDialog->result() == QDialog::Accepted) {
-        qDebug() << "settings dialog: accepted";
+        MAINWINDOW_DEBUG << "settings dialog: accepted";
 
         WindowFunction wf = EngineSettings::instance().windowFunction();
         int fftSize = EngineSettings::instance().fftSize();
@@ -309,6 +290,11 @@ void MainWindow::showSettingsDialog()
     }
 }
 
+void MainWindow::showAboutDialog()
+{
+    m_aboutDialog->exec();
+}
+
 void MainWindow::handleErrorMessage(const QString &heading, const QString &detail)
 {
     QMessageBox::critical(this, heading, detail);
@@ -322,11 +308,6 @@ void MainWindow::updateInputDevices()
 void MainWindow::updateOutputDevices()
 {
     loadOutputDevices();
-}
-
-void MainWindow::initializeOutputAudio(const QAudioDevice &outputDevice)
-{
-    m_engine->setAudioOutputDevice(outputDevice);
 }
 
 void MainWindow::setMode(Mode mode)
@@ -420,11 +401,11 @@ void MainWindow::openFile()
                                                     QStandardPaths::MusicLocation),
                                                 tr("Audio Files (*.wav)"));
 
-    qDebug() << file;
+    MAINWINDOW_DEBUG << file;
 
     if (file.isEmpty()) {
         setMode(m_mode); //if canceled, set back to current mode
-        qDebug() << "test";
+        MAINWINDOW_DEBUG << "test";
         return;
     }
 
@@ -439,7 +420,7 @@ void MainWindow::openFile()
 
     m_engine->loadFile(m_currentFile);
 
-    qDebug() << "buffer duration (us): " << m_engine->bufferDuration();
+    MAINWINDOW_DEBUG << "buffer duration (us): " << m_engine->bufferDuration();
 
     updateLabelDuration(m_engine->bufferDuration());
     updateLabelSeek(0);

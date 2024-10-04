@@ -9,7 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    audiolistener.cpp \
+    aboutdialog.cpp \
     enginesettings.cpp \
     gl3dspectrogramscene.cpp \
     glbarspectrumscene.cpp \
@@ -19,15 +19,13 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     settingsdialog.cpp \
-    settingsmanager.cpp \
-    signalprocessor.cpp \
     engine.cpp \
     frequencyspectrum.cpp \
     utils.cpp \
     spectrumanalyser.cpp
 
 HEADERS += \
-    audiolistener.h \
+    aboutdialog.h \
     enginesettings.h \
     gl3dspectrogramscene.h \
     glbarspectrumscene.h \
@@ -37,8 +35,6 @@ HEADERS += \
     graphicssettings.h \
     mainwindow.h \
     settingsdialog.h \
-    settingsmanager.h \
-    signalprocessor.h \
     engine.h \
     frequencyspectrum.h \
     spectrum.h \
@@ -46,6 +42,7 @@ HEADERS += \
     spectrumanalyser.h
 
 FORMS += \
+    aboutdialog.ui \
     mainwindow.ui \
     settingsdialog.ui
 
@@ -70,5 +67,8 @@ RESOURCES += \
 RC_ICONS = visualFREQ2.ico
 
 #DEFINES += LOG_MAINWINDOW LOG_ENGINE LOG_SPECTRUMANALYSER LOG_WAVEFORM
-DEFINES += LOG_ENGINE
+#DEFINES += LOG_ENGINE
+#DEFINES += LOG_GLSCENE
 #DEFINES += SPECTRUM_ANALYSER_SEPARATE_THREAD
+
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT

@@ -6,7 +6,7 @@
 
 #include <QMediaDevices>
 
-#include <audiolistener.h>
+#include <QAudioSource>
 
 #include <QAudioSink>
 
@@ -17,6 +17,8 @@
 #include <utils.h>
 
 #include <settingsdialog.h>
+
+#include <aboutdialog.h>
 
 #include <enginesettings.h>
 
@@ -58,6 +60,8 @@ private slots:
 
     void showSettingsDialog();
 
+    void showAboutDialog();
+
     void handleErrorMessage(const QString &heading, const QString &detail);
 
     void updateInputDevices();
@@ -67,11 +71,7 @@ private slots:
 private:
     void loadInputDevices();
 
-    void initializeInputAudio(const QAudioDevice &inputDevice);
-
     void loadOutputDevices();
-
-    void initializeOutputAudio(const QAudioDevice &outputDevice);
 
     //MenuBar
 
@@ -112,9 +112,7 @@ private:
     QAudioDevice m_currentInputDevice;
     QAudioDevice m_currentOutputDevice;
 
-    QScopedPointer<AudioListener> m_audioListener;
     QScopedPointer<QAudioSource> m_audioInput;
-
     QScopedPointer<QAudioSink> m_audioOutput;
 
     QString m_currentFile;
@@ -126,6 +124,7 @@ private:
     Mode m_mode;
 
     SettingsDialog *m_settingsDialog;
+    AboutDialog *m_aboutDialog;
 
     QLabel *m_statusLabel;
 
