@@ -82,4 +82,10 @@ inline NullDebug nullDebug()
 #    define WAVEFORM_DEBUG nullDebug()
 #endif
 
+#ifdef LOG_GLSCENE
+#define GLSCENE_DEBUG qDebug()
+#else
+#define GLSCENE_DEBUG nullDebug()
+#endif
+
 #endif // UTILS_H

@@ -10,7 +10,6 @@ CONFIG += c++17
 
 SOURCES += \
     aboutdialog.cpp \
-    audiolistener.cpp \
     enginesettings.cpp \
     gl3dspectrogramscene.cpp \
     glbarspectrumscene.cpp \
@@ -20,8 +19,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     settingsdialog.cpp \
-    settingsmanager.cpp \
-    signalprocessor.cpp \
     engine.cpp \
     frequencyspectrum.cpp \
     utils.cpp \
@@ -29,7 +26,6 @@ SOURCES += \
 
 HEADERS += \
     aboutdialog.h \
-    audiolistener.h \
     enginesettings.h \
     gl3dspectrogramscene.h \
     glbarspectrumscene.h \
@@ -39,8 +35,6 @@ HEADERS += \
     graphicssettings.h \
     mainwindow.h \
     settingsdialog.h \
-    settingsmanager.h \
-    signalprocessor.h \
     engine.h \
     frequencyspectrum.h \
     spectrum.h \
@@ -73,5 +67,8 @@ RESOURCES += \
 RC_ICONS = visualFREQ2.ico
 
 #DEFINES += LOG_MAINWINDOW LOG_ENGINE LOG_SPECTRUMANALYSER LOG_WAVEFORM
-DEFINES += LOG_ENGINE
+#DEFINES += LOG_ENGINE
+#DEFINES += LOG_GLSCENE
 #DEFINES += SPECTRUM_ANALYSER_SEPARATE_THREAD
+
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT

@@ -6,7 +6,7 @@
 
 #include <QMediaDevices>
 
-#include <audiolistener.h>
+#include <QAudioSource>
 
 #include <QAudioSink>
 
@@ -71,11 +71,7 @@ private slots:
 private:
     void loadInputDevices();
 
-    void initializeInputAudio(const QAudioDevice &inputDevice);
-
     void loadOutputDevices();
-
-    void initializeOutputAudio(const QAudioDevice &outputDevice);
 
     //MenuBar
 
@@ -116,9 +112,7 @@ private:
     QAudioDevice m_currentInputDevice;
     QAudioDevice m_currentOutputDevice;
 
-    QScopedPointer<AudioListener> m_audioListener;
     QScopedPointer<QAudioSource> m_audioInput;
-
     QScopedPointer<QAudioSink> m_audioOutput;
 
     QString m_currentFile;
